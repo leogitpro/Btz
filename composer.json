@@ -1,0 +1,21 @@
+{
+    "name": "leo/btz",
+    "description": "btz demo system",
+    "type": "project",
+    "require": {
+        "zendframework/zend-mvc": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Application\\": "module/Application/src/"
+        }
+    },
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Leo",
+            "email": "leoemailbox@163.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
