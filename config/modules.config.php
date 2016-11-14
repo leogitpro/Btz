@@ -12,5 +12,7 @@
  */
 return [
     'Zend\Router',
+    'DoctrineModule',
+    'DoctrineORMModule',
     'Application',
 ];
