@@ -1,0 +1,35 @@
+
+body {
+    padding:0;
+}
+
+.form-group ul {
+    list-style: none;
+    padding: 0;
+    font-size: small;
+}
+
+.login-wrapper {
+    margin: 0 auto;
+    max-width: 320px;
+}
+
+.login-panel .panel-heading {
+    padding: 20px 0;
+    padding-left: 20px;
+}
+.login-panel .panel-body {
+    padding-top: 30px;
+}
+
+.login-btn {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #FF8627;
+    color: #fff;
+    border: none;
+}
+.login-btn:hover {
+    color: #fff;
+    background-color: #FF6610;
+}

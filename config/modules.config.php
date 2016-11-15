@@ -12,7 +12,11 @@
  */
 return [
     'Zend\Router',
+    'Zend\Validator',
+    'Zend\I18n',
+    'Zend\Form',
     'DoctrineModule',
     'DoctrineORMModule',
     'Application',
+    'Admin',
 ];
