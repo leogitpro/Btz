@@ -14,6 +14,10 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
+        $logger = $this->getEvent()->getApplication()->getServiceManager()->get('appLogger');
+
+        $logger->debug("Welcome to homepage");
+
         return new ViewModel();
     }
 

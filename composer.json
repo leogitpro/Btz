@@ -6,6 +6,7 @@
         "zendframework/zend-mvc": "^3.0",
         "zendframework/zend-form": "^2.9",
         "zendframework/zend-i18n": "^2.7",
+        "zendframework/zend-log": "^2.9",
         "doctrine/doctrine-orm-module": "^1.1",
         "doctrine/migrations": "^1.4"
     },

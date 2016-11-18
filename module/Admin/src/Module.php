@@ -24,15 +24,59 @@ class Module
         $eventManager = $manager->getEventManager();
         $sharedEventManager = $eventManager->getSharedManager();
 
-        //Regist custom route lisener
-        $sharedEventManager->attach(__NAMESPACE__, 'route', [$this, 'onRoute'], 100);
+        $priority = 100;
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_ROUTE, [$this, 'onRoute'], $priority);
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], $priority);
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onError'], $priority);
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_RENDER_ERROR, [$this, 'onError'], $priority);
 
-        //Regist custom dispatch lisener
-        $sharedEventManager->attach(__NAMESPACE__, 'dispatch', [$this, 'onDispatch'], 100);
+        //$event = $manager->getEvent();
+        //$container = $event->getParam('ServiceManager');
 
-        //Regist custom error lisener
-        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onError'], 100);
-        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_RENDER_ERROR, [$this, 'onError'], 100);
+        //var_dump($container->get('appLogger'));
+        //$logger = $container->get("");
+
+        /**
+        $event = $manager->getEvent();
+        $container = $event->getParam('ServiceManager');
+        $logger = $container->get("appLogger");
+
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_ROUTE, [$this, 'onRoute'], $priority);
+        $logger->debug(
+            'Regeist listener' . PHP_EOL .
+            'identify: ' . __NAMESPACE__ . PHP_EOL .
+            'event: ' . MvcEvent::EVENT_ROUTE . PHP_EOL .
+            'callback: ' . __CLASS__ . '::onRoute' . PHP_EOL .
+            'priority: ' . $priority
+        );
+
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatch'], $priority);
+        $logger->debug(
+            'Regeist listener' . PHP_EOL .
+            'identify: ' . __NAMESPACE__ . PHP_EOL .
+            'event: ' . MvcEvent::EVENT_DISPATCH . PHP_EOL .
+            'callback: '. __CLASS__ .'::onDispatch' . PHP_EOL .
+            'priority: ' . $priority
+        );
+
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onError'], $priority);
+        $logger->debug(
+            'Regeist listener' . PHP_EOL .
+            'identify: ' . __NAMESPACE__ . PHP_EOL .
+            'event: ' . MvcEvent::EVENT_DISPATCH_ERROR . PHP_EOL .
+            'callback: '. __CLASS__ .'::onError' . PHP_EOL .
+            'priority: ' . $priority
+        );
+
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_RENDER_ERROR, [$this, 'onError'], $priority);
+        $logger->debug(
+            'Regeist listener' . PHP_EOL .
+            'identify: ' . __NAMESPACE__ . PHP_EOL .
+            'event: ' . MvcEvent::EVENT_RENDER_ERROR . PHP_EOL .
+            'callback: '. __CLASS__ .'::onError' . PHP_EOL .
+            'priority: ' . $priority
+        );
+        //*/
     }
 
 
@@ -76,6 +120,9 @@ class Module
         if ($moduleNamespace == __NAMESPACE__) {
             $viewModel = $event->getViewModel();
             $viewModel->setTemplate('layout/admin_simple');
+
+            $logger = $event->getApplication()->getServiceManager()->get('appLogger');
+            $logger->debug("Use custom layout: layout/admin_simple");
         }
     }
 
@@ -114,6 +161,9 @@ class Module
             $body .= "Line: $line\n";
             $body .= "Stack trace:\n\n" . $stackTrace;
         }
+
+        $logger = $event->getApplication()->getServiceManager()->get('appLogger');
+        $logger->debug(PHP_EOL . $body);
 
         //$body = str_replace("\n", "<br>", $body);
 
