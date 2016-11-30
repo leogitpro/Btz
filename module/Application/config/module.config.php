@@ -7,9 +7,13 @@
 
 namespace Application;
 
+use Application\Log\AppLogger;
+use Application\Log\AppLoggerFactory;
+
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+
 
 return [
     'router' => [
@@ -125,4 +129,16 @@ return [
             __DIR__ . '/../view',
         ],
     ],
+
+    'service_manager' => [
+        'factories' => [
+            AppLogger::class => AppLoggerFactory::class,
+        ],
+        'aliases' => [
+            'AppLogger' => AppLogger::class,
+        ],
+
+    ],
+
+    'applogger' => require(__DIR__ . '/config.applogger.php'),
 ];

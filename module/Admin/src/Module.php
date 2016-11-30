@@ -121,7 +121,7 @@ class Module
             $viewModel = $event->getViewModel();
             $viewModel->setTemplate('layout/admin_simple');
 
-            $logger = $event->getApplication()->getServiceManager()->get('appLogger');
+            $logger = $event->getApplication()->getServiceManager()->get('AppLogger');
             $logger->debug("Use custom layout: layout/admin_simple");
         }
     }
@@ -162,7 +162,7 @@ class Module
             $body .= "Stack trace:\n\n" . $stackTrace;
         }
 
-        $logger = $event->getApplication()->getServiceManager()->get('appLogger');
+        $logger = $event->getApplication()->getServiceManager()->get('AppLogger');
         $logger->debug(PHP_EOL . $body);
 
         //$body = str_replace("\n", "<br>", $body);

@@ -7,6 +7,8 @@
         "zendframework/zend-form": "^2.9",
         "zendframework/zend-i18n": "^2.7",
         "zendframework/zend-log": "^2.9",
+        "firephp/firephp-core": "^0.4",
+        "ccampbell/chromephp": "^4.1",
         "doctrine/doctrine-orm-module": "^1.1",
         "doctrine/migrations": "^1.4"
     },

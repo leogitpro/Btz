@@ -10,13 +10,14 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
+
 class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        $logger = $this->getEvent()->getApplication()->getServiceManager()->get('appLogger');
-
-        $logger->debug("Welcome to homepage");
+        $sm = $this->getEvent()->getApplication()->getServiceManager();
+        $logger = $sm->get("AppLogger");
+        $logger->emerg("emerg message test");
 
         return new ViewModel();
     }

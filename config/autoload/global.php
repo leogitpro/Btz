@@ -1,25 +1,7 @@
 <?php
 
-use Zend\Log\Logger;
 
 return [
-    'log' => [
-        'appLogger' => [
-            'writers' => [
-                [
-                    'name' => 'stream',
-                    'priority' => Logger::DEBUG,
-                    'options' => [
-                        'stream' => rtrim(sys_get_temp_dir(), "/\\") . DIRECTORY_SEPARATOR . 'log-' . date('Ymd') . '.txt',
-                        //'formatter' => [
-                        //    'name' => 'appFormatter',
-                        //],
-                        //'formatter' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
-                    ],
-                ], //First writer end
-            ],
-        ],
-    ],
 
     'doctrine' => [
         'connection' => [
