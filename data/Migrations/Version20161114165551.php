@@ -10,6 +10,11 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class Version20161114165551 extends AbstractMigration
 {
+    /**
+     * @var string db table adminer name
+     */
+    private $_table_adminer = 'sys_adminer';
+
 
     public function getDescription()
     {
@@ -24,7 +29,7 @@ class Version20161114165551 extends AbstractMigration
     public function up(Schema $schema)
     {
 
-        $table = $schema->createTable('adminer');
+        $table = $schema->createTable($this->_table_adminer);
 
         /**  Setting a global in connection configuration.
         $table->addOption('engine', 'InnoDB');
@@ -71,6 +76,6 @@ class Version20161114165551 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        $schema->dropTable('adminer');
+        $schema->dropTable($this->_table_adminer);
     }
 }
