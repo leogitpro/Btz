@@ -26,9 +26,11 @@ class Version20161114165551 extends AbstractMigration
 
         $table = $schema->createTable('adminer');
 
+        /**  Setting a global in connection configuration.
         $table->addOption('engine', 'InnoDB');
         $table->addOption('charset', 'utf8mb4');
         $table->addOption('collate', 'utf8mb4_unicode_ci');
+        //*/
 
         $table->addColumn('admin_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('admin_email', 'string', ['length' => 45, 'default' => '', 'comment' => '用户邮件地址, 登入账号.']);
@@ -37,6 +39,14 @@ class Version20161114165551 extends AbstractMigration
         $table->addColumn('admin_status', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => '用户状态.']);
         $table->setPrimaryKey(['admin_id']);
 
+        /** Error call
+        $this->addSql(
+            "INSERT INTO `adminer` (`admin_email`, `admin_passwd`, `admin_name`, `admin_status`) VALUES (?, ?, ?, ?)",
+            ['leo@email.com', strtolower(md5('12345')), 'Leo', 1]
+        );
+        //*/
+
+        //print_r($schema->toSql($this->platform));
     }
 
 
@@ -45,13 +55,14 @@ class Version20161114165551 extends AbstractMigration
      */
     public function postUp(Schema $schema)
     {
+        /**
         //默认管理员设置
         $this->connection->executeQuery(
         //$this->addSql(
             "INSERT INTO `adminer` (`admin_email`, `admin_passwd`, `admin_name`, `admin_status`) VALUES (?, ?, ?, ?)",
             ['leo@email.com', strtolower(md5('12345')), 'Leo', 1]
         );
-
+        //*/
     }
 
 
