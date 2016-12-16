@@ -1,6 +1,10 @@
 body {
-    padding-top: 60px;
     padding-bottom: 40px;
+}
+
+.app-caption {
+    font-size: 24px;
+    line-height: 80px;
 }
 
 .zf-green {

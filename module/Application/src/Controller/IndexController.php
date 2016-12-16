@@ -15,9 +15,12 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
-        $logger = $sm->get("AppLogger");
-        $logger->emerg("emerg message test");
+        //$sm = $this->getEvent()->getApplication()->getServiceManager();
+        //$logger = $sm->get("AppLogger");
+        //$logger->emerg("emerg message test");
+
+        //$config = $sm->get("config");
+        //echo '<pre>'; print_r($config); echo '</pre>';
 
         return new ViewModel();
     }

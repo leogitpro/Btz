@@ -7,21 +7,28 @@
  * use doctrine migrations for db manage.
  */
 
+use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
+//use Doctrine\DBAL\Driver\Mysqli\Driver as MysqliDriver;
+
 return [
     'connection' => [  // connection configuration
         'orm_default' => [
-            'driverClass' => 'Doctrine\DBAL\Driver\PDOMySql\Driver',
+            'driverClass' => PDOMySqlDriver::class,
             'params' => [
-                'host' => '127.0.0.1',
-                'port' => '3306',
-                'user' => 'root',
+                'host' => '',
+                'port' => '',
+                'user' => '',
                 'password' => '',
+                'unix_socket' => '',
                 'dbname' => 'btz',
+                'charset' => 'utf8mb4',
+                //**
                 'defaultTableOptions' => [ //For sepcial schema asset setting
                     'collate' => 'utf8mb4_unicode_ci',
                     'charset' => 'utf8mb4',
                     'engine' => 'InnoDB',
                 ],
+                //*/
             ], //End params
         ], //End orm_default
     ], // End Connection

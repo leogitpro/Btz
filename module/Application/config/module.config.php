@@ -28,44 +28,7 @@ return [
                     ],
                 ],
             ],
-            'user' => [
-                'type'    => Segment::class,
-                'options' => [
-                    'route'    => '/user[/]',
-                    'defaults' => [
-                        'controller' => Controller\UserController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes' => [
-                    'user_profile' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'profile[/]',
-                            'defaults' => [
-                                'action' => 'guide',
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'user_profile_detail' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => '[:user_id][/]',
-                                    'constraints' => [
-                                        'user_id' => '[a-zA-Z0-9_-]+',
-                                    ],
-                                    'defaults' => [
-                                        'action' => 'detail',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'application' => [
+            'app' => [
                 'type'    => Segment::class,
                 'options' => [
                     'route'    => '/application[/]',
@@ -76,7 +39,7 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
-                    'application_g' => [
+                    'auto_segment' => [
                         'type'    => Segment::class,
                         'options' => [
                             'route'    => '[:controller[/:action]]',
@@ -97,8 +60,6 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
-            Controller\SettingController::class => InvokableFactory::class,
-            Controller\UserController::class => InvokableFactory::class,
         ],
         'aliases' => [
             'index' => Controller\IndexController::class,
@@ -113,6 +74,8 @@ return [
             'access' => Controller\Plugin\AccessPlugin::class,
         ],
     ],
+
+    // View configuration.
     'view_manager' => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
@@ -130,9 +93,21 @@ return [
         ],
     ],
 
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\Menu::class => View\Helper\Factory\MenuFactory::class,
+            View\Helper\Breadcrumbs::class => InvokableFactory::class,
+        ],
+        'aliases' => [
+            'barMenu' => View\Helper\Menu::class,
+            'barBreadcrumbs' => View\Helper\Breadcrumbs::class,
+        ],
+    ],
+
     'service_manager' => [
         'factories' => [
             AppLogger::class => AppLoggerFactory::class,
+            Service\NavManager::class => Service\Factory\NavManagerFactory::class,
         ],
         'aliases' => [
             'AppLogger' => AppLogger::class,

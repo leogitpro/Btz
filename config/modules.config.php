@@ -18,6 +18,8 @@ return [
     'Zend\Form',
     'DoctrineModule',
     'DoctrineORMModule',
+    'Zend\Session',
     'Application',
+    'User',
     'Admin',
 ];
