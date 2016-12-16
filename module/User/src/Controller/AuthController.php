@@ -10,6 +10,7 @@ namespace User\Controller;
 
 
 use Doctrine\ORM\EntityManager;
+use User\Form\SignUpForm;
 use User\Service\AuthManager;
 use User\Service\UserManager;
 use Zend\Authentication\AuthenticationService;
@@ -103,7 +104,22 @@ class AuthController extends AbstractActionController
      */
     public function signupAction()
     {
-        return new ViewModel();
+
+        $form = new SignUpForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+                //todo
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
 
