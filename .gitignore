@@ -1,3 +1,6 @@
+# PhpStorm project files
+.idea
+
 # Composer files
 composer.phar
 vendor/
