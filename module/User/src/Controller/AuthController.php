@@ -105,7 +105,7 @@ class AuthController extends AbstractActionController
     public function signupAction()
     {
 
-        $form = new SignUpForm();
+        $form = new SignUpForm($this->entityManager, null);
 
         if($this->getRequest()->isPost()) {
 

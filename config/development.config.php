@@ -5,6 +5,7 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
+
 return [
     // Additional modules to include when in development mode
     'modules' => [
@@ -15,4 +16,22 @@ return [
         'config_cache_enabled' => false,
         'module_map_cache_enabled' => false,
     ],
+
+
+    /**
+    //Doctrine configuration
+    'doctrine' => [
+        'connection' => [
+            'orm_default' => [
+                'params' => [
+                    'host' => '127.0.0.1',
+                    'port' => '3306',
+                    'user' => 'root',
+                    'password' => 'root',
+                    'unix_socket' => '/Applications/MAMP/tmp/mysql/mysql.sock',
+                ], //End params
+            ], //End orm_default
+        ], // End Connection
+    ],
+    //*/
 ];

@@ -10,9 +10,14 @@ namespace User\Form;
 
 
 
+use Doctrine\ORM\EntityManager;
+use User\Entity\User;
+use User\Validator\EmailUniqueValidator;
 use Zend\Filter\FilterChain;
 use Zend\Filter\StringTrim;
 use Zend\Filter\StripTags;
+use Zend\Form\Element\Password;
+use Zend\Form\Element\Submit;
 use Zend\Form\Element\Text;
 use Zend\Form\Form;
 use Zend\InputFilter\Input;
@@ -31,9 +36,23 @@ class SignUpForm extends Form
 {
 
     /**
-     * SignUpForm constructor.
+     * @var EntityManager|null
      */
-    public function __construct()
+    private $entityManager = null;
+
+    /**
+     * @var null|User
+     */
+    private $user = null;
+
+
+    /**
+     * SignUpForm constructor.
+     *
+     * @param EntityManager $entityManager
+     * @param User $user
+     */
+    public function __construct(EntityManager $entityManager, $user = null)
     {
         parent::__construct('signup_form');
 
@@ -41,6 +60,9 @@ class SignUpForm extends Form
             'method' => 'post',
             'role' => 'form',
         ]);
+
+        $this->entityManager = $entityManager;
+        $this->user = $user;
 
         $this->setInputFilter(new InputFilter());
 
@@ -65,6 +87,7 @@ class SignUpForm extends Form
         $inputFilter->setRequired(true); // Not null input
 
         $validatorChain = new ValidatorChain();
+
         $validatorEmail = new EmailAddress(); // Validator for e-mail address
         $validatorEmail->setOptions([
             'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
@@ -72,6 +95,11 @@ class SignUpForm extends Form
         ]);
         $validatorEmail->setMessage('请输入一个合法的电子邮箱地址.', EmailAddress::INVALID_FORMAT);
         $validatorChain->attach($validatorEmail, true); //出错返回, 不执行后续验证器, 权重 1(默认)
+
+        $validatorEmailUnique = new EmailUniqueValidator(['entityManager' => $this->entityManager, 'user' => $this->user]);
+        $validatorEmailUnique->setMessage('电子邮件已经被其他人使用了!', EmailUniqueValidator::USER_EXISTS);
+        $validatorChain->attach($validatorEmailUnique);
+
         $inputFilter->setValidatorChain($validatorChain);
 
         $this->getInputFilter()->add($inputFilter);
@@ -114,17 +142,27 @@ class SignUpForm extends Form
     }
 
 
-
-    public function addSubmit()
+    public function addInputPassword()
     {
-        $submit = [
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'value' => 'Sign Up'
-            ],
-        ];
-        $this->add($submit);
+        $input = 'passwd';
+        $element = new Password($input);
+        $element->setLabel('Password');
+        $element->setAttribute('id', $input);
+        $this->add($element);
+
+        $input1 = 'repasswd';
+        $element1 = new Password($input1);
+        $element1->setLabel('Confirm password');
+        $element1->setAttribute('id', $input1);
+        $this->add($element1);
+    }
+
+
+    public function addInputSubmit()
+    {
+        $element = new Submit('submit');
+        $element->setAttribute('value', 'Sign Up');
+        $this->add($element);
     }
 
 
@@ -133,7 +171,8 @@ class SignUpForm extends Form
     {
         $this->addInputEmail();
         $this->addInputName();
-        $this->addSubmit();
+        $this->addInputPassword();
+        $this->addInputSubmit();
     }
 
 }

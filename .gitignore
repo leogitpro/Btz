@@ -7,6 +7,7 @@ vendor/
 
 # Local configs
 config/autoload/*.local.php
+config/autoload/*.local-development.php
 
 # Binary gettext files
 *.mo

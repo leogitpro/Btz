@@ -77,7 +77,7 @@ class NavManager
                     [
                         'id' => 'signup',
                         'label' => 'Sign up',
-                        'link' => $url('route_user_auth_actions', ['action'=>'signup'])
+                        'link' => $url('route_user_auth_actions', ['action'=>'signup', 'suffix' => '.html'])
                     ],
                 ]
             ];

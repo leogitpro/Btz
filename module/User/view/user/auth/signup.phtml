@@ -20,6 +20,14 @@ $form->get('name')->setAttributes([
     'placeholder'=>'Leo'
 ]);
 
+$form->get('passwd')->setAttributes([
+    'class'=>'form-control'
+]);
+
+$form->get('repasswd')->setAttributes([
+    'class'=>'form-control'
+]);
+
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 //*/
@@ -34,22 +42,37 @@ $form->prepare();
 
 <div class="row">
     <div class="col-md-6">
-        <?= $this->form()->openTag($form); ?>
+        <?php echo $this->form()->openTag($form); ?>
 
         <div class="form-group">
-            <?= $this->formLabel($form->get('email')); ?>
-            <?= $this->formElement($form->get('email')); ?>
-            <?= $this->formElementErrors($form->get('email')); ?>
+            <?php echo $this->formLabel($form->get('email')); ?>
+            <?php echo $this->formElement($form->get('email')); ?>
+            <?php echo $this->formElementErrors($form->get('email')); ?>
         </div>
 
         <div class="form-group">
-            <?= $this->formLabel($form->get('name')); ?>
-            <?= $this->formElement($form->get('name')); ?>
-            <?= $this->formElementErrors($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('passwd')); ?>
+            <?php echo $this->formElement($form->get('passwd')); ?>
+            <?php echo $this->formElementErrors($form->get('passwd')); ?>
         </div>
 
-        <?= $this->formElement($form->get('submit')); ?>
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('repasswd')); ?>
+            <?php echo $this->formElement($form->get('repasswd')); ?>
+            <?php echo $this->formElementErrors($form->get('repasswd')); ?>
+        </div>
 
-        <?= $this->form()->closeTag(); ?>
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('name')); ?>
+            <?php echo $this->formElement($form->get('name')); ?>
+            <?php echo $this->formElementErrors($form->get('name')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
     </div>
 </div>
