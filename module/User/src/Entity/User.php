@@ -18,6 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  * This class represents a registered user.
  *
  * @package User\Entity
+ * @ORM\Entity()
+ * @ORM\Table(name="user")
  */
 class User
 {
@@ -26,15 +28,53 @@ class User
     const STATUS_ACTIVE = 1; // Actived user
     const STATUS_RETIRED = 2; // Retired user.
 
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(name="uid")
+     */
     protected $uid;
+
+    /**
+     * @ORM\Column(name="email")
+     */
     protected $email;
+
+    /**
+     * @ORM\Column(name="passwd")
+     */
     protected $passwd;
+
+    /**
+     * @ORM\Column(name="name")
+     */
     protected $name;
+
+    /**
+     * @ORM\Column(name="status")
+     */
     protected $status;
+
+    /**
+     * @ORM\Column(name="created")
+     */
     protected $created;
-    protected $activeToken;
-    protected $pwdResetToken;
-    protected $pwdResetTokenCreated;
+
+    /**
+     * @ORM\Column(name="active_token")
+     */
+    protected $activeToken = '';
+
+    /**
+     * @ORM\Column(name="pwd_reset_token");
+     */
+    protected $pwdResetToken = '';
+
+    /**
+     * @ORM\Column(name="pwd_reset_token_created")
+     */
+    protected $pwdResetTokenCreated = 0;
+
 
     /**
      * @return integer

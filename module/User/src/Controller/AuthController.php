@@ -113,7 +113,17 @@ class AuthController extends AbstractActionController
             $form->setData($data);
 
             if ($form->isValid()) {
-                //todo
+
+                $data = $form->getData(); // Get the filtered and validated
+
+                $user = $this->userManager->addNewUser($data);
+
+                // User sign up success
+                return $this->redirect()->toRoute('route_user_profile_view', [
+                    'uid' => $user->getUid(),
+                    'suffix' => '.html',
+                ]);
+
             }
         }
 

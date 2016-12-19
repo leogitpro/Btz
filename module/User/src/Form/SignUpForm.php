@@ -12,6 +12,7 @@ namespace User\Form;
 
 use Doctrine\ORM\EntityManager;
 use User\Entity\User;
+
 use User\Validator\EmailUniqueValidator;
 use Zend\Filter\FilterChain;
 use Zend\Filter\StringTrim;
@@ -23,6 +24,7 @@ use Zend\Form\Form;
 use Zend\InputFilter\Input;
 use Zend\InputFilter\InputFilter;
 use Zend\Validator\EmailAddress;
+use Zend\Validator\Identical;
 use Zend\Validator\StringLength;
 use Zend\Validator\ValidatorChain;
 
@@ -150,11 +152,38 @@ class SignUpForm extends Form
         $element->setAttribute('id', $input);
         $this->add($element);
 
+        $inputFilter = new Input($input);
+        $inputFilter->setBreakOnFailure(true);
+        $inputFilter->isRequired(true);
+
+        $validatorChain = new ValidatorChain();
+        $validatorStringLen = new StringLength(['min' => '4', 'max' => 15]);
+        $validatorChain->attach($validatorStringLen);
+
+        $inputFilter->setValidatorChain($validatorChain);
+        $this->getInputFilter()->add($inputFilter);
+
+
         $input1 = 'repasswd';
         $element1 = new Password($input1);
         $element1->setLabel('Confirm password');
         $element1->setAttribute('id', $input1);
         $this->add($element1);
+
+        $inputFilter1 = new Input($input1);
+        $inputFilter1->setBreakOnFailure(true);
+        $inputFilter1->isRequired(true);
+
+        $validatorChain1 = new ValidatorChain();
+
+        $validatorIdentical = new Identical(); // confirm same as password
+        //$validatorIdentical->setOptions(['token' => $input]);
+        $validatorIdentical->setToken($input);
+        $validatorChain1->attach($validatorIdentical);
+
+        $inputFilter1->setValidatorChain($validatorChain1);
+        $this->getInputFilter()->add($inputFilter1);
+
     }
 
 
