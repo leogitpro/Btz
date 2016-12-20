@@ -7,9 +7,6 @@
 
 namespace Application;
 
-use Application\Log\AppLogger;
-use Application\Log\AppLoggerFactory;
-
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -106,14 +103,31 @@ return [
 
     'service_manager' => [
         'factories' => [
-            AppLogger::class => AppLoggerFactory::class,
+            Log\AppLogger::class => Log\AppLoggerFactory::class,
+            Service\MailManager::class => Service\Factory\MailManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
         ],
         'aliases' => [
-            'AppLogger' => AppLogger::class,
+            'AppLogger' => Log\AppLogger::class,
         ],
 
     ],
 
+    // App logger configuration
     'applogger' => require(__DIR__ . '/config.applogger.php'),
+
+    // Mail service configuration
+    'mail' => [
+        'smtp' => [
+            'name' => 'MailService',
+            'host' => '',
+            'port' => 465,
+            'connection_class' => 'login',
+            'connection_config' => [
+                'username' => '',
+                'password' => '',
+                'ssl' => 'ssl',
+            ],
+        ],
+    ],
 ];

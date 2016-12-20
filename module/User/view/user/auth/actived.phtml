@@ -1,0 +1,33 @@
+<?php
+$this->headTitle('Actived'); // Set page title: Actived
+
+$this->barMenu()->setActiveItemId(null); // Cancel actived menu
+
+$this->barBreadcrumbs()->setItems([ // Page breadcrumbs
+    'Home' => $this->url('home'),
+    'Actived' => '',
+]);
+
+
+?>
+
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Congratulations</h3>
+            </div>
+            <div class="panel-body">
+
+                Your account has actived success!
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+

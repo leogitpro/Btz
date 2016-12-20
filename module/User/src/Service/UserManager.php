@@ -8,7 +8,7 @@
 namespace User\Service;
 
 
-
+use Doctrine\ORM\EntityManager;
 use User\Entity\User;
 
 
@@ -19,15 +19,17 @@ class UserManager
     /**
      * Doctrine entity manager.
      *
-     * @var Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $entityManager;
 
 
     /**
      * UserManager constructor.
+     *
+     * @param EntityManager $entityManager
      */
-    public function __construct($entityManager)
+    public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
@@ -57,6 +59,30 @@ class UserManager
         $this->entityManager->flush(); // Apply changes to database.
 
         return $newUser;
+    }
+
+
+    /**
+     * @param string $code
+     * @return User
+     */
+    public function activeUser($code)
+    {
+        $user = $this->entityManager->getRepository(User::class)->findOneByActiveToken($code);
+        if (null == $user) {
+            return false;
+        }
+
+        if (User::STATUS_ACTIVE == $user->getStatus()) {
+            return false;
+        }
+
+        $user->setStatus(User::STATUS_ACTIVE);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
     }
 
 }

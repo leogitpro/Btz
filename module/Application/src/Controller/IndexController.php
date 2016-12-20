@@ -7,8 +7,10 @@
 
 namespace Application\Controller;
 
+
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+
 
 
 class IndexController extends AbstractActionController
@@ -21,6 +23,7 @@ class IndexController extends AbstractActionController
 
         //$config = $sm->get("config");
         //echo '<pre>'; print_r($config); echo '</pre>';
+
 
         return new ViewModel();
     }

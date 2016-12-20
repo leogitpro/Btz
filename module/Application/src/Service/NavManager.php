@@ -72,12 +72,12 @@ class NavManager
                     [
                         'id' => 'login',
                         'label' => 'Sign in',
-                        'link' => $url('route_user_auth_actions', ['action'=>'login', 'suffix' => '.html'])
+                        'link' => $url('user_auth_actions', ['action'=>'login', 'suffix' => '.html'])
                     ],
                     [
                         'id' => 'signup',
                         'label' => 'Sign up',
-                        'link' => $url('route_user_auth_actions', ['action'=>'signup', 'suffix' => '.html'])
+                        'link' => $url('user_auth_actions', ['action'=>'signup', 'suffix' => '.html'])
                     ],
                 ]
             ];
@@ -91,12 +91,12 @@ class NavManager
                     [
                         'id' => 'profile',
                         'label' => 'My Profile',
-                        'link' => $url('route_user_profile')
+                        'link' => $url('user_profile')
                     ],
                     [
                         'id' => 'logout',
                         'label' => 'Sign out',
-                        'link' => $url('route_user_auth_actions', ['action'=>'logout'])
+                        'link' => $url('user_auth_actions', ['action'=>'logout'])
                     ],
                 ]
             ];

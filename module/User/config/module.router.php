@@ -45,7 +45,7 @@ $_route_user_auth_actions = [
     'options' => [
         'route' => '/user/auth/:action[:suffix]',
         'constraints' => [
-            'action' => '(index|login|logout|signup|active|forgot-passwd|reset-passwd)',
+            'action' => '(index|login|logout|signup|active|actived|forgot-passwd|reset-passwd)',
             'suffix' => '(/|.html)',
         ],
         'defaults' => [
@@ -55,12 +55,13 @@ $_route_user_auth_actions = [
     ],
 ];
 
-//Default user auth active url
-$_route_user_auth_active = [
+//Default user auth action with key url
+$_route_user_auth_action_with_param = [
     'type' => Segment::class,
     'options' => [
-        'route' => '/user/auth/active/:key[:suffix]',
+        'route' => '/user/auth/:action/:key[:suffix]',
         'constraints' => [
+            'action' => '(active|send-active-mail|sended-active-mail)',
             'key' => '[a-zA-Z0-9]+',
             'suffix' => '(/|.html)',
         ],
@@ -124,15 +125,15 @@ $_route_user_profile_view = [
 return [
     'routes' => [
         //Authencation routes
-        'route_user_default' => $_route_user_default,
-        'route_user_auth' => $_route_user_auth,
-        'route_user_auth_actions' => $_route_user_auth_actions,
-        'route_user_auth_active' => $_route_user_auth_active,
+        'user_default' => $_route_user_default,
+        'user_auth' => $_route_user_auth,
+        'user_auth_actions' => $_route_user_auth_actions,
+        'user_auth_action_with_param' => $_route_user_auth_action_with_param,
 
         //Profile routes
-        'route_user_profile' => $_route_user_profile,
-        'route_user_profile_actions' => $_route_user_profile_actions,
-        'route_user_profile_view' => $_route_user_profile_view,
+        'user_profile' => $_route_user_profile,
+        'user_profile_actions' => $_route_user_profile_actions,
+        'user_profile_view' => $_route_user_profile_view,
     ],
 ];
 
