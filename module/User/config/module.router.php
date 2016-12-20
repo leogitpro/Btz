@@ -45,7 +45,7 @@ $_route_user_auth_actions = [
     'options' => [
         'route' => '/user/auth/:action[:suffix]',
         'constraints' => [
-            'action' => '(index|login|logout|signup|active|actived|forgot-passwd|reset-passwd)',
+            'action' => '(index|login|logout|signup|actived|active|forgot-passwd|reset-passwd)',
             'suffix' => '(/|.html)',
         ],
         'defaults' => [
