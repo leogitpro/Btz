@@ -45,6 +45,10 @@ $form->prepare();
         <?php echo $this->form()->openTag($form); ?>
 
         <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
             <?php echo $this->formLabel($form->get('email')); ?>
             <?php echo $this->formElement($form->get('email')); ?>
             <?php echo $this->formElementErrors($form->get('email')); ?>

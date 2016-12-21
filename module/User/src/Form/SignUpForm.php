@@ -17,6 +17,7 @@ use User\Validator\EmailUniqueValidator;
 use Zend\Filter\FilterChain;
 use Zend\Filter\StringTrim;
 use Zend\Filter\StripTags;
+use Zend\Form\Element\Csrf;
 use Zend\Form\Element\Password;
 use Zend\Form\Element\Submit;
 use Zend\Form\Element\Text;
@@ -69,6 +70,17 @@ class SignUpForm extends Form
         $this->setInputFilter(new InputFilter());
 
         $this->addElements();
+    }
+
+
+    /**
+     * Safely form csrf
+     */
+    public function addInputCsrf()
+    {
+        $element = new Csrf('csrf');
+        $element->setOption('csrf_options', ['timeout' => 600]); // 10 minutes
+        $this->add($element);
     }
 
 
@@ -198,6 +210,7 @@ class SignUpForm extends Form
 
     public function addElements()
     {
+        $this->addInputCsrf();
         $this->addInputEmail();
         $this->addInputName();
         $this->addInputPassword();

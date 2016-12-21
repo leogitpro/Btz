@@ -44,7 +44,8 @@ class ActiveForm extends Form
      * Form elements list
      *
      */
-    private function addElements() {
+    private function addElements()
+    {
 
         // CSRF Safe
         $this->add([
