@@ -107,19 +107,19 @@ class AuthController extends AbstractActionController
      */
     public function signupAction()
     {
-
+        // Use sign up form
         $form = new SignUpForm($this->entityManager, null);
 
+        // Post request check
         if($this->getRequest()->isPost()) {
 
-            $data = $this->params()->fromPost();
-            $form->setData($data);
+            $form->setData($this->params()->fromPost());
 
-            if ($form->isValid()) {
+            if ($form->isValid()) { // Validate form data
 
-                $data = $form->getData(); // Get the filtered and validated
+                $data = $form->getData(); // Get the filtered data
 
-                $user = $this->userManager->addNewUser($data);
+                $user = $this->userManager->addNewUser($data); // Save data to database
 
                 // Show user profile url
                 $toUrl = $this->url()->fromRoute('user_auth_action_with_param', [
@@ -168,18 +168,11 @@ class AuthController extends AbstractActionController
             'suffix' => '.html',
         ]);
 
-
-        $https = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;
-        if (!$https) {
-            $https =  isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] == 1);
-        }
-        $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
-
         $msg = 'Hi: ' . $user->getName() . PHP_EOL . PHP_EOL;
         $msg .= 'Please active your account by the follow code:' . PHP_EOL;
         $msg .= $user->getActiveToken() . PHP_EOL;
         $msg .= 'Or click the follow link address:' . PHP_EOL;
-        $msg .= 'http' . ($https ? 's' : '') . '://' . $host . $activeUrl . PHP_EOL . PHP_EOL;
+        $msg .= $this->host()->getHost() . $activeUrl . PHP_EOL . PHP_EOL;
         $msg .= 'Thanks!';
 
         $subject = 'Active your account';
@@ -264,17 +257,10 @@ class AuthController extends AbstractActionController
                         'suffix' => '.html',
                     ]);
 
-
-                    $https = isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;
-                    if (!$https) {
-                        $https =  isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] == 1);
-                    }
-                    $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
-
                     $msg = 'Welcome: ' . $user->getName() . '!' . PHP_EOL . PHP_EOL;
                     $msg .= 'Thanks join us' . PHP_EOL;
                     $msg .= 'Click the follow link to qucik login:' . PHP_EOL;
-                    $msg .= 'http' . ($https ? 's' : '') . '://' . $host . $loginUrl . PHP_EOL . PHP_EOL;
+                    $msg .= $this->host()->getHost() . $loginUrl . PHP_EOL . PHP_EOL;
                     $msg .= 'Thanks!';
 
                     $subject = 'Welcome ' . $user->getName();

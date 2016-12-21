@@ -23,7 +23,10 @@ class IndexController extends AbstractActionController
 
         //$config = $sm->get("config");
         //echo '<pre>'; print_r($config); echo '</pre>';
+        //var_dump($this->host()->getHost());
 
+        //$arr = $this->config()->get('mail.smtp.connection_config');
+        //echo '<pre>'; print_r($arr); echo '</pre>';
 
         return new ViewModel();
     }

@@ -7,6 +7,7 @@
 
 namespace Application;
 
+use Application\Controller\Plugin\ConfigPlugin;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -66,9 +67,13 @@ return [
     'controller_plugins' => [
         'factories' => [
             Controller\Plugin\AccessPlugin::class => InvokableFactory::class,
+            Controller\Plugin\HostPlugin::class => InvokableFactory::class,
+            Controller\Plugin\ConfigPlugin::class => Controller\Plugin\Factory\ConfigPluginFactory::class,
         ],
         'aliases' => [
             'access' => Controller\Plugin\AccessPlugin::class,
+            'host' => Controller\Plugin\HostPlugin::class,
+            'config' => Controller\Plugin\ConfigPlugin::class,
         ],
     ],
 
