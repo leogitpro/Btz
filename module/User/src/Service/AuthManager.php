@@ -32,31 +32,31 @@ class AuthManager
     private $config;
 
 
-    public function __construct(AuthenticationService $authServcie, SessionManager $sessionManager, $config)
+    public function __construct(AuthenticationService $authService, SessionManager $sessionManager, $config)
     {
-        $this->authService = $authServcie;
+        $this->authService = $authService;
         $this->sessionManager = $sessionManager;
         $this->config = $config;
     }
 
 
     /**
-     * Pefforms a login attempt.
-     *
-     * @param string $email
-     * @param string $passwd
+     * @param $email
+     * @param $password
+     * @return \Zend\Authentication\Result
+     * @throws \Exception
      */
-    public function login($email, $passwd)
+    public function login($email, $password)
     {
         // Check if user has already logged in. If so, do not allow to log in twice.
         if(null != $this->authService->getIdentity()) {
             throw new \Exception('Already logged in');
         }
 
-        // Authencation with login/password
+        // Authentication with login/password
         $authAdapter = $this->authService->getAdapter();
         $authAdapter->setEmail($email);
-        $authAdapter->setPasswd($passwd);
+        $authAdapter->setPassword($password);
         $result = $this->authService->authenticate();
 
         return $result;

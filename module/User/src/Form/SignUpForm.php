@@ -169,7 +169,7 @@ class SignUpForm extends Form
         $inputFilter->isRequired(true);
 
         $validatorChain = new ValidatorChain();
-        $validatorStringLen = new StringLength(['min' => '4', 'max' => 15]);
+        $validatorStringLen = new StringLength(['min' => 4, 'max' => 15]);
         $validatorChain->attach($validatorStringLen);
 
         $inputFilter->setValidatorChain($validatorChain);

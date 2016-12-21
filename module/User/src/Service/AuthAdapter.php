@@ -25,7 +25,7 @@ class AuthAdapter implements AdapterInterface
     /**
      * @var string
      */
-    private $passwd;
+    private $password;
 
 
     /**
@@ -49,11 +49,11 @@ class AuthAdapter implements AdapterInterface
     }
 
     /**
-     * @param string $passwd
+     * @param string $password
      */
-    public function setPasswd($passwd)
+    public function setPassword($password)
     {
-        $this->passwd = md5(strtolower($passwd));
+        $this->password = strtolower($password);
     }
 
 
@@ -84,7 +84,7 @@ class AuthAdapter implements AdapterInterface
         }
 
         // Check user password to pass authenticated
-        if($this->passwd == $user->getPasswd()) {
+        if($this->password == $user->getPasswd()) {
             return new Result(
                 Result::SUCCESS,
                 $this->email,

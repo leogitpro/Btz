@@ -13,11 +13,13 @@ use Application\Service\MailManager;
 use Doctrine\ORM\EntityManager;
 use User\Entity\User;
 use User\Form\ActiveForm;
+use User\Form\LoginForm;
 use User\Form\SignUpForm;
 use User\Service\AuthManager;
 use User\Service\UserManager;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Authentication\Result;
 use Zend\View\Model\ViewModel;
 
 
@@ -84,19 +86,44 @@ class AuthController extends AbstractActionController
      */
     public function loginAction()
     {
-        return new ViewModel();
+        $form = new LoginForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) { // Validate form data
+
+                $data = $form->getData(); // Get the filtered data
+
+                // Perform login attempt.
+                $result = $this->authManager->login($data['email'], $data['password']);
+
+                // Check result.
+                if ($result->getCode() == Result::SUCCESS) {
+
+                    return $this->redirect()->toRoute('home');
+
+                } else {
+                    // Login failure
+                }
+
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
     /**
-     * Destory user authenticationed data
+     * Clean user login data
      *
      */
     public function logoutAction()
     {
-        //go to default page
-        echo '<p>logout</p>';
-        //auto go login or profile page
-        return $this->getResponse();
+        $this->authManager->logout();
+        return $this->redirect()->toRoute('home');
     }
 
 
