@@ -45,7 +45,7 @@ $_route_user_auth_actions = [
     'options' => [
         'route' => '/user/auth/:action[:suffix]',
         'constraints' => [
-            'action' => '(index|login|logout|signup|actived|active|forgot-passwd|reset-passwd)',
+            'action' => '(index|login|logout|sign-up|activated|active|forgot-password|reset-password)',
             'suffix' => '(/|.html)',
         ],
         'defaults' => [
@@ -61,7 +61,7 @@ $_route_user_auth_action_with_param = [
     'options' => [
         'route' => '/user/auth/:action/:key[:suffix]',
         'constraints' => [
-            'action' => '(active|send-active-mail|sended-active-mail)',
+            'action' => '(active|send-active-mail|sent-active-mail)',
             'key' => '[a-zA-Z0-9]+',
             'suffix' => '(/|.html)',
         ],

@@ -37,4 +37,9 @@ return [
             ],
         ],
     ],
+
+    // User mail service configuration
+    'mail' => [
+        'template' => require(__DIR__ . '/module.config.mail_tpl.php'),
+    ],
 ];

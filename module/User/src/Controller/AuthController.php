@@ -105,7 +105,7 @@ class AuthController extends AbstractActionController
      *
      * @return ViewModel
      */
-    public function signupAction()
+    public function signUpAction()
     {
         // Use sign up form
         $form = new SignUpForm($this->entityManager, null);
@@ -138,9 +138,7 @@ class AuthController extends AbstractActionController
 
 
     /**
-     * Send active account mail
-     *
-     * @return \Zend\Stdlib\ResponseInterface
+     * Send active mail to registered user
      */
     public function sendActiveMailAction()
     {
@@ -168,12 +166,10 @@ class AuthController extends AbstractActionController
             'suffix' => '.html',
         ]);
 
-        $msg = 'Hi: ' . $user->getName() . PHP_EOL . PHP_EOL;
-        $msg .= 'Please active your account by the follow code:' . PHP_EOL;
-        $msg .= $user->getActiveToken() . PHP_EOL;
-        $msg .= 'Or click the follow link address:' . PHP_EOL;
-        $msg .= $this->host()->getHost() . $activeUrl . PHP_EOL . PHP_EOL;
-        $msg .= 'Thanks!';
+        $msg = $this->config()->get('mail.template.active'); // Mail template
+        $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
+        $msg = str_replace('%active_code%', $user->getActiveToken(), $msg); // Fill active code
+        $msg = str_replace('%active_link%', $this->host()->getHost() . $activeUrl, $msg); // Fill active link
 
         $subject = 'Active your account';
 
@@ -181,46 +177,29 @@ class AuthController extends AbstractActionController
         $mailService = $serviceManager->get(MailManager::class);
         $mailService->sendMail($user->getEmail(), $subject, $msg);
 
-        // Show sended page
+        // Show sent page
         $toUrl = $this->url()->fromRoute('user_auth_action_with_param', [
-            'action' => 'sended-active-mail',
+            'action' => 'sent-active-mail',
             'key' => $user->getUid(),
             'suffix' => '.html'
         ]);
         return $this->redirect()->toUrl($toUrl);
     }
 
-
     /**
+     * Show sent mail page
      *
-     * @return void|ViewModel
+     * @return ViewModel
      */
-    public function sendedActiveMailAction()
+    public function sentActiveMailAction()
     {
 
         $uid = (int)$this->params()->fromRoute('key', 0);
-        if ($uid < 1) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
-
-        $user = $this->entityManager->getRepository(User::class)->find($uid);
-        if (null == $user) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
-
-        if (User::STATUS_ACTIVE == $user->getStatus()) { // Forbid review send active mail
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
-
         $resendActiveMailUrl = $this->url()->fromRoute('user_auth_action_with_param', [
             'action' => 'send-active-mail',
-            'key' => $user->getUid(),
+            'key' => $uid,
             'suffix' => '.html'
         ]);
-
 
         return new ViewModel(['send_mail_url' => $resendActiveMailUrl]);
 
@@ -228,7 +207,7 @@ class AuthController extends AbstractActionController
 
 
     /**
-     * Active a registed user
+     * Active a registered user
      *
      * @return ViewModel
      */
@@ -251,29 +230,25 @@ class AuthController extends AbstractActionController
                 // Send mail to user
                 if($user) {
 
-
                     $loginUrl = $this->url()->fromRoute('user_auth_actions', [
                         'action' => 'login',
                         'suffix' => '.html',
                     ]);
 
-                    $msg = 'Welcome: ' . $user->getName() . '!' . PHP_EOL . PHP_EOL;
-                    $msg .= 'Thanks join us' . PHP_EOL;
-                    $msg .= 'Click the follow link to qucik login:' . PHP_EOL;
-                    $msg .= $this->host()->getHost() . $loginUrl . PHP_EOL . PHP_EOL;
-                    $msg .= 'Thanks!';
+                    $msg = $this->config()->get('mail.template.activated'); // Mail template
+                    $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
+                    $msg = str_replace('%login_link%', $this->host()->getHost() . $loginUrl, $msg); // Fill login link
 
                     $subject = 'Welcome ' . $user->getName();
 
                     $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
                     $mailService = $serviceManager->get(MailManager::class);
                     $mailService->sendMail($user->getEmail(), $subject, $msg);
-
                 }
 
-                // Show actived message
+                // Show activated message
                 $this->redirect()->toRoute('user_auth_actions', [
-                    'action' => 'actived',
+                    'action' => 'activated',
                     'suffix' => '.html',
                 ]);
             }
@@ -282,16 +257,16 @@ class AuthController extends AbstractActionController
         return new ViewModel(['form' => $form]);
     }
 
-
     /**
-     * Show actived page
+     * Show activated page
      *
      * @return ViewModel
      */
-    public function activedAction()
+    public function activatedAction()
     {
         return new ViewModel();
     }
+
 
 
     /**
@@ -299,7 +274,7 @@ class AuthController extends AbstractActionController
      *
      * @return ViewModel
      */
-    public function forgotPasswdAction()
+    public function forgotPasswordAction()
     {
         return new ViewModel();
     }
@@ -310,7 +285,7 @@ class AuthController extends AbstractActionController
      *
      * @return ViewModel
      */
-    public function resetPasswdAction()
+    public function resetPasswordAction()
     {
         return new ViewModel();
     }

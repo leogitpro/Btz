@@ -1,0 +1,21 @@
+
+<?php
+$this->headTitle('Send active mail');
+
+$this->barMenu()->setActiveItemId('guest');
+
+$this->barBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Sign up' => $this->url('user_auth_actions', ['action' => 'sign-up']),
+    'Send active mail' => '',
+]);
+
+?>
+
+<h1>Congratulations</h1>
+<p>A active mail has sent to your sign up email box. </p>
+<p>Please check and active your account.</p>
+<p>Thanks</p>
+<p> </p>
+<p>If you haven't received the mail. Please <a href="<?php echo $send_mail_url; ?>">click here resend mail</a></p>
+
