@@ -88,30 +88,25 @@ class AuthController extends AbstractActionController
     {
         $form = new LoginForm();
 
+        $isLoginError = false;
+
         if($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
 
             if ($form->isValid()) { // Validate form data
-
                 $data = $form->getData(); // Get the filtered data
-
-                // Perform login attempt.
-                $result = $this->authManager->login($data['email'], $data['password']);
-
-                // Check result.
-                if ($result->getCode() == Result::SUCCESS) {
-
+                $result = $this->authManager->login($data['email'], $data['password'], (int)$data['remember_me']);
+                if ($result->getCode() == Result::SUCCESS) { // Check result.
                     return $this->redirect()->toRoute('home');
-
                 } else {
-                    // Login failure
+                    $isLoginError = true;
                 }
-
             }
         }
 
         return new ViewModel([
+            'isLoginError' => $isLoginError,
             'form' => $form,
         ]);
     }

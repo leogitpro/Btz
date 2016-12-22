@@ -10,6 +10,7 @@ namespace User\Service;
 
 use Zend\Authentication\AuthenticationService;
 use Zend\Session\SessionManager;
+use Zend\Authentication\Result;
 
 class AuthManager
 {
@@ -41,12 +42,13 @@ class AuthManager
 
 
     /**
-     * @param $email
-     * @param $password
+     * @param string $email
+     * @param string $password
+     * @param int $remember_me
      * @return \Zend\Authentication\Result
      * @throws \Exception
      */
-    public function login($email, $password)
+    public function login($email, $password, $remember_me)
     {
         // Check if user has already logged in. If so, do not allow to log in twice.
         if(null != $this->authService->getIdentity()) {
@@ -58,6 +60,10 @@ class AuthManager
         $authAdapter->setEmail($email);
         $authAdapter->setPassword($password);
         $result = $this->authService->authenticate();
+
+        if ($result->getCode() == Result::SUCCESS && $remember_me) {
+            $this->sessionManager->rememberMe(60*60*24*30); // Session cookie lifetime to One month
+        }
 
         return $result;
     }

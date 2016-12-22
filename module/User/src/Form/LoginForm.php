@@ -69,6 +69,15 @@ class LoginForm extends Form
             ],
         ]);
 
+        // Remember me input
+        $this->add([
+            'type'  => 'checkbox',
+            'name' => 'remember_me',
+            'options' => [
+                'label' => 'Remember me',
+            ],
+        ]);
+
 
         // Submit button input
         $this->add([
@@ -116,6 +125,21 @@ class LoginForm extends Form
                         'min' => 4,
                         'max' => 15
                     ],
+                ],
+            ],
+        ]);
+
+        $this->getInputFilter()->add([
+            'name'     => 'remember_me',
+            'required' => false,
+            'filters'  => [
+            ],
+            'validators' => [
+                [
+                    'name'    => 'InArray',
+                    'options' => [
+                        'haystack' => [0, 1],
+                    ]
                 ],
             ],
         ]);
