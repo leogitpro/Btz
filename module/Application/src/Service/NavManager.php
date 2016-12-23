@@ -89,7 +89,7 @@ class NavManager
         } else {
 
             $items[] = [
-                'id' => 'logout',
+                'id' => 'profile',
                 'label' => $this->authService->getIdentity(),
                 'float' => 'right',
                 'dropdown' => [
@@ -97,6 +97,11 @@ class NavManager
                         'id' => 'profile',
                         'label' => 'My Profile',
                         'link' => $url('user/profile', ['suffix' => '.html'])
+                    ],
+                    [
+                        'id' => 'password',
+                        'label' => 'Update password',
+                        'link' => $url('user/profile', ['action' => 'password', 'suffix' => '.html'])
                     ],
                     [
                         'id' => 'logout',

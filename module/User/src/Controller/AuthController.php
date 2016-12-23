@@ -275,10 +275,7 @@ class AuthController extends AbstractActionController
                 // Send mail to user
                 if($user) {
 
-                    $loginUrl = $this->url()->fromRoute('user/auth', [
-                        'action' => 'login',
-                        'suffix' => '.html',
-                    ]);
+                    $loginUrl = $this->url()->fromRoute('user/auth', ['suffix' => '.html']);
 
                     $msg = $this->config()->get('mail.template.activated'); // Mail template
                     $msg = str_replace('%username%', $user->getName(), $msg); // Fill username

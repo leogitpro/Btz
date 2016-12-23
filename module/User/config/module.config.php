@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Zend\Router\Http\Segment;
 
 return [
+    // Module router configuration
     'router' => [
         'routes' => [
             'user' => [
@@ -87,9 +88,24 @@ return [
         ]
     ],
 
+    //Module controller configuration
+    'controllers' => [
+        'factories' => [
+            Controller\AuthController::class => Controller\Factory\AuthControllerFactory::class,
+            Controller\ProfileController::class => Controller\Factory\UserControllerFactory::class,
+        ],
+    ],
 
-    'controllers' => require(__DIR__ . '/module.controller.php'),
-    'view_manager' => require(__DIR__ . '/module.view.php'),
+
+    // Module view configuration
+    'view_manager' => [
+        'template_path_stack' => [
+            __DIR__ . '/../view',
+        ],
+    ],
+
+
+    // Module service manager configuration
     'service_manager' => [
         'factories' => [
             \Zend\Authentication\AuthenticationService::class => Service\Factory\AuthenticationServiceFactory::class,
