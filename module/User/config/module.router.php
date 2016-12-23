@@ -121,7 +121,7 @@ $_route_user_profile_view = [
     ],
 ];
 
-
+/**
 return [
     'routes' => [
         //Authencation routes
@@ -135,5 +135,84 @@ return [
         'user_profile_actions' => $_route_user_profile_actions,
         'user_profile_view' => $_route_user_profile_view,
     ],
+];
+//*/
+
+return [
+    'routes' => [
+        'user' => [
+            'type' => Segment::class,
+            'options' => [
+                'route' => '/user[/]',
+                'defaults' => [
+                    'controller' => Controller\AuthController::class,
+                    'action' => 'index',
+                ],
+            ],
+            'may_terminate' => true,
+            'child_routes' => [
+                'auth' => [
+                    'type' => Segment::class,
+                    'options' => [
+                        'route' => 'auth[/:action][:suffix]',
+                        'constraints' => [
+                            //'action' => '(index|login|logout|sign-up|activated|active|forgot-password|reset-password)',
+                            'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                            'suffix' => '(/|.html)',
+                        ],
+                        'defaults' => [
+                            'controller' => Controller\AuthController::class,
+                            'action' => 'index',
+                        ],
+                    ],
+                ],
+                'auth_detail' => [
+                    'type' => Segment::class,
+                    'options' => [
+                        'route' => 'auth/:action/:key[:suffix]',
+                        'constraints' => [
+                            'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                            'key' => '[a-zA-Z0-9]+',
+                            'suffix' => '(/|.html)',
+                        ],
+                        'defaults' => [
+                            'controller' => Controller\AuthController::class,
+                            'action' => 'index',
+                        ],
+                    ],
+                ],
+
+                'profile' => [
+                    'type' => Segment::class,
+                    'options' => [
+                        'route' => 'profile[/:action][:suffix]',
+                        'constraints' => [
+                            'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                            'suffix' => '(/|.html)',
+                        ],
+                        'defaults' => [
+                            'controller' => Controller\ProfileController::class,
+                            'action' => 'index',
+                        ],
+                    ],
+                ],
+                'profile_detail' => [
+                    'type' => Segment::class,
+                    'options' => [
+                        'route' => 'profile/:action/:key[:suffix]',
+                        'constraints' => [
+                            'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                            'key' => '[a-zA-Z0-9]+',
+                            'suffix' => '(/|.html)',
+                        ],
+                        'defaults' => [
+                            'controller' => Controller\ProfileController::class,
+                            'action' => 'index',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ]
 ];
 

@@ -5,15 +5,10 @@ $this->barMenu()->setActiveItemId(null); // Cancel actived menu
 
 $this->barBreadcrumbs()->setItems([ // Page breadcrumbs
     'Home' => $this->url('home'),
-    'Sign up' => $this->url('user_auth_actions', ['action' => 'sign-up', 'suffix' => '.html']),
+    'Sign up' => $this->url('user/auth', ['action' => 'sign-up', 'suffix' => '.html']),
     'Active' => '',
 ]);
 
-
-$form->setAttributes([
-    //'class' => 'form-inline',
-    //'style' => 'padding: 30px 10px;',
-]);
 
 $form->get('active_code')->setAttributes([
     'class'=>'form-control',
@@ -51,9 +46,6 @@ $form->prepare();
                 <div class="form-group">
                     <?php echo $this->formElement($form->get('submit')); ?>
                 </div>
-
-
-
 
 
                 <?php echo $this->form()->closeTag(); ?>

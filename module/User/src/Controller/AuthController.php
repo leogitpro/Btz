@@ -77,7 +77,7 @@ class AuthController extends AbstractActionController
         if($this->authService->hasIdentity()) {
             $this->redirect()->toRoute('home');
         } else {
-            $this->redirect()->toRoute('user_auth_actions', ['action' => 'login', 'suffix' => '.html']);
+            $this->redirect()->toRoute('user/auth', ['action' => 'login', 'suffix' => '.html']);
         }
     }
 
@@ -129,7 +129,14 @@ class AuthController extends AbstractActionController
     public function logoutAction()
     {
         $this->authManager->logout();
-        return $this->redirect()->toRoute('home');
+
+        return $this->display(
+            'Identity cleaned',
+            'The identity information has been cleaned safely. thanks sign in again!',
+            $this->url()->fromRoute('home'),
+            'Go home',
+            3
+        );
     }
 
 
@@ -155,7 +162,7 @@ class AuthController extends AbstractActionController
                 $user = $this->userManager->addNewUser($data); // Save data to database
 
                 // Show user profile url
-                $toUrl = $this->url()->fromRoute('user_auth_action_with_param', [
+                $toUrl = $this->url()->fromRoute('user/auth_detail', [
                     'action' => 'send-active-mail',
                     'key' => $user->getUid(),
                     'suffix' => '.html'
@@ -193,7 +200,7 @@ class AuthController extends AbstractActionController
             return ;
         }
 
-        $activeUrl = $this->url()->fromRoute('user_auth_action_with_param', [
+        $activeUrl = $this->url()->fromRoute('user/auth_detail', [
             'action' => 'active',
             'key' => $user->getActiveToken(),
             'suffix' => '.html',
@@ -211,7 +218,7 @@ class AuthController extends AbstractActionController
         $mailService->sendMail($user->getEmail(), $subject, $msg);
 
         // Show sent page
-        $toUrl = $this->url()->fromRoute('user_auth_action_with_param', [
+        $toUrl = $this->url()->fromRoute('user/auth_detail', [
             'action' => 'sent-active-mail',
             'key' => $user->getUid(),
             'suffix' => '.html'
@@ -228,13 +235,18 @@ class AuthController extends AbstractActionController
     {
 
         $uid = (int)$this->params()->fromRoute('key', 0);
-        $resendActiveMailUrl = $this->url()->fromRoute('user_auth_action_with_param', [
+        $resendActiveMailUrl = $this->url()->fromRoute('user/auth_detail', [
             'action' => 'send-active-mail',
             'key' => $uid,
             'suffix' => '.html'
         ]);
 
-        return new ViewModel(['send_mail_url' => $resendActiveMailUrl]);
+        $message = 'A active mail has sent to your sign up email box.<br>';
+        $message .= 'Please check and active your account.<br>';
+        $message .= 'Thanks<br>';
+        $message .= 'If you haven\'t received the mail. Pls use the follow button.';
+
+        return $this->display('Congratulations', $message, $resendActiveMailUrl, 'Resend active mail');
 
     }
 
@@ -263,7 +275,7 @@ class AuthController extends AbstractActionController
                 // Send mail to user
                 if($user) {
 
-                    $loginUrl = $this->url()->fromRoute('user_auth_actions', [
+                    $loginUrl = $this->url()->fromRoute('user/auth', [
                         'action' => 'login',
                         'suffix' => '.html',
                     ]);
@@ -280,7 +292,7 @@ class AuthController extends AbstractActionController
                 }
 
                 // Show activated message
-                $this->redirect()->toRoute('user_auth_actions', [
+                $this->redirect()->toRoute('user/auth', [
                     'action' => 'activated',
                     'suffix' => '.html',
                 ]);
@@ -300,7 +312,7 @@ class AuthController extends AbstractActionController
         return $this->display(
             'Congratulations',
             'Your account is activated. Use the follow button quick sign in.',
-            $this->url()->fromRoute('user_auth_actions', ['action' => 'login', 'suffix' => '.html']),
+            $this->url()->fromRoute('user/auth', ['action' => 'login', 'suffix' => '.html']),
             'Sign In'
         );
     }
