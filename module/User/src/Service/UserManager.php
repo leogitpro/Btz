@@ -85,4 +85,29 @@ class UserManager
         return $user;
     }
 
+
+    /**
+     * Reset password token
+     *
+     * @param string $email
+     * @return User
+     */
+    public function resetUserPasswordToken($email)
+    {
+        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
+        if (null == $user) {
+            return false;
+        }
+
+        $token = md5($user->getEmail() . time());
+
+        $user->setPwdResetToken($token);
+        $user->setPwdResetTokenCreated(time());
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
 }

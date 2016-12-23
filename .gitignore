@@ -1,6 +1,12 @@
 # PhpStorm project files
 .idea
 
+# ZendStudio project files
+.project
+
+# Captcha files
+public/img/captcha/*.png
+
 # Composer files
 composer.phar
 vendor/

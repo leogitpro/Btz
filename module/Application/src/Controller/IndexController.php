@@ -8,6 +8,7 @@
 namespace Application\Controller;
 
 
+use Zend\Captcha\Factory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -33,6 +34,13 @@ class IndexController extends AbstractActionController
 
     public function testAction()
     {
-        return new ViewModel();
+        $captcha = Factory::factory($this->config()->get('captcha'));
+        $id = $captcha->generate();
+
+        var_dump($captcha->getWord());
+
+        $imgUrl = $this->getRequest()->getBaseUrl() . $captcha->getImgUrl() . $captcha->getId() . $captcha->getSuffix();
+
+        return new ViewModel(['img' => $imgUrl]);
     }
 }

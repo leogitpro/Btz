@@ -32,5 +32,6 @@ class Module
 
         // Init default session manager
         $sessionManager = $serviceManager->get(SessionManager::class);
+        $sessionManager->start();
     }
 }

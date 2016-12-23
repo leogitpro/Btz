@@ -60,8 +60,8 @@ class EmailUniqueValidator extends AbstractValidator
 
 
     /**
-     * Check the email is existed.
-     * if email has existed return true. else return false.
+     * Check the email is unique.
+     * if email is unique return true. else return false.
      *
      * @param string $value
      * @return bool

@@ -1,6 +1,6 @@
 <?php
 /**
- * User login form
+ * Forgot password form
  *
  * User: leo
  */
@@ -8,21 +8,43 @@
 namespace User\Form;
 
 
+use Doctrine\ORM\EntityManager;
+use User\Validator\EmailExistedValidator;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 
-
-class LoginForm extends Form
+class ForgotPasswordForm extends Form
 {
 
-    public function __construct()
+    /**
+     * @var EntityManager|null
+     */
+    private $entityManager = null;
+
+
+    /**
+     * @var array
+     */
+    private $captchaConfig = [];
+
+
+    /**
+     * ForgotPasswordForm constructor.
+     *
+     * @param EntityManager $entityManager
+     * @param array $captcha
+     */
+    public function __construct(EntityManager $entityManager, array $captcha = [])
     {
-        parent::__construct('login_form');
+        parent::__construct('forgot_password_form');
 
         $this->setAttributes([
             'method' => 'post',
             'role' => 'form',
         ]);
+
+        $this->entityManager = $entityManager;
+        $this->captchaConfig = $captcha;
 
         $this->setInputFilter(new InputFilter());
 
@@ -30,24 +52,24 @@ class LoginForm extends Form
         $this->addInputFilters();
     }
 
+
     public function addElements()
     {
-        // CSRF Safe
+        // Field csrf
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
             'options' => [
                 'csrf_options' => [
-                    'timeout' => 3600, // 60 minutes
+                    'timeout' => 600, // 10 minutes
                 ],
             ],
         ]);
 
-
-        // Text email input
+        // Field email
         $this->add([
-            'type' => 'text', // Element type
-            'name' => 'email', // Field name
+            'type' => 'text',
+            'name' => 'email',
             'attributes' => [ // Array of attributes
                 'id' => 'email',
             ],
@@ -56,40 +78,28 @@ class LoginForm extends Form
             ],
         ]);
 
-
-        // Password input
+        // Field captcha
         $this->add([
-            'type' => 'password', // Element type
-            'name' => 'password', // Field name
-            'attributes' => [ // Array of attributes
-                'id' => 'password',
-            ],
-            'options' => [ // Array of options
-                'label' => 'Password', // Text Label
-            ],
-        ]);
-
-        // Remember me input
-        $this->add([
-            'type'  => 'checkbox',
-            'name' => 'remember_me',
+            'type' => 'captcha',
+            'name' => 'captcha',
             'options' => [
-                'label' => 'Remember me',
+                'label' => 'Verification code',
+                'captcha' => $this->captchaConfig,
             ],
         ]);
 
-
-        // Submit button input
+        // Field submit
         $this->add([
-            'type' => 'submit',
+            'type'  => 'submit',
             'name' => 'submit',
             'attributes' => [
+                'value' => 'Forgot Password',
                 'id' => 'submit',
-                'value' => 'Sign in',
             ],
         ]);
-    }
 
+
+    }
 
 
     public function addInputFilters()
@@ -104,42 +114,18 @@ class LoginForm extends Form
             'validators' => [
                 [
                     'name' => 'EmailAddress',
+                    'break_chain_on_failure' => true,
                     'options' => [
                         'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
                         'useMxCheck' => false,
                     ],
                 ],
-            ],
-        ]);
-
-        $this->getInputFilter()->add([
-            'name'     => 'password',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-            ],
-            'validators' => [
                 [
-                    'name'    => 'StringLength',
+                    'name' => EmailExistedValidator::class,
+                    'break_chain_on_failure' => true,
                     'options' => [
-                        'min' => 4,
-                        'max' => 15
+                        'entityManager' => $this->entityManager,
                     ],
-                ],
-            ],
-        ]);
-
-        $this->getInputFilter()->add([
-            'name'     => 'remember_me',
-            'required' => false,
-            'filters'  => [
-            ],
-            'validators' => [
-                [
-                    'name'    => 'InArray',
-                    'options' => [
-                        'haystack' => [0, 1],
-                    ]
                 ],
             ],
         ]);

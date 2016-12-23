@@ -13,6 +13,7 @@ use Application\Service\MailManager;
 use Doctrine\ORM\EntityManager;
 use User\Entity\User;
 use User\Form\ActiveForm;
+use User\Form\ForgotPasswordForm;
 use User\Form\LoginForm;
 use User\Form\SignUpForm;
 use User\Service\AuthManager;
@@ -323,7 +324,52 @@ class AuthController extends AbstractActionController
      */
     public function forgotPasswordAction()
     {
-        return new ViewModel();
+        $config = $this->config()->get('captcha');
+        $config['imgUrl'] = $this->getRequest()->getBaseUrl() . $config['imgUrl'];
+        $form = new ForgotPasswordForm($this->entityManager, $config);
+
+        if($this->getRequest()->isPost()) {
+
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()) {
+
+                $data = $form->getData(); // Get the filtered and validated
+                $user = $this->userManager->resetUserPasswordToken($data['email']);
+
+                // Send mail to user include the reset password link
+                if($user) {
+
+                    $resetUrl = $this->url()->fromRoute('user/auth_detail', [
+                        'action' => 'reset-password',
+                        'key' => $user->getPwdResetToken(),
+                        'suffix' => '.html']);
+
+                    $msg = $this->config()->get('mail.template.reset-password'); // Mail template
+                    $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
+                    $msg = str_replace('%reset_link%', $this->host()->getHost() . $resetUrl, $msg); // Fill reset link
+                    $msg = str_replace('%expired_hours%', 24, $msg); // Fill expired hours: 24
+
+                    $subject = 'Reset password for ' . $user->getName();
+
+                    $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
+                    $mailService = $serviceManager->get(MailManager::class);
+                    $mailService->sendMail($user->getEmail(), $subject, $msg);
+                }
+
+                // Show success message
+                return $this->display(
+                    'Password reset',
+                    'Hi, ' . $user->getName() . '! A reset password email has sent to your E-mail. Please check the mail and reset your new password. Thanks!'
+                );
+            }
+        }
+
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
 

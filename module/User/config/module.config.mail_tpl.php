@@ -30,5 +30,14 @@ Click the follow link to quick login:
 Thanks!
     ',
 
+    'reset-password' => '
+Hi: %username%!
+
+To reset your password use the below url:
+%reset_link%
+The link will be expired in next %expired_hours% hours.
+
+Thanks!
+    ',
     // ...
 ];

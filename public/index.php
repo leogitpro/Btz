@@ -3,6 +3,9 @@
 use Zend\Mvc\Application;
 use Zend\Stdlib\ArrayUtils;
 
+
+include __DIR__  . '/defined.php';
+
 /**
  * This makes our life easier when dealing with paths. Everything is relative
  * to the application root now.
