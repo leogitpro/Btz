@@ -74,10 +74,13 @@ class AuthController extends AbstractActionController
      */
     public function indexAction()
     {
-        echo '<p>authentication index</p>';
-        //auto go login or profile page
-        return $this->getResponse();
+        if($this->authService->hasIdentity()) {
+            $this->redirect()->toRoute('home');
+        } else {
+            $this->redirect()->toRoute('user_auth_actions', ['action' => 'login', 'suffix' => '.html']);
+        }
     }
+
 
     /**
      * User authentication page
@@ -98,7 +101,15 @@ class AuthController extends AbstractActionController
                 $data = $form->getData(); // Get the filtered data
                 $result = $this->authManager->login($data['email'], $data['password'], (int)$data['remember_me']);
                 if ($result->getCode() == Result::SUCCESS) { // Check result.
-                    return $this->redirect()->toRoute('home');
+
+                    return $this->display(
+                        'Welcome',
+                        'Thanks back to us!',
+                        $this->url()->fromRoute('home'),
+                        'Go home',
+                        3
+                    );
+
                 } else {
                     $isLoginError = true;
                 }
@@ -286,7 +297,12 @@ class AuthController extends AbstractActionController
      */
     public function activatedAction()
     {
-        return new ViewModel();
+        return $this->display(
+            'Congratulations',
+            'Your account is activated. Use the follow button quick sign in.',
+            $this->url()->fromRoute('user_auth_actions', ['action' => 'login', 'suffix' => '.html']),
+            'Sign In'
+        );
     }
 
 

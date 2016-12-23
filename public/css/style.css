@@ -2,6 +2,10 @@ body {
     padding-bottom: 40px;
 }
 
+.jumbotron {
+    background-color: #FFFFFF;
+}
+
 .app-caption {
     font-size: 24px;
     line-height: 80px;

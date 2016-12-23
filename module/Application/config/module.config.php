@@ -7,7 +7,7 @@
 
 namespace Application;
 
-use Application\Controller\Plugin\ConfigPlugin;
+
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -26,6 +26,16 @@ return [
                     ],
                 ],
             ],
+            'display_message' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/display/message.html',
+                    'defaults' => [
+                        'controller' => Controller\DisplayController::class,
+                        'action' => 'message',
+                    ],
+                ],
+            ],
             'app' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -37,13 +47,13 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
-                    'auto_segment' => [
+                    'index_actions' => [
                         'type'    => Segment::class,
                         'options' => [
-                            'route'    => '[:controller[/:action]]',
+                            'route'    => 'index[/:action][:suffix]',
                             'constraints' => [
-                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]+',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
                                 'controller' => Controller\IndexController::class,
@@ -58,22 +68,19 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
-        ],
-        'aliases' => [
-            'index' => Controller\IndexController::class,
-            'user' => Controller\UserController::class,
+            Controller\DisplayController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
         'factories' => [
-            Controller\Plugin\AccessPlugin::class => InvokableFactory::class,
             Controller\Plugin\HostPlugin::class => InvokableFactory::class,
             Controller\Plugin\ConfigPlugin::class => Controller\Plugin\Factory\ConfigPluginFactory::class,
+            Controller\Plugin\DisplayPlugin::class => InvokableFactory::class,
         ],
         'aliases' => [
-            'access' => Controller\Plugin\AccessPlugin::class,
             'host' => Controller\Plugin\HostPlugin::class,
             'config' => Controller\Plugin\ConfigPlugin::class,
+            'display' => Controller\Plugin\DisplayPlugin::class,
         ],
     ],
 

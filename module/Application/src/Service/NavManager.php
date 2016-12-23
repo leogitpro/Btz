@@ -56,7 +56,7 @@ class NavManager
         $items[] = [
             'id' => 'test',
             'label' => 'Test',
-            'link'  => $url('app/auto_segment', ['controller' => 'index', 'action' => 'test']),
+            'link'  => $url('app/index_actions', ['action' => 'test', 'suffix' => '.html']),
         ];
         // */
 
@@ -78,6 +78,11 @@ class NavManager
                         'id' => 'sign-up',
                         'label' => 'Sign up',
                         'link' => $url('user_auth_actions', ['action'=>'sign-up', 'suffix' => '.html'])
+                    ],
+                    [
+                        'id' => 'forgot-password',
+                        'label' => 'Forgot password',
+                        'link' => $url('user_auth_actions', ['action' => 'forgot-password', 'suffix' => '.html'])
                     ],
                 ]
             ];

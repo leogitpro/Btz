@@ -33,6 +33,21 @@ class IndexController extends AbstractActionController
 
     public function testAction()
     {
+
+
+        $title = 'Test title';
+        $content = 'Welcome to the share center. It\'s a free community for everyone everything. just tell what\'s your want. thanks.';
+        $url_href = '#';
+        $url_title = 'Google';
+        $delay = 5;
+
+        //return $this->display($title, $content);
+        return $this->display($title, $content, $url_href, $url_title);
+        //return $this->display($title, $content, $url_href, $url_title, $delay);
+
+
+
+
         return new ViewModel();
     }
 }
