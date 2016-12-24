@@ -18,8 +18,18 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        //$sm = $this->getEvent()->getApplication()->getServiceManager();
-        //$logger = $sm->get("AppLogger");
+        /**
+        echo '<pre>';
+        print_r($this->config()->get('log'));
+        print_r($this->config()->get('service_manager'));
+        echo '</pre>';
+        //*/
+        $sm = $this->getEvent()->getApplication()->getServiceManager();
+        $logger = $sm->get("Logger");
+        $logger->debug('This is a test debug at: ' . date('c'));
+        $logger->info('iTest info log');
+        $logger->emerg('Emerg message test');
+
         //$logger->emerg("emerg message test");
 
         //$config = $sm->get("config");

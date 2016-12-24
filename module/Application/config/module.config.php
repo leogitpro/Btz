@@ -26,16 +26,7 @@ return [
                     ],
                 ],
             ],
-            'display_message' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/display/message.html',
-                    'defaults' => [
-                        'controller' => Controller\DisplayController::class,
-                        'action' => 'message',
-                    ],
-                ],
-            ],
+
             'app' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -115,18 +106,53 @@ return [
 
     'service_manager' => [
         'factories' => [
-            Log\AppLogger::class => Log\AppLoggerFactory::class,
             Service\MailManager::class => Service\Factory\MailManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
         ],
         'aliases' => [
-            'AppLogger' => Log\AppLogger::class,
+            'Logger' => 'AppLogger', // The name: Logger is the key: $config['log']['AppLogger'].
         ],
-
     ],
 
-    // App logger configuration
-    'applogger' => require(__DIR__ . '/config.applogger.php'),
+    // Logger configuration
+    'log' => [
+        'AppLogger' => [
+            'writers' => [
+                [
+                    'name' => 'stream',
+                    'priority' => \Zend\Log\Logger::DEBUG,
+                    'options' => [
+                        'stream' => rtrim(sys_get_temp_dir(), "/\\") . DIRECTORY_SEPARATOR . 'php-log-' . date('Ymd') . '.txt',
+                        'formatter' => [
+                            'name' => 'simple',
+                            'options' => [
+                                'format' => '%priorityName%(%priority%) => %message% %extra%' . PHP_EOL . '%timestamp%' . PHP_EOL . PHP_EOL,
+                                'dateTimeFormat' => 'Y-m-d H:i:s A D',
+                            ],
+                        ],
+                        'filters' => [
+                            /**
+                            [
+                                'name' => 'priority',
+                                'options' => [
+                                    'priority' => \Zend\Log\Logger::DEBUG,
+                                ],
+                            ],
+                            //*/
+                            /**
+                            [
+                                'name' => 'regex',
+                                'options' => [
+                                    'regex' => '/test/i', // Log message content matched `test` string.
+                                ],
+                            ],
+                            //*/
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
 
     // Mail service configuration
     'mail' => [
