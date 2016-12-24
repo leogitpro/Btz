@@ -10,7 +10,7 @@ namespace User\Service;
 
 use Doctrine\ORM\EntityManager;
 use User\Entity\User;
-
+use Zend\Log\Logger;
 
 
 class UserManager
@@ -25,13 +25,21 @@ class UserManager
 
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+
+    /**
      * UserManager constructor.
      *
      * @param EntityManager $entityManager
+     * @param Logger $logger
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, Logger $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
 
@@ -55,8 +63,9 @@ class UserManager
         $newUser->setActiveToken($activeToken);
 
         $this->entityManager->persist($newUser); // Add entity to the entity manager.
-
         $this->entityManager->flush(); // Apply changes to database.
+
+        $this->logger->debug(__METHOD__ . ' added user: ' . $data['email']);
 
         return $newUser;
     }
@@ -70,10 +79,12 @@ class UserManager
     {
         $user = $this->entityManager->getRepository(User::class)->findOneByActiveToken($code);
         if (null == $user) {
+            $this->logger->info(__METHOD__ . PHP_EOL . 'Invalid active code:' . $code . ' for active user');
             return false;
         }
 
         if (User::STATUS_ACTIVE == $user->getStatus()) {
+            $this->logger->info(__METHOD__ . PHP_EOL . 'User is activated for active code:' . $code . ' no need active again');
             return false;
         }
 
@@ -81,6 +92,8 @@ class UserManager
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        $this->logger->debug(__METHOD__ . PHP_EOL . 'User[' . $user->getEmail() . '] has been activated by code: ' . $code);
 
         return $user;
     }
@@ -96,6 +109,7 @@ class UserManager
     {
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
         if (null == $user) {
+            $this->logger->info(__METHOD__ . PHP_EOL . 'Invalid user email:' . $email . ' for reset pwd token');
             return false;
         }
 
@@ -106,6 +120,8 @@ class UserManager
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        $this->logger->debug(__METHOD__ . PHP_EOL . 'User[' . $user->getEmail() . '] has reset password token');
 
         return $user;
     }

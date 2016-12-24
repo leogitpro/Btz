@@ -19,8 +19,9 @@ class UserManagerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $sm, $requestedName, array $options = null)
     {
         $entityManager = $sm->get('doctrine.entitymanager.orm_default');
+        $logger = $sm->get('Logger');
 
-        return new UserManager($entityManager);
+        return new UserManager($entityManager, $logger);
     }
 
 }

@@ -25,6 +25,7 @@ class AuthManagerFactory implements FactoryInterface
     {
         $authenticationService = $container->get(\Zend\Authentication\AuthenticationService::class);
         $sessionManager = $container->get(SessionManager::class);
+        $logger = $container->get('Logger');
 
         $config = $container->get('Config');
         if(isset($config['access_filter'])) {
@@ -34,7 +35,7 @@ class AuthManagerFactory implements FactoryInterface
         }
 
         // Instantiate the AuthManager service and inject dependencies to its constructor.
-        return new AuthManager($authenticationService, $sessionManager, $config);
+        return new AuthManager($authenticationService, $sessionManager, $logger, $config);
     }
 
 

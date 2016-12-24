@@ -31,6 +31,7 @@ class MailManager
      * MailManager constructor.
      *
      * @param array $config
+     * @param Logger $logger
      */
     public function __construct($config = array(), Logger $logger)
     {

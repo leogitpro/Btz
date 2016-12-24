@@ -9,6 +9,7 @@ namespace User\Service;
 
 
 use Zend\Authentication\AuthenticationService;
+use Zend\Log\Logger;
 use Zend\Session\SessionManager;
 use Zend\Authentication\Result;
 
@@ -28,15 +29,22 @@ class AuthManager
 
 
     /**
+     * @var Logger
+     */
+    private $logger;
+
+
+    /**
      * @var array
      */
     private $config;
 
 
-    public function __construct(AuthenticationService $authService, SessionManager $sessionManager, $config)
+    public function __construct(AuthenticationService $authService, SessionManager $sessionManager, Logger $logger, $config)
     {
         $this->authService = $authService;
         $this->sessionManager = $sessionManager;
+        $this->logger = $logger;
         $this->config = $config;
     }
 
@@ -52,6 +60,7 @@ class AuthManager
     {
         // Check if user has already logged in. If so, do not allow to log in twice.
         if(null != $this->authService->getIdentity()) {
+            $this->logger->err(__METHOD__ . PHP_EOL . 'User['. $email .'] has login. no need login again');
             throw new \Exception('Already logged in');
         }
 
@@ -78,6 +87,7 @@ class AuthManager
         if (null != $this->authService->getIdentity()) {
             // Remove identity from session
             $this->authService->clearIdentity();
+            $this->logger->debug(__METHOD__ . PHP_EOL . 'User logout success');
         }
     }
 
