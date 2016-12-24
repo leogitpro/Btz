@@ -24,12 +24,16 @@ class IndexController extends AbstractActionController
         print_r($this->config()->get('service_manager'));
         echo '</pre>';
         //*/
+
+        $this->logger()->debug('Controller Logger Plugin test');
+
+        /**
         $sm = $this->getEvent()->getApplication()->getServiceManager();
         $logger = $sm->get("Logger");
         $logger->debug('This is a test debug at: ' . date('c'));
         $logger->info('iTest info log');
         $logger->emerg('Emerg message test');
-
+        //*/
         //$logger->emerg("emerg message test");
 
         //$config = $sm->get("config");

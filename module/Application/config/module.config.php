@@ -65,13 +65,15 @@ return [
     'controller_plugins' => [
         'factories' => [
             Controller\Plugin\HostPlugin::class => InvokableFactory::class,
-            Controller\Plugin\ConfigPlugin::class => Controller\Plugin\Factory\ConfigPluginFactory::class,
             Controller\Plugin\DisplayPlugin::class => InvokableFactory::class,
+            Controller\Plugin\ConfigPlugin::class => Controller\Plugin\Factory\ConfigPluginFactory::class,
+            Controller\Plugin\LoggerPlugin::class => Controller\Plugin\Factory\LoggerPluginFactory::class,
         ],
         'aliases' => [
             'host' => Controller\Plugin\HostPlugin::class,
-            'config' => Controller\Plugin\ConfigPlugin::class,
             'display' => Controller\Plugin\DisplayPlugin::class,
+            'config' => Controller\Plugin\ConfigPlugin::class,
+            'logger' => Controller\Plugin\LoggerPlugin::class,
         ],
     ],
 
