@@ -8,6 +8,7 @@
 namespace Application\Service;
 
 
+use Zend\Log\Logger;
 use Zend\Mail\Message;
 use Zend\Mail\Transport\Smtp;
 use Zend\Mail\Transport\SmtpOptions;
@@ -15,11 +16,15 @@ use Zend\Mail\Transport\SmtpOptions;
 class MailManager
 {
 
-
     /**
      * @var array
      */
     private $config;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
 
 
     /**
@@ -27,9 +32,10 @@ class MailManager
      *
      * @param array $config
      */
-    public function __construct($config = array())
+    public function __construct($config = array(), Logger $logger)
     {
         $this->config = $config;
+        $this->logger = $logger;
     }
 
 
@@ -47,6 +53,7 @@ class MailManager
         $result = false;
 
         if (!isset($this->config['smtp'])) {
+            $this->logger->err('No E-mail SMTP information configuration, Cann\'t send mail.');
             return $result;
         }
 
@@ -66,10 +73,12 @@ class MailManager
 
             $smtp->send($message);
 
+            $this->logger->debug('Sent mail with' . PHP_EOL . 'to:' . $recipient . PHP_EOL . 'subject:' . $subject . PHP_EOL . 'content:' . $content);
+
             $result = true;
 
         } catch (\Exception $e) {
-            //todo
+            $this->logger->err('Send mail failure: ' . $e->getMessage());
         }
 
         return $result;

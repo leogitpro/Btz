@@ -23,7 +23,7 @@ class MailManagerFactory implements FactoryInterface
             $config = [];
         }
 
-        return new MailManager($config);
+        return new MailManager($config, $serviceManager->get('Logger'));
     }
 
 
