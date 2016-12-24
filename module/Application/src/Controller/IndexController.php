@@ -24,6 +24,7 @@ class IndexController extends AbstractActionController
 
     public function testAction()
     {
-        return new ViewModel(['img' => $imgUrl]);
+        echo __METHOD__;
+        return $this->getResponse();
     }
 }

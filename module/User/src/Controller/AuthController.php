@@ -61,7 +61,7 @@ class AuthController extends AbstractActionController
      * @param AuthenticationService $authService
      * @param UserManager $userManager
      */
-    public function __construct(EntityManager $entityManager, AuthManager $authManager, AuthenticationService $authService,  UserManager $userManager)
+    public function __construct(EntityManager $entityManager, AuthManager $authManager, AuthenticationService $authService, UserManager $userManager)
     {
         $this->entityManager = $entityManager;
         $this->authManager = $authManager;
@@ -75,7 +75,7 @@ class AuthController extends AbstractActionController
      */
     public function indexAction()
     {
-        if($this->authService->hasIdentity()) {
+        if ($this->authService->hasIdentity()) {
             $this->redirect()->toRoute('home');
         } else {
             $this->redirect()->toRoute('user/auth', ['action' => 'login', 'suffix' => '.html']);
@@ -94,7 +94,7 @@ class AuthController extends AbstractActionController
 
         $isLoginError = false;
 
-        if($this->getRequest()->isPost()) {
+        if ($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
 
@@ -152,7 +152,7 @@ class AuthController extends AbstractActionController
         $form = new SignUpForm($this->entityManager, null);
 
         // Post request check
-        if($this->getRequest()->isPost()) {
+        if ($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
 
@@ -168,6 +168,7 @@ class AuthController extends AbstractActionController
                     'key' => $user->getUid(),
                     'suffix' => '.html'
                 ]);
+
                 $this->redirect()->toUrl($toUrl);
             }
         }
@@ -179,24 +180,34 @@ class AuthController extends AbstractActionController
 
 
     /**
-     * Send active mail to registered user
+     * Send mail action
+     *
+     * @return void|\Zend\Stdlib\ResponseInterface
      */
-    public function sendActiveMailAction()
+    public function doSendActiveMailAction()
     {
+
+        ignore_user_abort(true);
+        set_time_limit(0);
+
+        $this->logger()->debug("Start async send mail");
 
         $uid = (int)$this->params()->fromRoute('key', 0);
         if ($uid < 1) {
+            $this->logger()->err("send active mail url lost the uid param");
             $this->getResponse()->setStatusCode(404);
             return ;
         }
 
         $user = $this->entityManager->getRepository(User::class)->find($uid);
         if (null == $user) {
+            $this->logger()->err("send active mail url include the uid is invalid. no user id is the:" . $uid);
             $this->getResponse()->setStatusCode(404);
             return ;
         }
 
         if (User::STATUS_ACTIVE == $user->getStatus()) { // Forbid resend active mail
+            $this->logger()->err("the uid:" . $uid . " has been activated. Forbid active again!");
             $this->getResponse()->setStatusCode(404);
             return ;
         }
@@ -218,10 +229,32 @@ class AuthController extends AbstractActionController
         $mailService = $serviceManager->get(MailManager::class);
         $mailService->sendMail($user->getEmail(), $subject, $msg);
 
+
+        return $this->getResponse();
+    }
+
+    /**
+     * Send active mail to registered user
+     */
+    public function sendActiveMailAction()
+    {
+
+        $uid = (int)$this->params()->fromRoute('key', 0);
+
+        $asyncUrl = $this->host()->getHost() . $this->url()->fromRoute('user/auth_detail', [
+            'action' => 'do-send-active-mail',
+            'key' => $uid,
+            'suffix' => '.html'
+        ]);
+
+        $this->logger()->debug("Ready call async request to:" . $asyncUrl);
+        $this->asyncRequest($asyncUrl);
+        $this->logger()->debug("Finished call async request");
+
         // Show sent page
         $toUrl = $this->url()->fromRoute('user/auth_detail', [
             'action' => 'sent-active-mail',
-            'key' => $user->getUid(),
+            'key' => $uid,
             'suffix' => '.html'
         ]);
         return $this->redirect()->toUrl($toUrl);

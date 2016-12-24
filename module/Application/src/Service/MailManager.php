@@ -74,7 +74,7 @@ class MailManager
 
             $smtp->send($message);
 
-            $this->logger->debug('Sent mail with' . PHP_EOL . 'to:' . $recipient . PHP_EOL . 'subject:' . $subject . PHP_EOL . 'content:' . $content);
+            $this->logger->debug('Sent mail information' . PHP_EOL . 'to:' . $recipient . PHP_EOL . 'subject:' . $subject . PHP_EOL . 'content:' . $content);
 
             $result = true;
 
