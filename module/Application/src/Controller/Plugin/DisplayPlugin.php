@@ -17,7 +17,7 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 class DisplayPlugin extends AbstractPlugin
 {
-    function __invoke($title = 'Information', $message = '...', $url_href = '', $url_title = '', $delay = null)
+    public function show($title = 'Information', $message = '...', $url_href = '', $url_title = '', $delay = null)
     {
         return  $this->getController()->forward()->dispatch(DisplayController::class, [
             'action' => 'message',

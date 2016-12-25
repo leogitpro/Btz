@@ -17,7 +17,7 @@ class AuthAdapterFactory implements FactoryInterface
 {
 
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface $serviceManager
      * @param string $requestedName
      * @param array|null|null $options
      * @return mixed

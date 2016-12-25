@@ -16,10 +16,10 @@ use User\Service\UserManager;
 class UserManagerFactory implements FactoryInterface
 {
 
-    public function __invoke(ContainerInterface $sm, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $serviceManager, $requestedName, array $options = null)
     {
-        $entityManager = $sm->get('doctrine.entitymanager.orm_default');
-        $logger = $sm->get('Logger');
+        $entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $logger = $serviceManager->get('Logger');
 
         return new UserManager($entityManager, $logger);
     }

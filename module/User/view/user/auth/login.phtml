@@ -38,7 +38,11 @@ $form->prepare();
 
         <?php if($isLoginError) { ?>
             <div class="alert alert-warning" role="alert">
-                <strong>Warning!</strong> The E-mail and/or Password was mismatched.
+                <?php if(2 == $isLoginError) { ?>
+                    <strong>Warning!</strong> Please active your account.
+                <?php } else { ?>
+                    <strong>Warning!</strong> The E-mail and/or Password was mismatched.
+                <?php } ?>
             </div>
         <?php } else { ?>
             <div class="alert alert-info" role="alert">

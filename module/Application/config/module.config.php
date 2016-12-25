@@ -64,18 +64,18 @@ return [
     ],
     'controller_plugins' => [
         'factories' => [
-            Controller\Plugin\HostPlugin::class => InvokableFactory::class,
+            Controller\Plugin\ServerPlugin::class => InvokableFactory::class,
             Controller\Plugin\DisplayPlugin::class => InvokableFactory::class,
             Controller\Plugin\AsyncRequestPlugin::class => InvokableFactory::class,
             Controller\Plugin\ConfigPlugin::class => Controller\Plugin\Factory\ConfigPluginFactory::class,
             Controller\Plugin\LoggerPlugin::class => Controller\Plugin\Factory\LoggerPluginFactory::class,
         ],
         'aliases' => [
-            'host' => Controller\Plugin\HostPlugin::class,
-            'display' => Controller\Plugin\DisplayPlugin::class,
-            'asyncRequest' => Controller\Plugin\AsyncRequestPlugin::class,
-            'config' => Controller\Plugin\ConfigPlugin::class,
-            'logger' => Controller\Plugin\LoggerPlugin::class,
+            'getServerPlugin' => Controller\Plugin\ServerPlugin::class,
+            'getDisplayPlugin' => Controller\Plugin\DisplayPlugin::class,
+            'getAsyncRequestPlugin' => Controller\Plugin\AsyncRequestPlugin::class,
+            'getConfigPlugin' => Controller\Plugin\ConfigPlugin::class,
+            'getLoggerPlugin' => Controller\Plugin\LoggerPlugin::class,
         ],
     ],
 

@@ -7,8 +7,6 @@
 
 namespace Application\Controller;
 
-
-use Zend\Captcha\Factory;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -18,13 +16,12 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-
         return new ViewModel();
     }
 
     public function testAction()
     {
-        echo __METHOD__;
-        return $this->getResponse();
+        //return $this->getResponse();
+        return new ViewModel();
     }
 }

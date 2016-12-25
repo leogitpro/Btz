@@ -17,8 +17,8 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 class AuthControllerFactory implements FactoryInterface
 {
     /**
-     * @param ContainerInterface $container
-     * @param string $requestedName
+     * @param ContainerInterface $serviceManager
+     * @param string $controllerName
      * @param array|null|null $options
      * @return mixed
      */

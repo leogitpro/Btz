@@ -91,19 +91,18 @@ class AuthController extends AbstractActionController
     public function loginAction()
     {
         $form = new LoginForm();
-
-        $isLoginError = false;
+        $isLoginError = 0;
 
         if ($this->getRequest()->isPost()) {
-
             $form->setData($this->params()->fromPost());
-
             if ($form->isValid()) { // Validate form data
                 $data = $form->getData(); // Get the filtered data
+
                 $result = $this->authManager->login($data['email'], $data['password'], (int)$data['remember_me']);
+
                 if ($result->getCode() == Result::SUCCESS) { // Check result.
 
-                    return $this->display(
+                    return $this->getDisplayPlugin()->show(
                         'Welcome',
                         'Thanks back to us!',
                         $this->url()->fromRoute('home'),
@@ -112,7 +111,11 @@ class AuthController extends AbstractActionController
                     );
 
                 } else {
-                    $isLoginError = true;
+                    if(Result::FAILURE == $result->getCode()) {
+                        $isLoginError = 2;
+                    } else {
+                        $isLoginError = 1;
+                    }
                 }
             }
         }
@@ -131,7 +134,7 @@ class AuthController extends AbstractActionController
     {
         $this->authManager->logout();
 
-        return $this->display(
+        return $this->getDisplayPlugin()->show(
             'Identity cleaned',
             'The identity information has been cleaned safely. thanks sign in again!',
             $this->url()->fromRoute('home'),
@@ -148,10 +151,8 @@ class AuthController extends AbstractActionController
      */
     public function signUpAction()
     {
-        // Use sign up form
         $form = new SignUpForm($this->entityManager, null);
 
-        // Post request check
         if ($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
@@ -159,10 +160,8 @@ class AuthController extends AbstractActionController
             if ($form->isValid()) { // Validate form data
 
                 $data = $form->getData(); // Get the filtered data
-
                 $user = $this->userManager->addNewUser($data); // Save data to database
 
-                // Show user profile url
                 $toUrl = $this->url()->fromRoute('user/auth_detail', [
                     'action' => 'send-active-mail',
                     'key' => $user->getUid(),
@@ -182,53 +181,30 @@ class AuthController extends AbstractActionController
     /**
      * Send mail action
      *
-     * @return void|\Zend\Stdlib\ResponseInterface
+     * @return ResponseInterface
      */
-    public function doSendActiveMailAction()
+    public function doSendMailAction()
     {
 
         ignore_user_abort(true);
         set_time_limit(0);
 
-        $this->logger()->debug("Start async send mail");
+        $subject = $this->params()->fromPost('mail_subject');
+        $content = $this->params()->fromPost('mail_content');
+        $recipient = $this->params()->fromPost('mail_recipient');
 
-        $uid = (int)$this->params()->fromRoute('key', 0);
-        if ($uid < 1) {
-            $this->logger()->err("send active mail url lost the uid param");
-            $this->getResponse()->setStatusCode(404);
-            return ;
+        if (empty($subject) || empty($content) || empty($recipient)) {
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Mail params lost. send cancel.');
+            return $this->getResponse();
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($uid);
-        if (null == $user) {
-            $this->logger()->err("send active mail url include the uid is invalid. no user id is the:" . $uid);
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
-
-        if (User::STATUS_ACTIVE == $user->getStatus()) { // Forbid resend active mail
-            $this->logger()->err("the uid:" . $uid . " has been activated. Forbid active again!");
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
-
-        $activeUrl = $this->url()->fromRoute('user/auth_detail', [
-            'action' => 'active',
-            'key' => $user->getActiveToken(),
-            'suffix' => '.html',
-        ]);
-
-        $msg = $this->config()->get('mail.template.active'); // Mail template
-        $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
-        $msg = str_replace('%active_code%', $user->getActiveToken(), $msg); // Fill active code
-        $msg = str_replace('%active_link%', $this->host()->getHost() . $activeUrl, $msg); // Fill active link
-
-        $subject = 'Active your account';
+        $this->getLoggerPlugin()->debug("Start send mail");
 
         $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
         $mailService = $serviceManager->get(MailManager::class);
-        $mailService->sendMail($user->getEmail(), $subject, $msg);
+        $mailService->sendMail($recipient, $subject, $content);
 
+        $this->getLoggerPlugin()->debug("End send mail");
 
         return $this->getResponse();
     }
@@ -238,18 +214,50 @@ class AuthController extends AbstractActionController
      */
     public function sendActiveMailAction()
     {
-
         $uid = (int)$this->params()->fromRoute('key', 0);
+        if ($uid < 1) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid uid for send active mail');
+            return ;
+        }
 
-        $asyncUrl = $this->host()->getHost() . $this->url()->fromRoute('user/auth_detail', [
-            'action' => 'do-send-active-mail',
-            'key' => $uid,
+        $user = $this->entityManager->getRepository(User::class)->find($uid);
+        if (null == $user) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid uid['.$uid.'] for send active mail. No user information exists.');
+            return ;
+        }
+
+        if (User::STATUS_ACTIVE == $user->getStatus()) { // Forbid resend active mail
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid uid['.$uid.'] is activated. Forbid re-active user.');
+            return ;
+        }
+
+        $postData = []; // Async request post params
+
+        $activeUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth_detail', [
+            'action' => 'active',
+            'key' => $user->getActiveToken(),
+            'suffix' => '.html',
+        ]);
+        $msg = $this->getConfigPlugin()->get('mail.template.active'); // Mail template
+        $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
+        $msg = str_replace('%active_code%', $user->getActiveToken(), $msg); // Fill active code
+        $msg = str_replace('%active_link%', $activeUrl, $msg); // Fill active link
+
+        $postData['mail_content'] = $msg;
+        $postData['mail_recipient'] = $user->getEmail();
+        $postData['mail_subject'] = 'Please active your account';
+
+        $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
+            'action' => 'do-send-mail',
             'suffix' => '.html'
         ]);
 
-        $this->logger()->debug("Ready call async request to:" . $asyncUrl);
-        $this->asyncRequest($asyncUrl);
-        $this->logger()->debug("Finished call async request");
+        $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
+        $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+        $this->getLoggerPlugin()->debug("Finished call async request");
 
         // Show sent page
         $toUrl = $this->url()->fromRoute('user/auth_detail', [
@@ -280,7 +288,7 @@ class AuthController extends AbstractActionController
         $message .= 'Thanks<br>';
         $message .= 'If you haven\'t received the mail. Pls use the follow button.';
 
-        return $this->display('Congratulations', $message, $resendActiveMailUrl, 'Resend active mail');
+        return $this->getDisplayPlugin()->show('Congratulations', $message, $resendActiveMailUrl, 'Resend active mail');
 
     }
 
@@ -293,7 +301,6 @@ class AuthController extends AbstractActionController
     public function activeAction()
     {
         $activeCode = $this->params()->fromRoute('key');
-
         $form = new ActiveForm($this->entityManager, $activeCode);
 
         if($this->getRequest()->isPost()) {
@@ -309,17 +316,28 @@ class AuthController extends AbstractActionController
                 // Send mail to user
                 if($user) {
 
-                    $loginUrl = $this->url()->fromRoute('user/auth', ['suffix' => '.html']);
+                    $loginUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', ['suffix' => '.html']);
 
-                    $msg = $this->config()->get('mail.template.activated'); // Mail template
+                    $msg = $this->getConfigPlugin()->get('mail.template.activated'); // Mail template
                     $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
-                    $msg = str_replace('%login_link%', $this->host()->getHost() . $loginUrl, $msg); // Fill login link
+                    $msg = str_replace('%login_link%', $loginUrl, $msg); // Fill login link
 
                     $subject = 'Welcome ' . $user->getName();
 
-                    $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
-                    $mailService = $serviceManager->get(MailManager::class);
-                    $mailService->sendMail($user->getEmail(), $subject, $msg);
+                    $postData = [
+                        'mail_subject' => $subject,
+                        'mail_content' => $msg,
+                        'mail_recipient' => $user->getEmail(),
+                    ];
+
+                    $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
+                        'action' => 'do-send-mail',
+                        'suffix' => '.html',
+                    ]);
+
+                    $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
+                    $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+                    $this->getLoggerPlugin()->debug("Finished call async request");
                 }
 
                 // Show activated message
@@ -340,7 +358,7 @@ class AuthController extends AbstractActionController
      */
     public function activatedAction()
     {
-        return $this->display(
+        return $this->getDisplayPlugin()->show(
             'Congratulations',
             'Your account is activated. Use the follow button quick sign in.',
             $this->url()->fromRoute('user/auth', ['action' => 'login', 'suffix' => '.html']),
@@ -357,7 +375,7 @@ class AuthController extends AbstractActionController
      */
     public function forgotPasswordAction()
     {
-        $config = $this->config()->get('captcha');
+        $config = $this->getConfigPlugin()->get('captcha');
         $config['imgUrl'] = $this->getRequest()->getBaseUrl() . $config['imgUrl'];
         $form = new ForgotPasswordForm($this->entityManager, $config);
 
@@ -374,27 +392,39 @@ class AuthController extends AbstractActionController
                 // Send mail to user include the reset password link
                 if($user) {
 
-                    $resetUrl = $this->url()->fromRoute('user/auth_detail', [
+                    $resetUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth_detail', [
                         'action' => 'reset-password',
                         'key' => $user->getPwdResetToken(),
                         'suffix' => '.html']);
 
-                    $msg = $this->config()->get('mail.template.reset-password'); // Mail template
+                    $msg = $this->getConfigPlugin()->get('mail.template.reset-password'); // Mail template
                     $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
-                    $msg = str_replace('%reset_link%', $this->host()->getHost() . $resetUrl, $msg); // Fill reset link
+                    $msg = str_replace('%reset_link%', $resetUrl, $msg); // Fill reset link
                     $msg = str_replace('%expired_hours%', 24, $msg); // Fill expired hours: 24
 
                     $subject = 'Reset password for ' . $user->getName();
 
-                    $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
-                    $mailService = $serviceManager->get(MailManager::class);
-                    $mailService->sendMail($user->getEmail(), $subject, $msg);
+
+                    $postData = [
+                        'mail_subject' => $subject,
+                        'mail_content' => $msg,
+                        'mail_recipient' => $user->getEmail(),
+                    ];
+
+                    $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
+                        'action' => 'do-send-mail',
+                        'suffix' => '.html',
+                    ]);
+
+                    $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
+                    $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+                    $this->getLoggerPlugin()->debug("Finished call async request");
                 }
 
                 // Show success message
-                return $this->display(
+                return $this->getDisplayPlugin()->show(
                     'Password reset',
-                    'Hi, ' . $user->getName() . '! A reset password email has sent to your E-mail. Please check the mail and reset your new password. Thanks!'
+                    'There is a reset password email has sent to your E-mail. Please check the mail and reset your new password. Thanks!'
                 );
             }
         }
