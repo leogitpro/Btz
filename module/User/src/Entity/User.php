@@ -242,7 +242,7 @@ class User
     /**
      * Set the reset token creation time
      *
-     * @param integer $pwdResetTokenCreated
+     * @param integer $created
      */
     public function setPwdResetTokenCreated($created)
     {

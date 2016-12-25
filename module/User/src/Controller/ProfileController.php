@@ -18,11 +18,6 @@ class ProfileController extends AbstractActionController
 {
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var UserManager
      */
     private $userManager;
@@ -30,12 +25,11 @@ class ProfileController extends AbstractActionController
 
     /**
      * AuthController constructor.
-     * @param EntityManager $entityManager
+     *
      * @param UserManager $userManager
      */
-    public function __construct(EntityManager $entityManager, UserManager $userManager)
+    public function __construct(UserManager $userManager)
     {
-        $this->entityManager = $entityManager;
         $this->userManager = $userManager;
     }
 

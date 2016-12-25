@@ -24,12 +24,11 @@ class AuthControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $serviceManager, $controllerName, array $options = null)
     {
-        $entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
         $authManager = $serviceManager->get(AuthManager::class);
         $authService = $serviceManager->get(\Zend\Authentication\AuthenticationService::class);
         $userManager = $serviceManager->get(UserManager::class);
 
-        return new AuthController($entityManager, $authManager, $authService, $userManager);
+        return new AuthController($authManager, $authService, $userManager);
     }
 
 

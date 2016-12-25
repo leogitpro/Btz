@@ -10,9 +10,8 @@ namespace User\Form;
 
 
 
-use Doctrine\ORM\EntityManager;
 use User\Entity\User;
-
+use User\Service\UserManager;
 use User\Validator\EmailUniqueValidator;
 use Zend\Filter\FilterChain;
 use Zend\Filter\StringTrim;
@@ -39,12 +38,12 @@ class SignUpForm extends Form
 {
 
     /**
-     * @var EntityManager|null
+     * @var UserManager
      */
-    private $entityManager = null;
+    private $userManager = null;
 
     /**
-     * @var null|User
+     * @var User
      */
     private $user = null;
 
@@ -52,19 +51,19 @@ class SignUpForm extends Form
     /**
      * SignUpForm constructor.
      *
-     * @param EntityManager $entityManager
+     * @param UserManager $userManager
      * @param User $user
      */
-    public function __construct(EntityManager $entityManager, $user = null)
+    public function __construct(UserManager $userManager, $user = null)
     {
-        parent::__construct('signup_form');
+        parent::__construct('sign_up_form');
 
         $this->setAttributes([
             'method' => 'post',
             'role' => 'form',
         ]);
 
-        $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
         $this->user = $user;
 
         $this->setInputFilter(new InputFilter());
@@ -110,7 +109,7 @@ class SignUpForm extends Form
         $validatorEmail->setMessage('请输入一个合法的电子邮箱地址.', EmailAddress::INVALID_FORMAT);
         $validatorChain->attach($validatorEmail, true); //出错返回, 不执行后续验证器, 权重 1(默认)
 
-        $validatorEmailUnique = new EmailUniqueValidator(['entityManager' => $this->entityManager, 'user' => $this->user]);
+        $validatorEmailUnique = new EmailUniqueValidator(['userManager' => $this->userManager, 'user' => $this->user]);
         $validatorEmailUnique->setMessage('电子邮件已经被其他人使用了!', EmailUniqueValidator::USER_EXISTS);
         $validatorChain->attach($validatorEmailUnique);
 

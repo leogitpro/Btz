@@ -1,6 +1,6 @@
 <?php
 /**
- * User login form
+ * Reset password form
  *
  * User: leo
  */
@@ -11,16 +11,16 @@ namespace User\Form;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 
-
-class LoginForm extends Form
+class ResetPasswordForm extends Form
 {
 
     /**
-     * LoginForm constructor.
+     * ResetPasswordForm constructor.
+     *
      */
     public function __construct()
     {
-        parent::__construct('login_form');
+        parent::__construct('reset_password_form');
 
         $this->setAttributes([
             'method' => 'post',
@@ -35,7 +35,8 @@ class LoginForm extends Form
 
 
     /**
-     * Add form elements
+     * Add the form elements
+     *
      */
     public function addElements()
     {
@@ -47,19 +48,6 @@ class LoginForm extends Form
                 'csrf_options' => [
                     'timeout' => 3600, // 60 minutes
                 ],
-            ],
-        ]);
-
-
-        // Text email input
-        $this->add([
-            'type' => 'text', // Element type
-            'name' => 'email', // Field name
-            'attributes' => [ // Array of attributes
-                'id' => 'email',
-            ],
-            'options' => [ // Array of options
-                'label' => 'Your E-mail', // Text Label
             ],
         ]);
 
@@ -76,12 +64,16 @@ class LoginForm extends Form
             ],
         ]);
 
-        // Remember me input
+
+        // Password input
         $this->add([
-            'type'  => 'checkbox',
-            'name' => 'remember_me',
-            'options' => [
-                'label' => 'Remember me',
+            'type' => 'password', // Element type
+            'name' => 're_password', // Field name
+            'attributes' => [ // Array of attributes
+                'id' => 're_password',
+            ],
+            'options' => [ // Array of options
+                'label' => 'Confirm password', // Text Label
             ],
         ]);
 
@@ -92,35 +84,19 @@ class LoginForm extends Form
             'name' => 'submit',
             'attributes' => [
                 'id' => 'submit',
-                'value' => 'Sign in',
+                'value' => 'Reset password',
             ],
         ]);
+
     }
 
 
     /**
-     * Add form filters and validators
+     * Add form Filters and Validators
+     *
      */
     public function addInputFilters()
     {
-        $this->getInputFilter()->add([
-            'name' => 'email',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'EmailAddress',
-                    'options' => [
-                        'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
-                        'useMxCheck' => false,
-                    ],
-                ],
-            ],
-        ]);
-
         $this->getInputFilter()->add([
             'name'     => 'password',
             'required' => true,
@@ -139,19 +115,21 @@ class LoginForm extends Form
         ]);
 
         $this->getInputFilter()->add([
-            'name'     => 'remember_me',
-            'required' => false,
+            'name'     => 're_password',
+            'required' => true,
+            'break_on_failure' => true,
             'filters'  => [
             ],
             'validators' => [
                 [
-                    'name'    => 'InArray',
+                    'name'    => 'identical',
                     'options' => [
-                        'haystack' => [0, 1],
-                    ]
+                        'token' => 'password',
+                    ],
                 ],
             ],
         ]);
+
     }
 
 }

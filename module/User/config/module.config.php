@@ -137,4 +137,11 @@ return [
     'mail' => [
         'template' => require(__DIR__ . '/module.config.mail_tpl.php'),
     ],
+
+    // User module configuration
+    'user' => [
+        'auth' => [
+            'reset_password_expired' => 24, // Hours
+        ],
+    ],
 ];

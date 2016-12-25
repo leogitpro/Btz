@@ -8,7 +8,7 @@
 namespace User\Form;
 
 
-use Doctrine\ORM\EntityManager;
+use User\Service\UserManager;
 use User\Validator\ActiveCodeValidator;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
@@ -16,12 +16,24 @@ use Zend\InputFilter\InputFilter;
 class ActiveForm extends Form
 {
 
-    private $entityManager;
+    /**
+     * @var UserManager
+     */
+    private $userManager;
 
+    /**
+     * @var string active token
+     */
     private $active_code = '';
 
 
-    public function __construct(EntityManager $entityManager, $code = '')
+    /**
+     * ActiveForm constructor.
+     *
+     * @param UserManager $userManager
+     * @param string $code
+     */
+    public function __construct(UserManager $userManager, $code = '')
     {
         parent::__construct('active_form');
 
@@ -30,7 +42,7 @@ class ActiveForm extends Form
             'role' => 'form',
         ]);
 
-        $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
         $this->active_code = $code;
 
         $this->setInputFilter(new InputFilter());
@@ -99,7 +111,7 @@ class ActiveForm extends Form
                 [
                     'name' => ActiveCodeValidator::class,
                     'options' => [
-                        'entityManager' => $this->entityManager,
+                        'userManager' => $this->userManager,
                     ],
                 ],
             ],

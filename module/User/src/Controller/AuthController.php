@@ -10,11 +10,11 @@ namespace User\Controller;
 
 
 use Application\Service\MailManager;
-use Doctrine\ORM\EntityManager;
 use User\Entity\User;
 use User\Form\ActiveForm;
 use User\Form\ForgotPasswordForm;
 use User\Form\LoginForm;
+use User\Form\ResetPasswordForm;
 use User\Form\SignUpForm;
 use User\Service\AuthManager;
 use User\Service\UserManager;
@@ -31,11 +31,6 @@ use Zend\View\Model\ViewModel;
  */
 class AuthController extends AbstractActionController
 {
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
 
     /**
      * @var AuthManager
@@ -56,14 +51,12 @@ class AuthController extends AbstractActionController
     /**
      * AuthController constructor.
      *
-     * @param EntityManager $entityManager
      * @param AuthManager $authManager
      * @param AuthenticationService $authService
      * @param UserManager $userManager
      */
-    public function __construct(EntityManager $entityManager, AuthManager $authManager, AuthenticationService $authService, UserManager $userManager)
+    public function __construct(AuthManager $authManager, AuthenticationService $authService, UserManager $userManager)
     {
-        $this->entityManager = $entityManager;
         $this->authManager = $authManager;
         $this->authService = $authService;
         $this->userManager = $userManager;
@@ -151,7 +144,7 @@ class AuthController extends AbstractActionController
      */
     public function signUpAction()
     {
-        $form = new SignUpForm($this->entityManager, null);
+        $form = new SignUpForm($this->userManager, null);
 
         if ($this->getRequest()->isPost()) {
 
@@ -221,7 +214,7 @@ class AuthController extends AbstractActionController
             return ;
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($uid);
+        $user = $this->userManager->getUserById($uid);
         if (null == $user) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid uid['.$uid.'] for send active mail. No user information exists.');
@@ -301,7 +294,7 @@ class AuthController extends AbstractActionController
     public function activeAction()
     {
         $activeCode = $this->params()->fromRoute('key');
-        $form = new ActiveForm($this->entityManager, $activeCode);
+        $form = new ActiveForm($this->userManager, $activeCode);
 
         if($this->getRequest()->isPost()) {
 
@@ -377,7 +370,7 @@ class AuthController extends AbstractActionController
     {
         $config = $this->getConfigPlugin()->get('captcha');
         $config['imgUrl'] = $this->getRequest()->getBaseUrl() . $config['imgUrl'];
-        $form = new ForgotPasswordForm($this->entityManager, $config);
+        $form = new ForgotPasswordForm($this->userManager, $config);
 
         if($this->getRequest()->isPost()) {
 
@@ -397,10 +390,12 @@ class AuthController extends AbstractActionController
                         'key' => $user->getPwdResetToken(),
                         'suffix' => '.html']);
 
+                    $expired = $this->getConfigPlugin()->get('user.auth.reset_password_expired', 24);
+
                     $msg = $this->getConfigPlugin()->get('mail.template.reset-password'); // Mail template
                     $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
                     $msg = str_replace('%reset_link%', $resetUrl, $msg); // Fill reset link
-                    $msg = str_replace('%expired_hours%', 24, $msg); // Fill expired hours: 24
+                    $msg = str_replace('%expired_hours%', $expired, $msg); // Fill expired hours: 24
 
                     $subject = 'Reset password for ' . $user->getName();
 
@@ -429,7 +424,6 @@ class AuthController extends AbstractActionController
             }
         }
 
-
         return new ViewModel([
             'form' => $form,
         ]);
@@ -443,7 +437,44 @@ class AuthController extends AbstractActionController
      */
     public function resetPasswordAction()
     {
-        return new ViewModel();
+
+        $resetPwdCode = $this->params()->fromRoute('key');
+        $user = $this->userManager->getUserByResetPwdToken($resetPwdCode);
+        if (null == $user) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid reset code for password reset');
+            return ;
+        }
+
+        $expired = $this->getConfigPlugin()->get('user.auth.reset_password_expired', 24);
+        $expired = $expired * 3600;
+
+        $nowTime = time();
+
+        $requestTime = $user->getPwdResetTokenCreated();
+        if(($requestTime + $expired) < $nowTime) {
+            return $this->getDisplayPlugin()->show(
+                'Request expired',
+                'The requested reset password is expired!'
+            );
+        }
+
+        $form = new ResetPasswordForm();
+        if($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $this->userManager->resetPasswordByToken($resetPwdCode, $data['password']);
+                return $this->getDisplayPlugin()->show(
+                    'Password updated',
+                    'Your password has been updated. Please use new password to sign in.'
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
 }

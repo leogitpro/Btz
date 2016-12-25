@@ -8,7 +8,7 @@
 namespace User\Form;
 
 
-use Doctrine\ORM\EntityManager;
+use User\Service\UserManager;
 use User\Validator\EmailExistedValidator;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
@@ -17,9 +17,9 @@ class ForgotPasswordForm extends Form
 {
 
     /**
-     * @var EntityManager|null
+     * @var UserManager
      */
-    private $entityManager = null;
+    private $userManager = null;
 
 
     /**
@@ -31,10 +31,10 @@ class ForgotPasswordForm extends Form
     /**
      * ForgotPasswordForm constructor.
      *
-     * @param EntityManager $entityManager
+     * @param UserManager $userManager
      * @param array $captcha
      */
-    public function __construct(EntityManager $entityManager, array $captcha = [])
+    public function __construct(UserManager $userManager, array $captcha = [])
     {
         parent::__construct('forgot_password_form');
 
@@ -43,7 +43,7 @@ class ForgotPasswordForm extends Form
             'role' => 'form',
         ]);
 
-        $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
         $this->captchaConfig = $captcha;
 
         $this->setInputFilter(new InputFilter());
@@ -124,7 +124,7 @@ class ForgotPasswordForm extends Form
                     'name' => EmailExistedValidator::class,
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'entityManager' => $this->entityManager,
+                        'userManager' => $this->userManager,
                     ],
                 ],
             ],

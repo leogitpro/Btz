@@ -44,6 +44,79 @@ class UserManager
 
 
     /**
+     * Get user by id
+     *
+     * @param integer $uid
+     * @return User
+     */
+    public function getUserById($uid)
+    {
+        return $this->entityManager->getRepository(User::class)->find($uid);
+    }
+
+
+    /**
+     * Get user by field: email
+     *
+     * @param string $email
+     * @return User
+     */
+    public function getUserByEmail($email)
+    {
+        return $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+    }
+
+
+    /**
+     * Get user by field: active_token
+     *
+     * @param string $token
+     * @return User
+     */
+    public function getUserByActiveToken($token)
+    {
+        return $this->entityManager->getRepository(User::class)->findOneBy(['activeToken' => $token]);
+    }
+
+
+    /**
+     * Get user by filed: pwd_reset_token
+     *
+     * @param string $token
+     * @return User
+     */
+    public function getUserByResetPwdToken($token)
+    {
+        return $this->entityManager->getRepository(User::class)->findOneBy(['pwdResetToken' => $token]);
+    }
+
+
+    /**
+     * Update password by reset password token
+     *
+     * @param $token
+     * @param $password
+     * @return User
+     */
+    public function resetPasswordByToken($token, $password)
+    {
+        $user = $this->getUserByResetPwdToken($token);
+        if (!$user) {
+            $this->logger->err(__METHOD__  . PHP_EOL . 'Invalid pwd_reset_token for get user information: ' . $token);
+            return false;
+        }
+
+        $user->setPasswd($password);
+        $user->setPwdResetTokenCreated(0);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+
+    /**
      * Create new user
      *
      * @param array $data
@@ -65,7 +138,7 @@ class UserManager
         $this->entityManager->persist($newUser); // Add entity to the entity manager.
         $this->entityManager->flush(); // Apply changes to database.
 
-        $this->logger->debug(__METHOD__ . ' added user: ' . $data['email']);
+        $this->logger->debug(__METHOD__ . PHP_EOL . ' added user: ' . $data['email']);
 
         return $newUser;
     }
@@ -77,7 +150,7 @@ class UserManager
      */
     public function activeUser($code)
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneByActiveToken($code);
+        $user = $this->getUserByActiveToken($code);
         if (null == $user) {
             $this->logger->info(__METHOD__ . PHP_EOL . 'Invalid active code:' . $code . ' for active user');
             return false;
@@ -107,7 +180,7 @@ class UserManager
      */
     public function resetUserPasswordToken($email)
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
+        $user = $this->getUserByEmail($email);
         if (null == $user) {
             $this->logger->info(__METHOD__ . PHP_EOL . 'Invalid user email:' . $email . ' for reset pwd token');
             return false;

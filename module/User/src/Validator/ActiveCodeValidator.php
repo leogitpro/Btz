@@ -15,12 +15,13 @@ class ActiveCodeValidator extends AbstractValidator
 {
 
     private $options = [
-        'entityManager' => null,
+        'userManager' => null,
     ];
 
 
     // Message IDs
     const CODE_INVALID = 'codeInvalid';
+    const CODE_USED = 'codeUsed';
 
     /**
      * Message templates
@@ -29,6 +30,7 @@ class ActiveCodeValidator extends AbstractValidator
      */
     protected $messageTemplates = [
         self::CODE_INVALID => 'The code is invalid.',
+        self::CODE_USED => 'The code is used activated',
     ];
 
 
@@ -40,8 +42,8 @@ class ActiveCodeValidator extends AbstractValidator
     public function __construct($options = null)
     {
         if (is_array($options)) {
-            if (isset($options['entityManager'])) {
-                $this->options['entityManager'] = $options['entityManager'];
+            if (isset($options['userManager'])) {
+                $this->options['userManager'] = $options['userManager'];
             }
         }
 
@@ -60,11 +62,8 @@ class ActiveCodeValidator extends AbstractValidator
     public function isValid($value)
     {
         $code = (string)$value;
-
-        // The entityManager
-        $entityManager = $this->options['entityManager'];
-
-        $user = $entityManager->getRepository(User::class)->findOneByActiveToken($code);
+        $userManager = $this->options['userManager'];
+        $user = $userManager->getUserByActiveToken($code);
 
         if (null == $user) {
             $this->error(self::CODE_INVALID);
@@ -72,12 +71,11 @@ class ActiveCodeValidator extends AbstractValidator
         }
 
         if(User::STATUS_ACTIVE == $user->getStatus()) {
-            $this->error(self::CODE_INVALID);
+            $this->error(self::CODE_USED);
             return false;
         }
 
         return true;
-
     }
 
 

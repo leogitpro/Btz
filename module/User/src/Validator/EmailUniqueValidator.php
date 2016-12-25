@@ -9,7 +9,6 @@
 namespace User\Validator;
 
 
-use User\Entity\User;
 use Zend\Validator\AbstractValidator;
 
 
@@ -20,7 +19,7 @@ class EmailUniqueValidator extends AbstractValidator
      * @var array
      */
     protected $options = [
-        'entityManager' => null,
+        'userManager' => null,
         'user' => null,
     ];
 
@@ -47,8 +46,8 @@ class EmailUniqueValidator extends AbstractValidator
     public function __construct($options = null)
     {
         if (is_array($options)) {
-            if (isset($options['entityManager'])) {
-                $this->options['entityManager'] = $options['entityManager'];
+            if (isset($options['userManager'])) {
+                $this->options['userManager'] = $options['userManager'];
             }
             if (isset($options['user'])) {
                 $this->options['user'] = $options['user'];
@@ -73,11 +72,9 @@ class EmailUniqueValidator extends AbstractValidator
             return false;
         }
 
-        // The entityManager
-        $entityManager = $this->options['entityManager'];
 
-        // Find user by the email value, If $existedUser is null => no user use the email.
-        $existedUser = $entityManager->getRepository(User::class)->findOneByEmail($value);
+        $userManager = $this->options['userManager'];
+        $existedUser = $userManager->getUserByEmail($value);
 
         $isValid = false;
         if (null == $this->options['user']) { // New created user email
