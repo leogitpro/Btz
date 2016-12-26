@@ -123,6 +123,7 @@ class Menu extends AbstractHelper
         $id = isset($item['id']) ? $item['id'] : '';
         $isActive = ($id == $this->activeItemId);
         $label = isset($item['label']) ? $item['label'] : '';
+        $title = isset($item['title']) ? $item['title'] : '';
 
         $result = '';
 
@@ -141,9 +142,10 @@ class Menu extends AbstractHelper
             foreach ($dropdownItems as $item) {
                 $link = isset($item['link']) ? $item['link'] : '#';
                 $label = isset($item['label']) ? $item['label'] : '';
+                $title = isset($item['title']) ? $item['title'] : '';
 
                 $result .= '<li>';
-                $result .= '<a href="'.$escapeHtml($link).'">'.$escapeHtml($label).'</a>';
+                $result .= '<a href="'.$escapeHtml($link).'" title="'.$title.'">'. $label .'</a>';
                 $result .= '</li>';
             }
             $result .= '</ul>';
@@ -153,7 +155,7 @@ class Menu extends AbstractHelper
             $link = isset($item['link']) ? $item['link'] : '#';
 
             $result .= $isActive ? '<li class="active">' : '<li>';
-            $result .= '<a href="'.$escapeHtml($link).'">' . $escapeHtml($label) . '</a>';
+            $result .= '<a href="'.$escapeHtml($link).'" title="'.$title.'">' . $escapeHtml($label) . '</a>';
             $result .= '</li>';
         }
 

@@ -128,7 +128,7 @@ class SignUpForm extends Form
         $input = 'name';
 
         $element = new Text($input);
-        $element->setLabel('Nickname');
+        $element->setLabel('Full Name');
         $element->setAttributes(['id' => $input]);
         $this->add($element);
 

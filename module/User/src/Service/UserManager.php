@@ -92,6 +92,23 @@ class UserManager
 
 
     /**
+     * Direct save user all attributes.
+     * Take care for this api
+     *
+     * @param User $user
+     * @return User
+     */
+    public function saveEditedUser($user)
+    {
+        if ($user instanceof User) {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
+        return $user;
+    }
+
+
+    /**
      * Update user password
      *
      * @param string $password
@@ -106,6 +123,26 @@ class UserManager
         }
 
         $user->setPasswd($password);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+
+    /**
+     * Update user email
+     *
+     * @param User $user
+     * @param string $new_email
+     * @return User
+     */
+    public function updateUserEmail(User $user, $new_email)
+    {
+        $user->setEmail($new_email);
+        $user->setActiveToken(md5($new_email . time()));
+        $user->setStatus(User::STATUS_RETIRED);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -155,7 +192,7 @@ class UserManager
         $newUser->setStatus(User::STATUS_RETIRED); // New user need active email manually
         $newUser->setCreated(date('Y-m-d H:i:s'));
 
-        $activeToken = md5($data['email'] . $data['passwd']);
+        $activeToken = md5($data['email'] . time());
         $newUser->setActiveToken($activeToken);
 
         $this->entityManager->persist($newUser); // Add entity to the entity manager.

@@ -60,28 +60,31 @@ class NavManager
         ];
         // */
 
-        // Display "Login" menu item for not authorized user only. On the other hand,
-        // display "Admin" and "Logout" menu items only for authorized users.
+        // Display "Sign in" menu item for not authorized user only. On the other hand,
+        // display "Sign out" menu items only for authorized users.
         //**
         if (!$this->authService->hasIdentity()) {
             $items[] = [
                 'id' => 'guest',
-                'label' => 'Guest',
+                'label' => 'Hi: Guest!',
                 'float' => 'right',
                 'dropdown' => [
                     [
                         'id' => 'login',
-                        'label' => 'Sign in',
+                        'label' => '<i class="fa fa-sign-in" aria-hidden="true"></i> Sign in',
+                        'title' => 'Sign in',
                         'link' => $url('user/auth', ['action'=>'login', 'suffix' => '.html'])
                     ],
                     [
                         'id' => 'sign-up',
-                        'label' => 'Sign up',
+                        'label' => '<i class="fa fa-user-plus" aria-hidden="true"></i> Sign up',
+                        'title' => 'Sign up',
                         'link' => $url('user/auth', ['action'=>'sign-up', 'suffix' => '.html'])
                     ],
                     [
                         'id' => 'forgot-password',
-                        'label' => 'Forgot password',
+                        'label' => '<i class="fa fa-support" aria-hidden="true"></i> Password',
+                        'title' => 'Forgot password',
                         'link' => $url('user/auth', ['action' => 'forgot-password', 'suffix' => '.html'])
                     ],
                 ]
@@ -95,17 +98,32 @@ class NavManager
                 'dropdown' => [
                     [
                         'id' => 'profile',
-                        'label' => 'My Profile',
+                        'label' => '<i class="fa fa-home" aria-hidden="true"></i> Preface',
+                        'title' => 'My Preface',
                         'link' => $url('user/profile', ['suffix' => '.html'])
                     ],
                     [
+                        'id' => 'update',
+                        'label' => '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Profile',
+                        'title' => 'Update profile',
+                        'link' => $url('user/profile', ['action' => 'update', 'suffix' => '.html'])
+                    ],
+                    [
+                        'id' => 'email',
+                        'label' => '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> E-mail',
+                        'title' => 'Update E-mail address',
+                        'link' => $url('user/profile', ['action' => 'email', 'suffix' => '.html'])
+                    ],
+                    [
                         'id' => 'password',
-                        'label' => 'Update password',
+                        'label' => '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> Password',
+                        'title' => 'Update password',
                         'link' => $url('user/profile', ['action' => 'password', 'suffix' => '.html'])
                     ],
                     [
                         'id' => 'logout',
-                        'label' => 'Sign out',
+                        'label' => '<i class="fa fa-sign-out" aria-hidden="true"></i> Sign out',
+                        'title' => 'Sign out',
                         'link' => $url('user/auth', ['action'=>'logout', 'suffix' => '.html'])
                     ],
                 ]

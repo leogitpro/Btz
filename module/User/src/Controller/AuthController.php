@@ -9,7 +9,6 @@
 namespace User\Controller;
 
 
-use Application\Service\MailManager;
 use User\Entity\User;
 use User\Form\ActiveForm;
 use User\Form\ForgotPasswordForm;
@@ -172,37 +171,6 @@ class AuthController extends AbstractActionController
 
 
     /**
-     * Send mail action
-     *
-     * @return ResponseInterface
-     */
-    public function doSendMailAction()
-    {
-
-        ignore_user_abort(true);
-        set_time_limit(0);
-
-        $subject = $this->params()->fromPost('mail_subject');
-        $content = $this->params()->fromPost('mail_content');
-        $recipient = $this->params()->fromPost('mail_recipient');
-
-        if (empty($subject) || empty($content) || empty($recipient)) {
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Mail params lost. send cancel.');
-            return $this->getResponse();
-        }
-
-        $this->getLoggerPlugin()->debug("Start send mail");
-
-        $serviceManager = $this->getEvent()->getApplication()->getServiceManager();
-        $mailService = $serviceManager->get(MailManager::class);
-        $mailService->sendMail($recipient, $subject, $content);
-
-        $this->getLoggerPlugin()->debug("End send mail");
-
-        return $this->getResponse();
-    }
-
-    /**
      * Send active mail to registered user
      */
     public function sendActiveMailAction()
@@ -227,9 +195,7 @@ class AuthController extends AbstractActionController
             return ;
         }
 
-        $postData = []; // Async request post params
-
-        $activeUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth_detail', [
+        $activeUrl = $this->url()->fromRoute('user/auth_detail', [
             'action' => 'active',
             'key' => $user->getActiveToken(),
             'suffix' => '.html',
@@ -237,19 +203,17 @@ class AuthController extends AbstractActionController
         $msg = $this->getConfigPlugin()->get('mail.template.active'); // Mail template
         $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
         $msg = str_replace('%active_code%', $user->getActiveToken(), $msg); // Fill active code
-        $msg = str_replace('%active_link%', $activeUrl, $msg); // Fill active link
+        $msg = str_replace('%active_link%', $this->getServerPlugin()->domain() . $activeUrl, $msg); // Fill active link
 
-        $postData['mail_content'] = $msg;
-        $postData['mail_recipient'] = $user->getEmail();
-        $postData['mail_subject'] = 'Please active your account';
+        $postData = [
+            'mail_content' =>  $msg,
+            'mail_recipient' => $user->getEmail(),
+            'mail_subject' => 'Please active your account',
+        ];
 
-        $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
-            'action' => 'do-send-mail',
-            'suffix' => '.html'
-        ]);
-
+        $asyncUrl = $this->url()->fromRoute('send-mail');
         $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
-        $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+        $this->getAsyncRequestPlugin()->post($this->getServerPlugin()->domain() . $asyncUrl, $postData);
         $this->getLoggerPlugin()->debug("Finished call async request");
 
         // Show sent page
@@ -306,30 +270,21 @@ class AuthController extends AbstractActionController
                 $data = $form->getData(); // Get the filtered and validated
                 $user = $this->userManager->activeUser($data['active_code']);
 
-                // Send mail to user
-                if($user) {
-
-                    $loginUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', ['suffix' => '.html']);
-
-                    $msg = $this->getConfigPlugin()->get('mail.template.activated'); // Mail template
-                    $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
-                    $msg = str_replace('%login_link%', $loginUrl, $msg); // Fill login link
-
-                    $subject = 'Welcome ' . $user->getName();
+                if($user) { // Send mail to user
+                    $loginUrl = $this->url()->fromRoute('user/auth', ['suffix' => '.html']);
+                    $msg = $this->getConfigPlugin()->get('mail.template.activated');
+                    $msg = str_replace('%username%', $user->getName(), $msg);
+                    $msg = str_replace('%login_link%', $this->getServerPlugin()->domain() . $loginUrl, $msg);
 
                     $postData = [
-                        'mail_subject' => $subject,
+                        'mail_subject' => 'Welcome ' . $user->getName(),
                         'mail_content' => $msg,
                         'mail_recipient' => $user->getEmail(),
                     ];
 
-                    $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
-                        'action' => 'do-send-mail',
-                        'suffix' => '.html',
-                    ]);
-
+                    $asyncUrl = $this->url()->fromRoute('send-mail');
                     $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
-                    $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+                    $this->getAsyncRequestPlugin()->post($this->getServerPlugin()->domain() . $asyncUrl, $postData);
                     $this->getLoggerPlugin()->debug("Finished call async request");
                 }
 
@@ -374,45 +329,34 @@ class AuthController extends AbstractActionController
 
         if($this->getRequest()->isPost()) {
 
-            $data = $this->params()->fromPost();
-            $form->setData($data);
+            $form->setData($this->params()->fromPost());
 
             if ($form->isValid()) {
 
                 $data = $form->getData(); // Get the filtered and validated
                 $user = $this->userManager->resetUserPasswordToken($data['email']);
 
-                // Send mail to user include the reset password link
-                if($user) {
+                if($user) { // Send mail to user include the reset password link
 
-                    $resetUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth_detail', [
+                    $resetUrl = $this->url()->fromRoute('user/auth_detail', [
                         'action' => 'reset-password',
                         'key' => $user->getPwdResetToken(),
                         'suffix' => '.html']);
-
                     $expired = $this->getConfigPlugin()->get('user.auth.reset_password_expired', 24);
-
-                    $msg = $this->getConfigPlugin()->get('mail.template.reset-password'); // Mail template
-                    $msg = str_replace('%username%', $user->getName(), $msg); // Fill username
-                    $msg = str_replace('%reset_link%', $resetUrl, $msg); // Fill reset link
-                    $msg = str_replace('%expired_hours%', $expired, $msg); // Fill expired hours: 24
-
-                    $subject = 'Reset password for ' . $user->getName();
-
+                    $msg = $this->getConfigPlugin()->get('mail.template.reset-password');
+                    $msg = str_replace('%username%', $user->getName(), $msg);
+                    $msg = str_replace('%reset_link%', $this->getServerPlugin()->domain() . $resetUrl, $msg);
+                    $msg = str_replace('%expired_hours%', $expired, $msg);
 
                     $postData = [
-                        'mail_subject' => $subject,
+                        'mail_subject' => 'Reset password for ' . $user->getName(),
                         'mail_content' => $msg,
                         'mail_recipient' => $user->getEmail(),
                     ];
 
-                    $asyncUrl = $this->getServerPlugin()->domain() . $this->url()->fromRoute('user/auth', [
-                        'action' => 'do-send-mail',
-                        'suffix' => '.html',
-                    ]);
-
+                    $asyncUrl = $this->url()->fromRoute('send-mail');
                     $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
-                    $this->getAsyncRequestPlugin()->post($asyncUrl, $postData);
+                    $this->getAsyncRequestPlugin()->post($this->getServerPlugin()->domain() . $asyncUrl, $postData);
                     $this->getLoggerPlugin()->debug("Finished call async request");
                 }
 

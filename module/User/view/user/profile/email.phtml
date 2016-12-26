@@ -1,22 +1,17 @@
 <?php
-$this->headTitle('Reset Password');
+$this->headTitle('Update E-mail');
 
-$this->barMenu()->setActiveItemId(null);
+$this->barMenu()->setActiveItemId('profile');
 
 $this->barBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    'Reset password' => '',
+    'My preface' => $this->url('user/profile', ['suffix' => '.html']),
+    'Update E-mail' => '',
 ]);
 
-
-$form->get('password')->setAttributes([
+$form->get('email')->setAttributes([
     'class' => 'form-control',
-    'placeholder'=>'Enter new password'
-]);
-
-$form->get('re_password')->setAttributes([
-    'class' => 'form-control',
-    'placeholder'=>'Re-enter new password'
+    'placeholder'=>'name@example.com'
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -34,8 +29,8 @@ $form->prepare();
 <div class="row">
     <div class="col-md-6">
 
-        <h1>Reset password</h1>
-        <p>Enter your new password</p>
+        <h1>Update E-mail</h1>
+        <p>When E-mail address was updated, your account will been in unactivated status. Please check your email and active your account again.</p>
 
         <?php echo $this->form()->openTag($form); ?>
 
@@ -44,15 +39,9 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('password')); ?>
-            <?php echo $this->formElement($form->get('password')); ?>
-            <?php echo $this->formElementErrors($form->get('password')); ?>
-        </div>
-
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('re_password')); ?>
-            <?php echo $this->formElement($form->get('re_password')); ?>
-            <?php echo $this->formElementErrors($form->get('re_password')); ?>
+            <?php echo $this->formLabel($form->get('email')); ?>
+            <?php echo $this->formElement($form->get('email')); ?>
+            <?php echo $this->formElementErrors($form->get('email')); ?>
         </div>
 
         <div class="form-group">
