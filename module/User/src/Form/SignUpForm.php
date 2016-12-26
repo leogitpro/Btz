@@ -14,6 +14,7 @@ use User\Entity\User;
 use User\Service\UserManager;
 use User\Validator\EmailUniqueValidator;
 use Zend\Filter\FilterChain;
+use Zend\Filter\StringToLower;
 use Zend\Filter\StringTrim;
 use Zend\Filter\StripTags;
 use Zend\Form\Element\Csrf;
@@ -166,6 +167,13 @@ class SignUpForm extends Form
         $inputFilter = new Input($input);
         $inputFilter->setBreakOnFailure(true);
         $inputFilter->isRequired(true);
+
+        $filterChain = new FilterChain();
+        $filterStrToLower = new StringToLower(['encoding' => 'UTF-8']);
+        //$filterStrToLower->setEncoding('UTF-8');
+        //$filterStrToLower->setOptions(['encoding' => 'UTF-8']);
+        $filterChain->attach($filterStrToLower);
+        $inputFilter->setFilterChain($filterChain);
 
         $validatorChain = new ValidatorChain();
         $validatorStringLen = new StringLength(['min' => 4, 'max' => 15]);

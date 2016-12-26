@@ -126,6 +126,12 @@ class LoginForm extends Form
             'required' => true,
             'break_on_failure' => true,
             'filters'  => [
+                [
+                    'name' => 'StringToLower',
+                    'options' => [
+                        'encoding' => 'UTF-8',
+                    ],
+                ],
             ],
             'validators' => [
                 [

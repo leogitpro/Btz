@@ -92,6 +92,29 @@ class UserManager
 
 
     /**
+     * Update user password
+     *
+     * @param string $password
+     * @param string $email
+     * @return User
+     */
+    public function updateUserPasswordByEmail($password, $email)
+    {
+        $user = $this->getUserByEmail($email);
+        if (null == $user) {
+            return false;
+        }
+
+        $user->setPasswd($password);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+
+
+    /**
      * Update password by reset password token
      *
      * @param $token

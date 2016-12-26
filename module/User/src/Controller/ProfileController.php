@@ -3,13 +3,12 @@
  * ProfileController.php
  *
  * User Profile manager
- *
+ * User: Leo
  */
 
 namespace User\Controller;
 
-
-use Doctrine\ORM\EntityManager;
+use User\Form\UpdatePasswordForm;
 use User\Service\UserManager;
 use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -31,9 +30,10 @@ class ProfileController extends AbstractActionController
 
 
     /**
-     * AuthController constructor.
+     * ProfileController constructor.
      *
      * @param UserManager $userManager
+     * @param AuthenticationService $authService
      */
     public function __construct(UserManager $userManager, AuthenticationService $authService)
     {
@@ -51,7 +51,7 @@ class ProfileController extends AbstractActionController
         $user = $this->userManager->getUserByEmail($this->authService->getIdentity());
         if (null == $user) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid user identity');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid user identity');
             return ;
         }
 
@@ -77,7 +77,24 @@ class ProfileController extends AbstractActionController
      */
     public function passwordAction()
     {
-        return new ViewModel();
+        $form = new UpdatePasswordForm($this->userManager, $this->authService);
+        if($this->getRequest()->isPost()) {
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+                $this->userManager->updateUserPasswordByEmail($data['new_password'], $this->authService->getIdentity());
+
+                return $this->getDisplayPlugin()->show(
+                    'Password updated',
+                    'Your password has been changed. Please use the new password login at the next time.',
+                    $this->url()->fromRoute('user/profile', ['suffix' => '.html']),
+                    'View my profile',
+                    3
+                );
+            }
+        }
+
+        return new ViewModel(['form' => $form]);
     }
 
 
@@ -88,8 +105,15 @@ class ProfileController extends AbstractActionController
      */
     public function viewAction()
     {
-        $user_id = $this->params()->fromRoute('uid', 0);
-        return new ViewModel(['user_id' => $user_id]);
+        $uid = (int)$this->params()->fromRoute('key', 0);
+        $user = $this->userManager->getUserById($uid);
+        if (null == $user) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid user id');
+            return ;
+        }
+
+        return new ViewModel(['user' => $user]);
     }
 
 }

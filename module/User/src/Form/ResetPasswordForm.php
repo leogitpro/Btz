@@ -46,7 +46,7 @@ class ResetPasswordForm extends Form
             'name' => 'csrf',
             'options' => [
                 'csrf_options' => [
-                    'timeout' => 3600, // 60 minutes
+                    'timeout' => 600, // 10 minutes
                 ],
             ],
         ]);
@@ -102,6 +102,12 @@ class ResetPasswordForm extends Form
             'required' => true,
             'break_on_failure' => true,
             'filters'  => [
+                [
+                    'name' => 'StringToLower',
+                    'options' => [
+                        'encoding' => 'UTF-8',
+                    ],
+                ],
             ],
             'validators' => [
                 [
