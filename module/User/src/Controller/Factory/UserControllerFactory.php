@@ -17,11 +17,12 @@ use Interop\Container\ContainerInterface;
 class UserControllerFactory implements FactoryInterface
 {
 
-    public function __invoke(ContainerInterface $sm, $controllerName, array $options = null)
+    public function __invoke(ContainerInterface $serviceManager, $controllerName, array $options = null)
     {
-        $userManager = $sm->get(UserManager::class);
+        $userManager = $serviceManager->get(UserManager::class);
+        $authService = $serviceManager->get(\Zend\Authentication\AuthenticationService::class);
 
-        return new $controllerName($userManager);
+        return new $controllerName($userManager, $authService);
     }
 
 }

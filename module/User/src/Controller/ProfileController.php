@@ -11,6 +11,7 @@ namespace User\Controller;
 
 use Doctrine\ORM\EntityManager;
 use User\Service\UserManager;
+use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -24,13 +25,20 @@ class ProfileController extends AbstractActionController
 
 
     /**
+     * @var AuthenticationService
+     */
+    private $authService;
+
+
+    /**
      * AuthController constructor.
      *
      * @param UserManager $userManager
      */
-    public function __construct(UserManager $userManager)
+    public function __construct(UserManager $userManager, AuthenticationService $authService)
     {
         $this->userManager = $userManager;
+        $this->authService = $authService;
     }
 
     /**
@@ -40,7 +48,14 @@ class ProfileController extends AbstractActionController
      */
     public function indexAction()
     {
-        return new ViewModel();
+        $user = $this->userManager->getUserByEmail($this->authService->getIdentity());
+        if (null == $user) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . ' Invalid user identity');
+            return ;
+        }
+
+        return new ViewModel(['user' => $user]);
     }
 
 
