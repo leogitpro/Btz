@@ -35,6 +35,8 @@ class AuthManager
 
 
     /**
+     * Public actions list
+     *
      * @var array
      */
     private $config;
@@ -89,6 +91,37 @@ class AuthManager
             $this->authService->clearIdentity();
             $this->logger->debug(__METHOD__ . PHP_EOL . 'User logout success');
         }
+    }
+
+
+    /**
+     * Access control for controller and action.
+     * access by global configuration key: access_filter.
+     * Default forbid any access for unauthenticated user
+     *
+     * @param string $controller
+     * @param string $action
+     * @return bool
+     */
+    public function access($controller, $action)
+    {
+        if (!isset($this->config['controllers'])) { // Forbid any access if no access_filter configuration.
+            return false;
+        }
+
+        $identified = $this->authService->hasIdentity(); // Current auth status
+
+        if (!isset($this->config['controllers'][$controller])) {
+            // The controller has no configuration, only authenticated user can access
+            return $identified;
+        }
+
+        $actions = $this->config['controllers'][$controller]; // The listed actions
+        if (is_array($actions) && (in_array('*', $actions) || in_array($action, $actions))) {
+            return true;
+        }
+
+        return false;
     }
 
 

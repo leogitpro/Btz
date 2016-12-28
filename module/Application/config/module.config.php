@@ -183,4 +183,12 @@ return [
             ],
         ],
     ],
+
+    // Public actions access configuration
+    'access_filter' => [
+        'controllers' => [
+            Controller\IndexController::class => ['*'], // All action can ben access for unauthenticated user.
+            Controller\DisplayController::class => ['*'], // Same as the previous.
+        ],
+    ],
 ];

@@ -144,4 +144,16 @@ return [
             'reset_password_expired' => 24, // Hours
         ],
     ],
+
+    /**
+     * Module access filter configuration.
+     * Default limit all action access.
+     * If want action can been accessed by unauthenticated user. just register bellow the configuration
+     * Notice: * is a special flag for the controller's all actions can be access anonymous.
+     */
+    'access_filter' => [
+        'controllers' => [
+            Controller\AuthController::class => ['*'], // AuthController public all actions.
+        ],
+    ],
 ];

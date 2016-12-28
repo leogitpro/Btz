@@ -82,6 +82,11 @@ class AuthController extends AbstractActionController
      */
     public function loginAction()
     {
+        if ($this->authService->hasIdentity()) { // Forbid Re-login
+            $this->redirect()->toRoute('home');
+            return false;
+        }
+
         $form = new LoginForm();
         $isLoginError = 0;
 
