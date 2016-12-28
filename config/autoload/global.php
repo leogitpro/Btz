@@ -1,11 +1,5 @@
 <?php
 
-
-use Zend\Session\Validator\RemoteAddr;
-use Zend\Session\Validator\HttpUserAgent;
-use Zend\Session\Storage\SessionArrayStorage;
-
-
 return [
     'doctrine' => require(__DIR__ . '/doctrine.config.php'), //Global doctrine configuration.
 
@@ -25,23 +19,33 @@ return [
         'dotNoiseLevel' => 40, // The noise point number.
     ],
 
+    //**
     // Session configuration.
     'session_config' => [
-        'cookie_lifetime' => 60 * 60 * 1, // Session cookie will expire in 1 hour.
+        'cookie_lifetime' => 3600, // Session cookie will expire in 1 hour.
         'gc_maxlifetime' => 60 * 60 * 24 * 30, // Session data stored on server time: 30days.
+
+        /** Default php config
+        'save_handler' => 'files',
+        'save_path' => '/tmp',
+        //*/
+
+        //**
+        // Redis support need install PHP Redis extension
+        'save_handler' => 'redis',
+        'save_path' => 'tcp://192.168.30.81:6379?weight=1&timeout=1',
+        //*/
     ],
 
-    // Session manager configuration.
-    'session_manager' => [
-        // Session validators
+    'session_manager' => [ // Session manager configuration.
         'validators' => [
-            RemoteAddr::class,
-            HttpUserAgent::class,
+            \Zend\Session\Validator\RemoteAddr::class,
+            \Zend\Session\Validator\HttpUserAgent::class,
         ],
     ],
 
-    // Session storage configuration.
-    'session_storage' => [
-        'type' => SessionArrayStorage::class,
+    'session_storage' => [ // Session storage configuration.
+        'type' => \Zend\Session\Storage\SessionArrayStorage::class,
     ],
+    //*/
 ];

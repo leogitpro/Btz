@@ -21,17 +21,14 @@ class Module
     }
 
 
-
     /**
-     * This method is called once the MVC bootstrapping is complete.
+     *
+     * @param MvcEvent $event
      */
     public function onBootstrap(MvcEvent $event)
     {
-        $application = $event->getApplication();
-        $serviceManager = $application->getServiceManager();
-
-        // Init default session manager
-        $sessionManager = $serviceManager->get(SessionManager::class);
-        $sessionManager->start();
+        // Init Default Session
+        $event->getApplication()->getServiceManager()->get(SessionManager::class);
     }
+
 }
