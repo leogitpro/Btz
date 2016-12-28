@@ -45,23 +45,11 @@ class NavManager
     {
         $url = $this->urlHelper;
         $items = [];
+        array_push($items, ['id' => 'home', 'label' => 'Home', 'link' => $url('home')]);
+        array_push($items, ['id' => 'contact', 'label' => 'Contact Us', 'link' => $url('contact')]);
+        //array_push($items, ['id' => 'test', 'label' => 'Test', 'link' => $url('app/index', ['action' => 'test', 'suffix' => '.html'])]);
 
-        $items[] = [
-            'id' => 'home',
-            'label' => 'Home',
-            'link'  => $url('home'),
-        ];
 
-        //**
-        $items[] = [
-            'id' => 'test',
-            'label' => 'Test',
-            'link'  => $url('app/index_actions', ['action' => 'test', 'suffix' => '.html']),
-        ];
-        // */
-
-        // Display "Sign in" menu item for not authorized user only. On the other hand,
-        // display "Sign out" menu items only for authorized users.
         //**
         if (!$this->authService->hasIdentity()) {
             $items[] = [

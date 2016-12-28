@@ -38,6 +38,17 @@ return [
                 ],
             ],
 
+            'contact' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/contact.html',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action' => 'contact',
+                    ],
+                ],
+            ],
+
             'app' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -49,7 +60,7 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
-                    'index_actions' => [
+                    'index' => [
                         'type'    => Segment::class,
                         'options' => [
                             'route'    => 'index[/:action][:suffix]',
@@ -67,9 +78,10 @@ return [
             ],
         ],
     ],
+
     'controllers' => [
         'factories' => [
-            Controller\IndexController::class => InvokableFactory::class,
+            Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
             Controller\DisplayController::class => InvokableFactory::class,
         ],
     ],
@@ -121,11 +133,31 @@ return [
 
     'service_manager' => [
         'factories' => [
+            Service\ContactManager::class => Service\Factory\EntityManagerFactory::class,
             Service\MailManager::class => Service\Factory\MailManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
         ],
         'aliases' => [
             'Logger' => 'AppLogger', // The name: Logger is the key: $config['log']['AppLogger'].
+        ],
+    ],
+
+
+    // Doctrine entity configuration
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_driver' => [
+                'class' => \Doctrine\ORM\Mapping\Driver\AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [
+                    __DIR__ . '/../src/Entity',
+                ],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver',
+                ],
+            ],
         ],
     ],
 
@@ -182,6 +214,20 @@ return [
                 'ssl' => 'ssl',
             ],
         ],
+        'contact' => 'name@example.com',
+        'template' => [
+            'contact' => '
+Hi:
+    Master!
+    
+There is a new contact from the E-mail: %email%.
+
+%message%
+
+Message post time: %datetime%.
+Thanks!
+            ',
+        ],
     ],
 
     // Public actions access configuration
@@ -191,4 +237,5 @@ return [
             Controller\DisplayController::class => ['*'], // Same as the previous.
         ],
     ],
+
 ];

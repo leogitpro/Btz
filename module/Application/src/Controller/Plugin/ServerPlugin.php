@@ -8,10 +8,23 @@
 namespace Application\Controller\Plugin;
 
 
+use Zend\Http\PhpEnvironment\RemoteAddress;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ServerPlugin extends AbstractPlugin
 {
+
+    /**
+     * Get remote ip address
+     *
+     * @return string
+     */
+    public function ipAddress()
+    {
+        $remoteIpAddress = new RemoteAddress();
+        return $remoteIpAddress->getIpAddress();
+    }
+
 
     /**
      * Get current hostname

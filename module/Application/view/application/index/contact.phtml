@@ -1,36 +1,29 @@
-
 <?php
-$this->headTitle('Sign Up');
-
-$this->barMenu()->setActiveItemId('guest');
-
+$this->headTitle('Contact Us');
+$this->barMenu()->setActiveItemId('contact');
 $this->barBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    'Sign up' => '',
+    'Contact Us' => '',
 ]);
 
+$form = $this->form;
 
 $form->get('email')->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com'
 ]);
-
-$form->get('name')->setAttributes([
+$form->get('subject')->setAttributes([
     'class'=>'form-control',
-    'placeholder'=>'Leo'
+    'placeholder'=>'Type subject here'
 ]);
-
-$form->get('passwd')->setAttributes([
+$form->get('message')->setAttributes([
     'class'=>'form-control',
-    'placeholder'=>'Enter a password'
+    'rows'=>6,
+    'placeholder'=>'Type message text here'
 ]);
-
-$form->get('repasswd')->setAttributes([
-    'class'=>'form-control',
-    'placeholder'=>'Re-enter the password'
+$form->get('captcha')->setAttributes([
+    'class' => 'form-control',
 ]);
-
-
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $helper = $this->formElementErrors();
@@ -39,12 +32,14 @@ $helper->setMessageSeparatorString('</p><p class="text-danger">');
 $helper->setMessageCloseString('</p>');
 
 $form->prepare();
+
 ?>
 
-<h1>Sign up a account</h1>
+<h1>Contact Us</h1>
 
 <p>
-    Please fill out the following form and click the <i>Sign Up</i> button.
+    Please fill out the following form to contact us.
+    We appreciate your feedback.
 </p>
 
 <div class="row">
@@ -62,21 +57,21 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
-            <?php echo $this->formElement($form->get('name')); ?>
-            <?php echo $this->formElementErrors($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('subject')); ?>
+            <?php echo $this->formElement($form->get('subject')); ?>
+            <?php echo $this->formElementErrors($form->get('subject')); ?>
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('passwd')); ?>
-            <?php echo $this->formElement($form->get('passwd')); ?>
-            <?php echo $this->formElementErrors($form->get('passwd')); ?>
+            <?php echo $this->formLabel($form->get('message')); ?>
+            <?php echo $this->formElement($form->get('message')); ?>
+            <?php echo $this->formElementErrors($form->get('message')); ?>
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('repasswd')); ?>
-            <?php echo $this->formElement($form->get('repasswd')); ?>
-            <?php echo $this->formElementErrors($form->get('repasswd')); ?>
+            <?php echo $this->formElement($form->get('captcha')); ?>
+            <p class="hint">Please enter the letters above as you see them.</p>
+            <?php echo $this->formElementErrors($form->get('captcha')); ?>
         </div>
 
         <div class="form-group">
