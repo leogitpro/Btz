@@ -27,6 +27,12 @@ class NavManager
 
 
     /**
+     * @var array
+     */
+    private $items;
+
+
+    /**
      * NavManager constructor.
      *
      * @param AuthenticationService $authService
@@ -38,21 +44,34 @@ class NavManager
         $this->authService = $authService;
         $this->urlHelper = $urlHelper;
 
+        $this->items = [];
+
+        $this->addItem(['id' => 'home', 'label' => 'Home', 'link' => $urlHelper('home')]);
+        $this->addItem(['id' => 'contact', 'label' => 'Contact Us', 'link' => $urlHelper('contact')]);
+        //$this->addItem(['id' => 'about', 'label' => 'About', 'link' => $this->urlHelper('about')]);
     }
 
 
+    /**
+     * Add a item menu
+     *
+     * @param array $item
+     */
+    public function addItem($item) {
+        array_push($this->items, $item);
+    }
+
+
+    /**
+     * Get menu items
+     *
+     * @return array
+     */
     public function getMenuItems()
     {
         $url = $this->urlHelper;
-        $items = [];
-        array_push($items, ['id' => 'home', 'label' => 'Home', 'link' => $url('home')]);
-        array_push($items, ['id' => 'contact', 'label' => 'Contact Us', 'link' => $url('contact')]);
-        //array_push($items, ['id' => 'test', 'label' => 'Test', 'link' => $url('app/index', ['action' => 'test', 'suffix' => '.html'])]);
-
-
-        //**
         if (!$this->authService->hasIdentity()) {
-            $items[] = [
+            $this->items[] = [
                 'id' => 'guest',
                 'label' => 'Hi: Guest!',
                 'float' => 'right',
@@ -78,8 +97,7 @@ class NavManager
                 ]
             ];
         } else {
-
-            $items[] = [
+            $this->items[] = [
                 'id' => 'profile',
                 'label' => $this->authService->getIdentity(),
                 'float' => 'right',
@@ -117,8 +135,8 @@ class NavManager
                 ]
             ];
         }
-        //*/
-        return $items;
+
+        return $this->items;
     }
 
 }

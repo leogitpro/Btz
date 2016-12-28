@@ -25,16 +25,17 @@ class Version20161228093114 extends AbstractMigration
     public function up(Schema $schema)
     {
         $table = $schema->createTable($this->tableName);
-        $table->addColumn('cid', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('email', 'string', ['length' => 45, 'default' => '', 'comment' => '用户邮件地址']);
-        $table->addColumn('subject', 'string', ['length' => 128, 'default' => '', 'comment' => 'Subject']);
-        $table->addColumn('content', 'text', ['default' => '', 'notnull' => false, 'comment' => 'Message content']);
-        $table->addColumn('cread', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => 'message read status']);
-        $table->addColumn('status', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => 'message delete status']);
-        $table->addColumn('ip', 'string', ['length' => 20, 'default' => '', 'comment' => 'ip address']);
-        $table->addColumn('created', 'datetime', ['comment' => 'message post time']);
-        $table->setPrimaryKey(['cid']);
+        $table->addColumn('contact_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+        $table->addColumn('contact_email', 'string', ['length' => 45, 'default' => '', 'comment' => '用户邮件地址']);
+        $table->addColumn('contact_subject', 'string', ['length' => 128, 'default' => '', 'comment' => 'Subject']);
+        $table->addColumn('contact_content', 'text', ['default' => '', 'notnull' => false, 'comment' => 'Message content']);
+        $table->addColumn('contact_is_read', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => 'message read status']);
+        $table->addColumn('contact_status', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => 'message delete status']);
+        $table->addColumn('contact_from_ip', 'string', ['length' => 20, 'default' => '', 'comment' => 'ip address']);
+        $table->addColumn('contact_created', 'datetime', ['comment' => 'message post time']);
+        $table->setPrimaryKey(['contact_id']);
     }
+
 
     /**
      * @param Schema $schema

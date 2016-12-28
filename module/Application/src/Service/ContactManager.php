@@ -48,16 +48,16 @@ class ContactManager
      * @param string $ip
      * @return Contact
      */
-    public function createContactMessage($email, $subject, $message, $ip)
+    public function saveNewContact($email, $subject, $message, $ip)
     {
         $contact = new Contact();
-        $contact->setEmail($email);
-        $contact->setSubject($subject);
-        $contact->setContent($message);
-        $contact->setIp($ip);
-        $contact->setCread(Contact::READ_UNREAD);
-        $contact->setStatus(Contact::STATUS_NORMAL);
-        $contact->setCreated(date('Y-m-d H:i:s'));
+        $contact->setContactEmail($email);
+        $contact->setContactSubject($subject);
+        $contact->setContactContent($message);
+        $contact->setContactFromIp($ip);
+        $contact->setContactIsRead(Contact::STATUS_UNREAD);
+        $contact->setContactStatus(Contact::STATUS_NORMAL);
+        $contact->setContactCreated(date('Y-m-d H:i:s'));
 
         $this->entityManager->persist($contact);
         $this->entityManager->flush();

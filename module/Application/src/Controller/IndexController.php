@@ -12,6 +12,7 @@ use Application\Service\ContactManager;
 use Application\Service\MailManager;
 use Application\Service\NavManager;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
 
@@ -97,7 +98,7 @@ class IndexController extends AbstractActionController
                 $message = $data['message'];
                 $ip = $this->getServerPlugin()->ipAddress();
 
-                $this->contactManager->createContactMessage($email, $subject, $message, $ip);
+                $this->contactManager->saveNewContact($email, $subject, $message, $ip);
 
                 // Ready send mail
                 $contactMail = $this->getConfigPlugin()->get('mail.contact');
