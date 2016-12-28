@@ -5,8 +5,63 @@
 
 namespace Admin;
 
+
+use Zend\Router\Http\Segment;
+use Zend\ServiceManager\Factory\InvokableFactory;
+
+
 return [
-    'router' => require(__DIR__ . '/module.router.php'),
-    'controllers' => require(__DIR__ . '/module.controller.php'),
-    'view_manager' => require(__DIR__ . '/module.view.php'),
+
+    // Router configuration
+    'router' => [
+        'routes' => [
+            'admin' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/admin[/]',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes' => [
+                    // IndexController router configuration
+                    'default' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'index[/:action][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\IndexController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ], // End IndexController router
+
+                ],
+            ],
+        ],
+    ],
+
+    // Controller configuration
+    'controllers' => [
+        'factories' => [
+            Controller\IndexController::class => InvokableFactory::class,
+        ]
+    ],
+
+    // View configuration
+    'view_manager' => [
+        'template_map' => [
+            'layout/admin_simple'  => __DIR__ . '/../view/layout/simple.phtml',
+            'layout/admin_default' => __DIR__ . '/../view/layout/layout.phtml',
+        ],
+        'template_path_stack' => [
+            __DIR__ . '/../view',
+        ],
+    ],
 ];

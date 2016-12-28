@@ -94,6 +94,12 @@ class NavManager
                         'title' => 'Forgot password',
                         'link' => $url('user/auth', ['action' => 'forgot-password', 'suffix' => '.html'])
                     ],
+                    [
+                        'id' => 'admin',
+                        'label' => '<i class="fa fa-support" aria-hidden="true"></i> CPanel',
+                        'title' => 'Control Panel',
+                        'link' => $url('admin', ['suffix' => '.html'])
+                    ],
                 ]
             ];
         } else {

@@ -35,6 +35,8 @@ class Module
         $sharedEventManager = $event->getApplication()->getEventManager()->getSharedManager();
 
         // Register listener
+        // attach id use: AbstractActionController::class will listen all modules dispatch event
+        // AbstractActionController::class > __NAMESPACE__ will only listen the current module dispatch event.
         $sharedEventManager->attach(AbstractActionController::class, MvcEvent::EVENT_DISPATCH, [$this, 'dispatchListenerForAccess'], 100);
 
     }
