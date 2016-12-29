@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom authentication adapter
+ * User authentication adapter
  *
  * User: leo
  */
@@ -8,7 +8,6 @@
 namespace User\Service;
 
 
-use Doctrine\ORM\EntityManager;
 use User\Entity\User;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
@@ -17,10 +16,14 @@ class AuthAdapter implements AdapterInterface
 {
 
     /**
+     * @var UserManager
+     */
+    private $userManager;
+
+    /**
      * @var string
      */
     private $email;
-
 
     /**
      * @var string
@@ -28,16 +31,17 @@ class AuthAdapter implements AdapterInterface
     private $password;
 
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-
-
-    public function __construct(EntityManager $entityManager)
+    public function __construct(UserManager $userManager)
     {
-        $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 
     /**
@@ -49,23 +53,30 @@ class AuthAdapter implements AdapterInterface
     }
 
     /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
      * @param string $password
      */
     public function setPassword($password)
     {
-        $this->password = strtolower($password);
+        $this->password = $password;
     }
 
 
     /**
-     * @return mixed
+     * authenticate user identity
+     *
+     * @return Result
      */
     public function authenticate()
     {
-        //check user table select user by email
-        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($this->email);
-
-        // Invalid email address
+        $user = $this->userManager->getUserByEmail($this->getEmail());
         if (null == $user) {
             return new Result(
                 Result::FAILURE_IDENTITY_NOT_FOUND,
@@ -74,8 +85,7 @@ class AuthAdapter implements AdapterInterface
             );
         }
 
-        // Check user status is retired
-        if (User::STATUS_RETIRED == $user->getStatus()) {
+        if(User::STATUS_RETIRED == $user->getStatus()) {
             return new Result(
                 Result::FAILURE,
                 null,
@@ -83,8 +93,7 @@ class AuthAdapter implements AdapterInterface
             );
         }
 
-        // Check user password to pass authenticated
-        if($this->password == $user->getPasswd()) {
+        if($this->getPassword() == $user->getPasswd()) {
             return new Result(
                 Result::SUCCESS,
                 $this->email,
@@ -92,13 +101,11 @@ class AuthAdapter implements AdapterInterface
             );
         }
 
-        // Default auth failure
         return new Result(
             Result::FAILURE_CREDENTIAL_INVALID,
             null,
             ['Invalid credentials.']
         );
     }
-
 
 }

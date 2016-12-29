@@ -1,6 +1,6 @@
 <?php
 /**
- * AuthManagerFactory
+ * User authentication manager factory
  *
  * User: leo
  */
@@ -10,24 +10,20 @@ namespace User\Service\Factory;
 
 use Interop\Container\ContainerInterface;
 use User\Service\AuthManager;
+use User\Service\AuthService;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Session\SessionManager;
 
 class AuthManagerFactory implements FactoryInterface
 {
-    /**
-     * @param ContainerInterface $container
-     * @param string $requestedName
-     * @param array|null|null $options
-     * @return mixed
-     */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
-    {
-        $authenticationService = $container->get(\Zend\Authentication\AuthenticationService::class);
-        $sessionManager = $container->get(SessionManager::class);
-        $logger = $container->get('Logger');
 
-        $config = $container->get('Config');
+    public function __invoke(ContainerInterface $serviceManager, $requestedName, array $options = null)
+    {
+        $authService = $serviceManager->get(AuthService::class);
+        $sessionManager = $serviceManager->get(SessionManager::class);
+        $logger = $serviceManager->get('Logger');
+
+        $config = $serviceManager->get('Config');
         if(isset($config['access_filter'])) {
             $config = $config['access_filter'];
         } else {
@@ -35,7 +31,7 @@ class AuthManagerFactory implements FactoryInterface
         }
 
         // Instantiate the AuthManager service and inject dependencies to its constructor.
-        return new AuthManager($authenticationService, $sessionManager, $logger, $config);
+        return new AuthManager($authService, $sessionManager, $logger, $config);
     }
 
 

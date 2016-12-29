@@ -58,6 +58,7 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
+        echo '<pre>'; print_r($_SESSION); echo '</pre>';
 
         return new ViewModel();
     }

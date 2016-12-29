@@ -107,10 +107,10 @@ return [
     // Module service manager configuration
     'service_manager' => [
         'factories' => [
-            \Zend\Authentication\AuthenticationService::class => Service\Factory\AuthenticationServiceFactory::class,
             Service\UserManager::class => Service\Factory\UserManagerFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
+            Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
         ],
     ],
 

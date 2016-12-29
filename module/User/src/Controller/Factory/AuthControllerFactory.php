@@ -11,6 +11,7 @@ namespace User\Controller\Factory;
 use Interop\Container\ContainerInterface;
 use User\Controller\AuthController;
 use User\Service\AuthManager;
+use User\Service\AuthService;
 use User\Service\UserManager;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -25,7 +26,7 @@ class AuthControllerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $serviceManager, $controllerName, array $options = null)
     {
         $authManager = $serviceManager->get(AuthManager::class);
-        $authService = $serviceManager->get(\Zend\Authentication\AuthenticationService::class);
+        $authService = $serviceManager->get(AuthService::class);
         $userManager = $serviceManager->get(UserManager::class);
 
         return new AuthController($authManager, $authService, $userManager);

@@ -16,8 +16,8 @@ use User\Form\LoginForm;
 use User\Form\ResetPasswordForm;
 use User\Form\SignUpForm;
 use User\Service\AuthManager;
+use User\Service\AuthService;
 use User\Service\UserManager;
-use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Authentication\Result;
 use Zend\View\Model\ViewModel;
@@ -37,7 +37,7 @@ class AuthController extends AbstractActionController
     private $authManager;
 
     /**
-     * @var AuthenticationService
+     * @var AuthService
      */
     private $authService;
 
@@ -51,10 +51,10 @@ class AuthController extends AbstractActionController
      * AuthController constructor.
      *
      * @param AuthManager $authManager
-     * @param AuthenticationService $authService
+     * @param AuthService $authService
      * @param UserManager $userManager
      */
-    public function __construct(AuthManager $authManager, AuthenticationService $authService, UserManager $userManager)
+    public function __construct(AuthManager $authManager, AuthService $authService, UserManager $userManager)
     {
         $this->authManager = $authManager;
         $this->authService = $authService;

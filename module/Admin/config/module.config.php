@@ -64,4 +64,31 @@ return [
             __DIR__ . '/../view',
         ],
     ],
+
+    // Service manager configuration
+    'service_manager' => [
+        'factories' => [
+            Service\AdminAuthAdapter::class => Service\Factory\AdminAuthAdapterFactory::class,
+        ],
+    ],
+
+
+    // Doctrine entity configuration
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_driver' => [
+                'class' => \Doctrine\ORM\Mapping\Driver\AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [
+                    __DIR__ . '/../src/Entity',
+                ],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver',
+                ],
+            ],
+        ],
+    ],
+
 ];

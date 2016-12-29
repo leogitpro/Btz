@@ -10,6 +10,7 @@ namespace Application\Service\Factory;
 
 use Application\Service\NavManager;
 use Interop\Container\ContainerInterface;
+use User\Service\AuthService;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class NavManagerFactory implements FactoryInterface
@@ -22,7 +23,7 @@ class NavManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $authService = $container->get(\Zend\Authentication\AuthenticationService::class);
+        $authService = $container->get(AuthService::class);
 
         $viewHelperManager = $container->get('ViewHelperManager');
         $urlHelper = $viewHelperManager->get('url');

@@ -8,7 +8,6 @@
 namespace User\Service;
 
 
-use Zend\Authentication\AuthenticationService;
 use Zend\Log\Logger;
 use Zend\Session\SessionManager;
 use Zend\Authentication\Result;
@@ -17,7 +16,7 @@ class AuthManager
 {
 
     /**
-     * @var AuthenticationService
+     * @var AuthService
      */
     private $authService;
 
@@ -42,7 +41,7 @@ class AuthManager
     private $config;
 
 
-    public function __construct(AuthenticationService $authService, SessionManager $sessionManager, Logger $logger, $config)
+    public function __construct(AuthService $authService, SessionManager $sessionManager, Logger $logger, $config)
     {
         $this->authService = $authService;
         $this->sessionManager = $sessionManager;

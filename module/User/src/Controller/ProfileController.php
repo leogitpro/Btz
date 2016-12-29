@@ -11,8 +11,8 @@ namespace User\Controller;
 use User\Form\UpdateEmailForm;
 use User\Form\UpdatePasswordForm;
 use User\Form\UpdateProfileForm;
+use User\Service\AuthService;
 use User\Service\UserManager;
-use Zend\Authentication\AuthenticationService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -26,7 +26,7 @@ class ProfileController extends AbstractActionController
 
 
     /**
-     * @var AuthenticationService
+     * @var AuthService
      */
     private $authService;
 
@@ -35,9 +35,9 @@ class ProfileController extends AbstractActionController
      * ProfileController constructor.
      *
      * @param UserManager $userManager
-     * @param AuthenticationService $authService
+     * @param AuthService $authService
      */
-    public function __construct(UserManager $userManager, AuthenticationService $authService)
+    public function __construct(UserManager $userManager, AuthService $authService)
     {
         $this->userManager = $userManager;
         $this->authService = $authService;

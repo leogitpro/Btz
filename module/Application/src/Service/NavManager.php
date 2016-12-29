@@ -8,14 +8,14 @@
 namespace Application\Service;
 
 
-use Zend\Authentication\AuthenticationService;
+use User\Service\AuthService;
 use Zend\View\Helper\Url;
 
 class NavManager
 {
 
     /**
-     * @var AuthenticationService
+     * @var AuthService
      */
     private $authService;
 
@@ -35,10 +35,10 @@ class NavManager
     /**
      * NavManager constructor.
      *
-     * @param AuthenticationService $authService
+     * @param AuthService $authService
      * @param Url $urlHelper
      */
-    public function __construct(AuthenticationService $authService, Url $urlHelper)
+    public function __construct(AuthService $authService, Url $urlHelper)
     {
 
         $this->authService = $authService;
