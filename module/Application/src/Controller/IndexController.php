@@ -58,6 +58,12 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
+        $ip = $this->getServerPlugin()->ipAddress();
+        $ua = $this->getServerPlugin()->userAgent();
+
+        echo '<p>ip: ' . $ip . '</p>';
+        echo '<p>ua: ' . $ua . '</p>';
+
         echo '<pre>'; print_r($_SESSION); echo '</pre>';
 
         return new ViewModel();

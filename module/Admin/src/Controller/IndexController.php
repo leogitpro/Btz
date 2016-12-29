@@ -7,6 +7,7 @@ namespace Admin\Controller;
 
 
 use Admin\Form\LoginForm;
+use Admin\Service\AuthService;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -15,13 +16,22 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
+        $sm = $this->getEvent()->getApplication()->getServiceManager();
+        $authService = $sm->get(AuthService::class);
+
+        if ($authService->hasIdentity()) {
+            //todo
+        } else {
+            //$this->redirect()->toRoute('admin/default', ['action' => 'login', 'suffix' => '.html']);
+        }
+
         return new ViewModel();
     }
 
 
     public function loginAction()
     {
-        //**
+        /**
         $form = new LoginForm();
 
         if($this->getRequest()->isPost())
@@ -35,6 +45,6 @@ class IndexController extends AbstractActionController
         }
         //*/
 
-        return new ViewModel(['form' => $form]);
+        return new ViewModel();
     }
 }

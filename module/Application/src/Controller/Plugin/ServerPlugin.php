@@ -21,8 +21,22 @@ class ServerPlugin extends AbstractPlugin
      */
     public function ipAddress()
     {
-        $remoteIpAddress = new RemoteAddress();
-        return $remoteIpAddress->getIpAddress();
+        $remoteAddress = new RemoteAddress();
+        $remoteAddress->setUseProxy(false);
+        $remoteAddress->setTrustedProxies([]);
+        $remoteAddress->setProxyHeader('HTTP_X_FORWARDED_FOR');
+        return $remoteAddress->getIpAddress();
+    }
+
+
+    /**
+     * Get user agent
+     *
+     * @return string
+     */
+    public function userAgent()
+    {
+        return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
     }
 
 

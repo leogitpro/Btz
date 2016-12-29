@@ -17,7 +17,7 @@ use Zend\Authentication\AuthenticationService;
  *
  * @package Admin\Service
  */
-class AdminAuthService extends AuthenticationService
+class AuthService extends AuthenticationService
 {
 
 }

@@ -10,15 +10,21 @@ namespace Admin\Service;
 
 use Doctrine\ORM\EntityManager;
 use Zend\Authentication\Adapter\AdapterInterface;
+use Zend\Log\Logger;
 
 
-class AdminAuthAdapter implements AdapterInterface
+class AuthAdapter implements AdapterInterface
 {
 
     /**
      * @var EntityManager
      */
     private $entityManager;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * @var string
@@ -33,13 +39,15 @@ class AdminAuthAdapter implements AdapterInterface
 
 
     /**
-     * AdminAuthAdapter constructor.
+     * AuthAdapter constructor.
      *
      * @param EntityManager $entityManager
+     * @param Logger $logger
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, Logger $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     /**
