@@ -1,0 +1,48 @@
+<?php
+
+$this->headTitle('Message');
+
+if($delay > 0) {
+
+    $this->inlineScript()->captureStart();
+    echo <<<JS
+    $(function(){
+        var seconds = parseInt($("#delay_seconds").text());
+        var url = $("#reload_url").attr("href");
+        
+        if(seconds > 0) {
+            var timer = window.setInterval(function(){
+                seconds--;
+                $("#delay_seconds").text("" + seconds);
+                if(seconds < 1) {
+                    window.clearInterval(timer);
+                    window.location.href = url;
+                }
+            }, 1000);
+        }
+    });
+JS;
+    $this->inlineScript()->captureEnd();
+
+}
+
+?>
+
+
+<div id="centered_container" class="centered">
+    <div class="jumbotron message-container">
+        <h3><?php echo $msg_title; ?></h3>
+        <p><?php echo $msg_content; ?></p>
+        <?php if(!empty($url_title) && !empty($url_href)) { ?>
+            <p>
+                <a class="btn btn-primary" id="reload_url" href="<?php echo $url_href; ?>" role="button"><?php echo $url_title; ?></a>
+                <?php if($delay > 0) { ?>
+
+                    <small><i class="fa fa-spinner fa-spin fa-fw"></i> After <strong id="delay_seconds"><?php echo (int)$delay; ?></strong>s page will be auto reload!</small>
+                <?php } ?>
+            </p>
+        <?php } ?>
+    </div>
+</div>
+
+

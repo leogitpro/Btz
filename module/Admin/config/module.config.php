@@ -26,6 +26,7 @@ return [
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
+
                     // IndexController router configuration
                     'default' => [
                         'type' => Segment::class,
@@ -42,6 +43,22 @@ return [
                         ],
                     ], // End IndexController router
 
+                    // DashboardController router configuration
+                    'dashboard' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'dashboard[/:action][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\DashboardController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ], // End DashboardController router
+
                 ],
             ],
         ],
@@ -51,14 +68,24 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
-        ]
+            Controller\DashboardController::class => InvokableFactory::class,
+        ],
     ],
+    'controller_plugins' => [
+        'factories' => [
+            Controller\Plugin\MessagePlugin::class => InvokableFactory::class,
+        ],
+        'aliases' => [
+            'getMessagePlugin' => Controller\Plugin\MessagePlugin::class,
+        ],
+    ],
+
 
     // View configuration
     'view_manager' => [
         'template_map' => [
             'layout/admin_simple'  => __DIR__ . '/../view/layout/simple.phtml',
-            'layout/admin_default' => __DIR__ . '/../view/layout/layout.phtml',
+            'layout/admin_layout' => __DIR__ . '/../view/layout/layout.phtml',
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',

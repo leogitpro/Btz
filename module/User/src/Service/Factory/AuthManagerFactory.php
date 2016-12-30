@@ -23,7 +23,7 @@ class AuthManagerFactory implements FactoryInterface
         $sessionManager = $serviceManager->get(SessionManager::class);
         $logger = $serviceManager->get('Logger');
 
-        $config = $serviceManager->get('Config');
+        $config = $serviceManager->get('config');
         if(isset($config['access_filter'])) {
             $config = $config['access_filter'];
         } else {

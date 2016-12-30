@@ -1,80 +1,69 @@
-
 <?php
+$this->headTitle('Administrator login');
+
 $form = $this->form;
+
+$form->get('email')->setAttributes([
+    'class'=>'form-control',
+    'placeholder'=>'name@example.com'
+]);
+$form->get('password')->setAttributes([
+    'class'=>'form-control',
+    'placeholder'=>'Enter your password'
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$helper = $this->formElementErrors();
+$helper->setMessageOpenFormat('<p class="text-danger">');
+$helper->setMessageSeparatorString('</p><p class="text-danger">');
+$helper->setMessageCloseString('</p>');
+
 $form->prepare();
+
 ?>
 
+<div id="centered_container" class="centered">
+    <div class="login-container">
+        <h3 class="text-center">Administrator</h3>
 
-<div class="wrapper login-wrapper">
+        <?php if(1 != $login_code) { ?>
+        <div class="alert alert-warning" role="alert">
+            <?php if(-1 == $login_code) { ?>
+            <strong>Warning!</strong> E-mail address invalid.
+            <?php } ?>
+            <?php if(0 == $login_code) { ?>
+                <strong>Warning!</strong> Your account was retried.
+            <?php } ?>
+            <?php if(-3 == $login_code) { ?>
+                <strong>Warning!</strong> Authentication failed.
+            <?php } ?>
+        </div>
+        <?php } ?>
 
-    <div class="row">
+        <?php echo $this->form()->openTag($form); ?>
 
-
-        <div class="panel panel-default login-panel">
-            <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-openid"></i> Passport</h3>
-            </div>
-            <div class="panel-body">
-
-
-
-                <?php echo $this->form()->openTag($form); ?>
-
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="fa fa-user" aria-hidden="true"></i>
-                        </span>
-                        <?php
-                        echo $this->formElement($form->get('email'));
-                        ?>
-                    </div>
-                    <?php /** echo $this->formLabel($form->get('email'));  */ ?>
-                    <?php
-                    echo $this->formElementErrors($form->get('email'), ['class' => 'input-error small text-danger']);
-                    ?>
-
-                </div>
-
-
-
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="fa fa-asterisk" aria-hidden="true"></i>
-                        </span>
-                        <?php
-                        echo $this->formElement($form->get('passwd'));
-                        ?>
-                    </div>
-                    <?php /**  echo $this->formLabel($form->get('passwd')); */ ?>
-                    <?php
-                    echo $this->formElementErrors($form->get('passwd'), ['class' => 'input-error small text-danger']);
-                    ?>
-
-                </div>
-
-                <div class="form-group">
-
-                    <?php echo $this->formElement($form->get('submit')); ?>
-
-                </div>
-
-                <?php echo $this->form()->closeTag(); ?>
-
-            </div>
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
         </div>
 
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('email')); ?>
+            <?php echo $this->formElement($form->get('email')); ?>
+            <?php echo $this->formElementErrors($form->get('email')); ?>
+        </div>
 
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('password')); ?>
+            <?php echo $this->formElement($form->get('password')); ?>
+            <?php echo $this->formElementErrors($form->get('password')); ?>
+        </div>
 
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
 
     </div>
-
 </div>
-
-
-
-
-
-

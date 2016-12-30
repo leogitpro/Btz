@@ -7,6 +7,12 @@
  */
 
 return [
+
+    // Application configuration
+    'application' => [
+        'env' => 'production',
+    ],
+
     // Retrieve list of modules used in this application.
     'modules' => require __DIR__ . '/modules.config.php',
 

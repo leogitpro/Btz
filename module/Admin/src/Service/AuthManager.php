@@ -44,11 +44,10 @@ class AuthManager
      *
      * @param string $email
      * @param string $password
-     * @param integer $remember_me
      * @return Result
      * @throws \Exception
      */
-    public function login($email, $password, $remember_me)
+    public function login($email, $password)
     {
         // Check if administrator has already logged in. If so, do not allow to log in twice.
         if(null != $this->authService->getIdentity()) {
@@ -61,10 +60,6 @@ class AuthManager
         $authAdapter->setEmail($email);
         $authAdapter->setPassword($password);
         $result = $this->authService->authenticate();
-
-        if ($result->getCode() == Result::SUCCESS && $remember_me) {
-            $this->sessionManager->rememberMe(60*60*24*30); // Session cookie lifetime to One month
-        }
 
         return $result;
     }

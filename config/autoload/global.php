@@ -1,6 +1,8 @@
 <?php
 
 return [
+
+    // Doctrine configuration
     'doctrine' => require(__DIR__ . '/doctrine.config.php'), //Global doctrine configuration.
 
     // Captcha configuration

@@ -74,8 +74,12 @@ class Module
      */
     public function onDispatchListener(MvcEvent $event)
     {
+        $appConfig = $event->getApplication()->getServiceManager()->get('ApplicationConfig');
+        $appEnv = isset($appConfig['application']['env']) ? $appConfig['application']['env'] : 'development';
+
         $viewModel = $event->getViewModel();
-        $viewModel->setTemplate('layout/admin_simple');
+        $viewModel->setTemplate('layout/admin_layout');
+        $viewModel->setVariable('appEnv', $appEnv);
     }
 
 }
