@@ -57,7 +57,7 @@ class AuthManager
 
         // Authentication with login/password
         $authAdapter = $this->authService->getAdapter();
-        $authAdapter->setEmail($email);
+        $authAdapter->setAccount($email);
         $authAdapter->setPassword($password);
         $result = $this->authService->authenticate();
 

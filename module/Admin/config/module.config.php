@@ -95,7 +95,7 @@ return [
     // Service manager configuration
     'service_manager' => [
         'factories' => [
-            Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
+            Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
             Service\AdminerManager::class => Service\Factory\EntityManagerFactory::class,
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,

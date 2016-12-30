@@ -8,23 +8,18 @@
 namespace Admin\Service;
 
 
-use Doctrine\ORM\EntityManager;
+use Admin\Entity\Adminer;
 use Zend\Authentication\Adapter\AdapterInterface;
-use Zend\Log\Logger;
+use Zend\Authentication\Result;
 
 
 class AuthAdapter implements AdapterInterface
 {
 
     /**
-     * @var EntityManager
+     * @var AdminerManager
      */
-    private $entityManager;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
+    private $adminerManager;
 
     /**
      * @var string
@@ -41,13 +36,11 @@ class AuthAdapter implements AdapterInterface
     /**
      * AuthAdapter constructor.
      *
-     * @param EntityManager $entityManager
-     * @param Logger $logger
+     * @param AdminerManager $adminerManager
      */
-    public function __construct(EntityManager $entityManager, Logger $logger)
+    public function __construct(AdminerManager $adminerManager)
     {
-        $this->entityManager = $entityManager;
-        $this->logger = $logger;
+        $this->adminerManager = $adminerManager;
     }
 
     /**
@@ -83,8 +76,42 @@ class AuthAdapter implements AdapterInterface
     }
 
 
+    /**
+     * Authenticate administrator login
+     *
+     * @return Result
+     */
     public function authenticate()
     {
-        // TODO: Implement authenticate() method.
+        $adminer = $this->adminerManager->getAdministratorByEmail($this->getAccount());
+        if (null == $adminer) {
+            return new Result(
+                Result::FAILURE_IDENTITY_NOT_FOUND,
+                null,
+                ['Invalid identity.']
+            );
+        }
+
+        if (Adminer::STATUS_RETRIED == $adminer->getAdminStatus()) {
+            return new Result(
+                Result::FAILURE_UNCATEGORIZED,
+                null,
+                ['Administrator was retired.']
+            );
+        }
+
+        if ($this->getPassword() == $adminer->getAdminPasswd()) {
+            return new Result(
+                Result::SUCCESS,
+                $this->getAccount(),
+                ['Authenticated successfully.']
+            );
+        }
+
+        return new Result(
+            Result::FAILURE,
+            null,
+            ['Authenticated failure.']
+        );
     }
 }

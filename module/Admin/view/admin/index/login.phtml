@@ -32,10 +32,10 @@ $form->prepare();
             <?php if(-1 == $login_code) { ?>
             <strong>Warning!</strong> E-mail address invalid.
             <?php } ?>
-            <?php if(0 == $login_code) { ?>
+            <?php if(-4 == $login_code) { ?>
                 <strong>Warning!</strong> Your account was retried.
             <?php } ?>
-            <?php if(-3 == $login_code) { ?>
+            <?php if(0 == $login_code) { ?>
                 <strong>Warning!</strong> Authentication failed.
             <?php } ?>
         </div>

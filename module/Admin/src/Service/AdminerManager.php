@@ -54,7 +54,7 @@ class AdminerManager
      */
     public function getAdministratorByEmail($email)
     {
-        return $this->entityManager->getRepository(Adminer::class)->findOneBy(['adminEmail' => $email]);
+        return $this->entityManager->getRepository(Adminer::class)->findOneBy(['admin_email' => $email]);
     }
 
 

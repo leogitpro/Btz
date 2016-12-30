@@ -57,7 +57,7 @@ class IndexController extends AbstractActionController
                 $data = $form->getData();
                 $sm = $this->getEvent()->getApplication()->getServiceManager();
                 $authManager = $sm->get(AuthManager::class);
-                $result = $authManager->login($data['email'], $data['password']);
+                $result = $authManager->login($data['email'], md5($data['password']));
 
                 if (Result::SUCCESS == $result->getCode()) {
                     return $this->getMessagePlugin()->show(
@@ -83,7 +83,7 @@ class IndexController extends AbstractActionController
      *
      * @return mixed
      */
-    public function logout()
+    public function logoutAction()
     {
         $sm = $this->getEvent()->getApplication()->getServiceManager();
         $authManager = $sm->get(AuthManager::class);

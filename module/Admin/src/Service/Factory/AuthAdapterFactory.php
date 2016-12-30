@@ -9,7 +9,8 @@
 namespace Admin\Service\Factory;
 
 
-use Admin\Service\AdminAuthAdapter;
+use Admin\Service\AdminerManager;
+use Admin\Service\AuthAdapter;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -17,10 +18,9 @@ class AuthAdapterFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $serviceManager, $requestedName, array $options = null)
     {
-        // Get the entity manger inject to the adapter
-        $entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
+        $adminerManager = $serviceManager->get(AdminerManager::class);
 
-        return new AdminAuthAdapter($entityManager);
+        return new AuthAdapter($adminerManager);
     }
 
 

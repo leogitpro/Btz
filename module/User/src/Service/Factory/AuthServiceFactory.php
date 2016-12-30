@@ -20,7 +20,7 @@ class AuthServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $serviceManager, $requestedName, array $options = null)
     {
         $sessionManager = $serviceManager->get(SessionManager::class);
-        $authStorage = new SessionStorage('User_Auth', 'usersess', $sessionManager);
+        $authStorage = new SessionStorage('User_Auth', 'identity', $sessionManager);
         $authAdapter = $serviceManager->get(AuthAdapter::class);
 
         return new AuthService($authStorage, $authAdapter);
