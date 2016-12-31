@@ -42,6 +42,7 @@ class Version20161114165551 extends AbstractMigration
         $table->addColumn('admin_passwd', 'string', ['length' => 32, 'default' => '', 'fixed' => true, 'comment' => '用户密码.']);
         $table->addColumn('admin_name', 'string', ['length' => 45, 'default' => '', 'comment' => '用户名称.']);
         $table->addColumn('admin_status', 'smallint', ['unsigned' => true, 'default' => 0, 'comment' => '用户状态.']);
+        $table->addColumn('admin_created', 'datetime', ['comment' => 'create datetime.']);
         $table->setPrimaryKey(['admin_id']);
 
         /** Error call

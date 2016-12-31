@@ -66,6 +66,14 @@ class Adminer
      */
     private $admin_status;
 
+    /**
+     * Administrator created datetime
+     *
+     * @var string
+     * @ORM\Column(name="admin_created")
+     */
+    private $admin_created;
+
 
     /**
      * Get status list
@@ -173,6 +181,22 @@ class Adminer
     public function setAdminStatus($admin_status)
     {
         $this->admin_status = $admin_status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAdminCreated()
+    {
+        return $this->admin_created;
+    }
+
+    /**
+     * @param mixed $admin_created
+     */
+    public function setAdminCreated($admin_created)
+    {
+        $this->admin_created = $admin_created;
     }
 
 

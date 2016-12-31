@@ -103,7 +103,7 @@ class AuthAdapter implements AdapterInterface
         if ($this->getPassword() == $adminer->getAdminPasswd()) {
             return new Result(
                 Result::SUCCESS,
-                $this->getAccount(),
+                $adminer->getAdminId(),
                 ['Authenticated successfully.']
             );
         }

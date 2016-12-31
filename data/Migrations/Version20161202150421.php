@@ -23,8 +23,8 @@ class Version20161202150421 extends AbstractMigration
     public function up(Schema $schema)
     {
         $this->addSql(
-            'INSERT INTO `sys_adminer` (`admin_email`, `admin_passwd`, `admin_name`, `admin_status`) VALUES (?, ?, ?, ?)',
-            ['leo@email.com', strtolower(md5('12345')), 'Leo', 1]
+            'INSERT INTO `sys_adminer` (`admin_email`, `admin_passwd`, `admin_name`, `admin_status`, `admin_created`) VALUES (?, ?, ?, ?, ?)',
+            ['admin@example.com', strtolower(md5('12345')), 'Administrator', 1, date('Y-m-d H:i:s')]
         );
     }
 
@@ -33,6 +33,6 @@ class Version20161202150421 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        $this->addSql('DELETE FROM `sys_adminer` WHERE `admin_email` = ?', ['leo@email.com']);
+        $this->addSql('DELETE FROM `sys_adminer` WHERE `admin_email` = ?', ['admin@example.com']);
     }
 }

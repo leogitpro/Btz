@@ -6,6 +6,8 @@
 namespace Admin;
 
 
+use Admin\Controller\IndexController;
+use Admin\Service\AuthService;
 use Zend\Mvc\MvcEvent;
 
 
@@ -74,12 +76,34 @@ class Module
      */
     public function onDispatchListener(MvcEvent $event)
     {
-        $appConfig = $event->getApplication()->getServiceManager()->get('ApplicationConfig');
+        // Application running env flag
+        $serviceManager = $event->getApplication()->getServiceManager();
+        $appConfig = $serviceManager->get('ApplicationConfig');
         $appEnv = isset($appConfig['application']['env']) ? $appConfig['application']['env'] : 'development';
-
         $viewModel = $event->getViewModel();
-        $viewModel->setTemplate('layout/admin_layout');
         $viewModel->setVariable('appEnv', $appEnv);
+
+
+        // Get controller name which was dispatched.
+        $controller = $event->getRouteMatch()->getParam('controller', null);
+        if($controller == IndexController::class) { // Allow all access
+            return ;
+        }
+
+        // Login status validate
+        $authService = $serviceManager->get(AuthService::class);
+        if (!$authService->hasIdentity()) {
+            return $event->getTarget()->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
+        }
+
+        // Set module default template
+        $viewModel->setTemplate('layout/admin_layout');
+
+        // ACL filter
+        $action = $event->getRouteMatch()->getParam('action', null);
+        $action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
+        // Todo
+
     }
 
 }

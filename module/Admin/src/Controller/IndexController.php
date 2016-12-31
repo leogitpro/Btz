@@ -37,7 +37,7 @@ class IndexController extends AbstractActionController
         if ($authService->hasIdentity()) {
             $this->redirect()->toRoute('admin/dashboard', ['suffix' => '.html']);
         } else {
-            $this->redirect()->toRoute('admin/default', ['action' => 'login', 'suffix' => '.html']);
+            $this->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
         }
     }
 

@@ -58,5 +58,75 @@ class AdminerManager
     }
 
 
+    /**
+     * Update edited administrator information to database.
+     *
+     * @param Adminer $adminer
+     * @return Adminer
+     */
+    public function saveUpdatedAdministrator(Adminer $adminer)
+    {
+        if (null != $adminer) {
+            $this->entityManager->persist($adminer);
+            $this->entityManager->flush();
+        }
+
+        return $adminer;
+    }
+
+
+    /**
+     * Update a administrator password
+     *
+     * @param integer $adminerId
+     * @param string $password
+     * @return Adminer
+     */
+    public function updateAdministratorPassword($adminerId, $password)
+    {
+        $adminer = $this->getAdministrator($adminerId);
+        if (null == $adminer) {
+            $this->logger->err(__METHOD__ . PHP_EOL . 'Get administrator by id(' . $adminerId . ') failure');
+            return false;
+        }
+
+        $adminer->setAdminPasswd($password);
+
+        $this->entityManager->persist($adminer);
+        $this->entityManager->flush();
+
+        return $adminer;
+    }
+
+
+    /**
+     * Update a administrator password
+     *
+     * @param string $email
+     * @param string $password
+     * @return Adminer
+     */
+    public function updateAdministratorPasswordByEmail($email, $password)
+    {
+        $adminer = $this->getAdministratorByEmail($email);
+        if (null == $adminer) {
+            $this->logger->err(__METHOD__ . PHP_EOL . 'Get administrator by email(' . $email . ') failure');
+            return false;
+        }
+
+        $adminer->setAdminPasswd($password);
+
+        $this->entityManager->persist($adminer);
+        $this->entityManager->flush();
+
+        return $adminer;
+    }
+
+
+
+
+
+
+
 
 }

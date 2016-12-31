@@ -28,7 +28,7 @@ return [
                 'child_routes' => [
 
                     // IndexController router configuration
-                    'default' => [
+                    'index' => [
                         'type' => Segment::class,
                         'options' => [
                             'route' => 'index[/:action][:suffix]',
@@ -59,6 +59,39 @@ return [
                         ],
                     ], // End DashboardController router
 
+
+                    'dashboard_detail' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'dashboard/:action/:key[:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\DashboardController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+
+                    // DashboardController router configuration
+                    'profile' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'profile[/:action][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\ProfileController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ], // End DashboardController router
+
                 ],
             ],
         ],
@@ -69,6 +102,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\DashboardController::class => InvokableFactory::class,
+            Controller\ProfileController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -92,6 +126,22 @@ return [
         ],
     ],
 
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\TopRightMenu::class => View\Helper\Factory\MenuFactory::class,
+            View\Helper\SideTreeMenu::class => View\Helper\Factory\MenuFactory::class,
+            View\Helper\PageTitleBar::class => InvokableFactory::class,
+            View\Helper\PageBreadcrumbBar::class => View\Helper\Factory\MenuFactory::class,
+        ],
+        'aliases' => [
+            'topRightMenu' => View\Helper\TopRightMenu::class,
+            'sideTreeMenu' => View\Helper\SideTreeMenu::class,
+            'pageTitleBar' => View\Helper\PageTitleBar::class,
+            'pageBreadcrumbBar' => View\Helper\PageBreadcrumbBar::class,
+        ],
+    ],
+
+
     // Service manager configuration
     'service_manager' => [
         'factories' => [
@@ -99,6 +149,7 @@ return [
             Service\AdminerManager::class => Service\Factory\EntityManagerFactory::class,
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
+            Service\NavManager::class => Service\Factory\NavManagerFactory::class,
         ],
     ],
 
