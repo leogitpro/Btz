@@ -24,9 +24,9 @@ class NavManager
     private $authService;
 
     /**
-     * @var AdminerManager
+     * @var MemberManager
      */
-    private $adminerManager;
+    private $memberManager;
 
     /**
      * @var array
@@ -45,10 +45,10 @@ class NavManager
     private $breadcrumbItems;
 
 
-    public function __construct(AuthService $authService, AdminerManager $adminerManager, Url $url)
+    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url)
     {
         $this->authService = $authService;
-        $this->adminerManager = $adminerManager;
+        $this->memberManager = $memberManager;
         $this->urlHelper = $url;
 
         $this->initTopRightItem();
@@ -119,25 +119,25 @@ class NavManager
         if(!$this->authService->hasIdentity()) {
             return ;
         }
-        $identity = $this->authService->getIdentity();
 
-        $adminer = $this->adminerManager->getAdministrator($identity);
-        if (null == $adminer) {
+        $identity = $this->authService->getIdentity();
+        $member = $this->memberManager->getMember($identity);
+        if (null == $member) {
             return ;
         }
 
         $url = $this->urlHelper;
 
         // Current user profile menu configuration
-        $adminerItem = $this->createNavItem('profile_menu', 'user', $adminer->getAdminName());
-        $adminerItem['dropdown'] = [
-            $this->createNavItem('summary', 'user', 'Summary', $url('admin/profile'), $adminer->getAdminName()),
+        $memberItem = $this->createNavItem('profile_menu', 'user', $member->getMemberName());
+        $memberItem['dropdown'] = [
+            $this->createNavItem('summary', 'user', 'Summary', $url('admin/profile'), $member->getMemberName()),
             $this->createNavItem('password', 'key', 'Password', $url('admin/profile', ['action' => 'password'])),
             $this->createNavItem('profile_detail', 'cog', 'Profile detail', $url('admin/profile', ['action' => 'update'])),
             $this->createNavItem('', '', '', '', '', 'divider'),
             $this->createNavItem('profile_logout', 'sign-out', 'Logout', $url('admin/index', ['action' => 'logout', 'suffix' => '.html'])),
         ];
-        $this->addTopRightItem($adminerItem);
+        $this->addTopRightItem($memberItem);
 
         // Logout menu configuration
         $logoutItem = $this->createNavItem('logout', 'sign-out', 'Logout', $url('admin/index', ['action' => 'logout', 'suffix' => '.html']));

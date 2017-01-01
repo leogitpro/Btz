@@ -12,11 +12,35 @@ use Admin\Form\UpdatePasswordForm;
 use Admin\Form\UpdateProfileForm;
 use Admin\Service\AdminerManager;
 use Admin\Service\AuthService;
+use Admin\Service\MemberManager;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
 class ProfileController extends AbstractActionController
 {
+
+    /**
+     * @var AuthService
+     */
+    private $authService;
+
+    /**
+     * @var MemberManager
+     */
+    private $memberManager;
+
+
+    public function onDispatch(MvcEvent $e)
+    {
+        $serviceManager = $e->getApplication()->getServiceManager();
+
+        $this->authService = $serviceManager->get(AuthService::class);
+        $this->memberManager = $serviceManager->get(MemberManager::class);
+
+        return parent::onDispatch($e);
+    }
+
 
     /**
      * Show administrator summary information page.
@@ -25,14 +49,9 @@ class ProfileController extends AbstractActionController
      */
     public function indexAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
+        $member = $this->memberManager->getMember($this->authService->getIdentity());
 
-        $authService = $sm->get(AuthService::class);
-        $adminerManager = $sm->get(AdminerManager::class);
-
-        $adminer = $adminerManager->getAdministrator($authService->getIdentity());
-
-        return new ViewModel(['adminer' => $adminer]);
+        return new ViewModel(['member' => $member]);
     }
 
 
@@ -43,19 +62,20 @@ class ProfileController extends AbstractActionController
      */
     public function passwordAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
 
-        $authService = $sm->get(AuthService::class);
-        $adminerManager = $sm->get(AdminerManager::class);
+        $form = new UpdatePasswordForm($this->memberManager, $this->authService);
 
-        $form = new UpdatePasswordForm($adminerManager, $authService);
         if($this->getRequest()->isPost()) {
+
             $form->setData($this->params()->fromPost());
+
             if ($form->isValid()) {
+
                 $data = $form->getData();
 
-                $adminerManager->updateAdministratorPassword($authService->getIdentity(), md5($data['new_password']));
-                $authService->clearIdentity();
+                $this->memberManager->updateMemberPassword($this->authService->getIdentity(), md5($data['new_password']));
+
+                $this->authService->clearIdentity();
 
                 return $this->getMessagePlugin()->show(
                     'Password changed',
@@ -79,27 +99,26 @@ class ProfileController extends AbstractActionController
      */
     public function updateAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
 
-        $authService = $sm->get(AuthService::class);
-        $adminerManager = $sm->get(AdminerManager::class);
-
-        $adminer = $adminerManager->getAdministrator($authService->getIdentity());
-
-        if (null == $adminer) {
+        $member = $this->memberManager->getMember($this->authService->getIdentity());
+        if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
             return ;
         }
 
-        $form = new UpdateProfileForm($adminer);
+        $form = new UpdateProfileForm($member);
 
         if($this->getRequest()->isPost()) {
+
             $form->setData($this->params()->fromPost());
+
             if ($form->isValid()) {
+
                 $data = $form->getData();
-                $adminer->setAdminName($data['name']);
-                $adminerManager->saveUpdatedAdministrator($adminer);
+
+                $member->setMemberName($data['name']);
+                $this->memberManager->saveModifiedMember($member);
 
                 return $this->getMessagePlugin()->show(
                     'Profile updated',

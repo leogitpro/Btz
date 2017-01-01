@@ -146,7 +146,8 @@ return [
     'service_manager' => [
         'factories' => [
             Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
-            Service\AdminerManager::class => Service\Factory\EntityManagerFactory::class,
+            //Service\AdminerManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\MemberManager::class => Service\Factory\EntityManagerFactory::class,
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,

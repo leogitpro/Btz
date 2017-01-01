@@ -7,8 +7,7 @@
 
 namespace Admin\Service;
 
-
-use Admin\Entity\Adminer;
+use Admin\Entity\Member;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -17,15 +16,14 @@ class AuthAdapter implements AdapterInterface
 {
 
     /**
-     * @var AdminerManager
+     * @var MemberManager
      */
-    private $adminerManager;
+    private $memberManager;
 
     /**
      * @var string
      */
-    private $account;
-
+    private $email;
 
     /**
      * @var string
@@ -33,30 +31,26 @@ class AuthAdapter implements AdapterInterface
     private $password;
 
 
-    /**
-     * AuthAdapter constructor.
-     *
-     * @param AdminerManager $adminerManager
-     */
-    public function __construct(AdminerManager $adminerManager)
+
+    public function __construct(MemberManager $memberManager)
     {
-        $this->adminerManager = $adminerManager;
+        $this->memberManager = $memberManager;
     }
 
     /**
      * @return string
      */
-    public function getAccount()
+    public function getEmail()
     {
-        return $this->account;
+        return $this->email;
     }
 
     /**
-     * @param string $account
+     * @param string $email
      */
-    public function setAccount($account)
+    public function setEmail($email)
     {
-        $this->account = $account;
+        $this->email = $email;
     }
 
     /**
@@ -83,8 +77,8 @@ class AuthAdapter implements AdapterInterface
      */
     public function authenticate()
     {
-        $adminer = $this->adminerManager->getAdministratorByEmail($this->getAccount());
-        if (null == $adminer) {
+        $member = $this->memberManager->getMemberByEmail($this->getEmail());
+        if (null == $member) {
             return new Result(
                 Result::FAILURE_IDENTITY_NOT_FOUND,
                 null,
@@ -92,26 +86,26 @@ class AuthAdapter implements AdapterInterface
             );
         }
 
-        if (Adminer::STATUS_RETRIED == $adminer->getAdminStatus()) {
+        if (Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             return new Result(
                 Result::FAILURE_UNCATEGORIZED,
                 null,
-                ['Administrator was retired.']
+                ['Unactivated identity.']
             );
         }
 
-        if ($this->getPassword() == $adminer->getAdminPasswd()) {
+        if ($this->getPassword() != $member->getMemberPassword()) {
             return new Result(
-                Result::SUCCESS,
-                $adminer->getAdminId(),
-                ['Authenticated successfully.']
+                Result::FAILURE_CREDENTIAL_INVALID,
+                null,
+                ['Password is incorrect.']
             );
         }
 
         return new Result(
-            Result::FAILURE,
-            null,
-            ['Authenticated failure.']
+            Result::SUCCESS,
+            $member->getMemberId(),
+            ['Authenticated successfully.']
         );
     }
 }

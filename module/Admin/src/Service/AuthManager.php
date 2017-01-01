@@ -45,23 +45,19 @@ class AuthManager
      * @param string $email
      * @param string $password
      * @return Result
-     * @throws \Exception
      */
     public function login($email, $password)
     {
-        // Check if administrator has already logged in. If so, do not allow to log in twice.
-        if(null != $this->authService->getIdentity()) {
-            $this->logger->err(__METHOD__ . PHP_EOL . 'Administrator['. $email .'] has login. no need login again');
-            throw new \Exception('Already logged in');
+        if($this->authService->hasIdentity()) {
+            $this->logger->err(__METHOD__ . PHP_EOL . 'Member['. $email .'] has login. no need login again');
+            return false;
         }
 
         // Authentication with login/password
         $authAdapter = $this->authService->getAdapter();
-        $authAdapter->setAccount($email);
+        $authAdapter->setEmail($email);
         $authAdapter->setPassword($password);
-        $result = $this->authService->authenticate();
-
-        return $result;
+        return $this->authService->authenticate();
     }
 
 
@@ -70,9 +66,7 @@ class AuthManager
      */
     public function logout()
     {
-        // Allow to log out only when administrator is logged in.
-        if (null != $this->authService->getIdentity()) {
-            // Remove identity from session
+        if ($this->authService->hasIdentity()) {
             $this->authService->clearIdentity();
             $this->logger->debug(__METHOD__ . PHP_EOL . 'Cleaned administrator login identity!');
         }

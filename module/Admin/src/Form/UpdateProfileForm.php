@@ -4,23 +4,24 @@
 namespace Admin\Form;
 
 
-use Admin\Entity\Adminer;
+use Admin\Entity\Member;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 
 class UpdateProfileForm extends Form
 {
+
     /**
-     * @var Adminer
+     * @var Member
      */
-    private $adminer;
+    private $member;
 
 
-    public function __construct(Adminer $adminer)
+    public function __construct(Member $member)
     {
         parent::__construct('update_profile_form');
 
-        $this->adminer = $adminer;
+        $this->member = $member;
 
         $this->setAttributes(['method' => 'post', 'role' => 'form']);
         $this->setInputFilter(new InputFilter());
@@ -46,7 +47,7 @@ class UpdateProfileForm extends Form
             'name' => 'name',
             'attributes' => [
                 'id' => 'name',
-                'value' => $this->adminer->getAdminName(),
+                'value' => $this->member->getMemberName(),
             ],
             'options' => [
                 'label' => 'Full Name',

@@ -33,10 +33,10 @@ $form->prepare();
             <strong>Warning!</strong> E-mail address invalid.
             <?php } ?>
             <?php if(-4 == $login_code) { ?>
-                <strong>Warning!</strong> Your account was retried.
+                <strong>Warning!</strong> You has been retried.
             <?php } ?>
-            <?php if(0 == $login_code) { ?>
-                <strong>Warning!</strong> Authentication failed.
+            <?php if(-3 == $login_code) { ?>
+                <strong>Warning!</strong> Credential(Password) invalid.
             <?php } ?>
         </div>
         <?php } ?>

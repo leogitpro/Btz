@@ -18,8 +18,25 @@ use Zend\View\Model\ViewModel;
 class IndexController extends AbstractActionController
 {
 
+    /**
+     * @var AuthService
+     */
+    private $authService;
+
+    /**
+     * @var AuthManager
+     */
+    private $authManager;
+
+
+
     public function onDispatch(MvcEvent $e)
     {
+        $serviceManager = $e->getApplication()->getServiceManager();
+
+        $this->authManager = $serviceManager->get(AuthManager::class);
+        $this->authService = $serviceManager->get(AuthService::class);
+
         $response = parent::onDispatch($e);
 
         $viewModel = $e->getViewModel();
@@ -29,12 +46,12 @@ class IndexController extends AbstractActionController
     }
 
 
+    /**
+     * Auto switch router
+     */
     public function indexAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
-        $authService = $sm->get(AuthService::class);
-
-        if ($authService->hasIdentity()) {
+        if ($this->authService->hasIdentity()) {
             $this->redirect()->toRoute('admin/dashboard', ['suffix' => '.html']);
         } else {
             $this->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
@@ -50,14 +67,18 @@ class IndexController extends AbstractActionController
     public function loginAction()
     {
         $login_code = 1;
+
         $form = new LoginForm();
+
         if ($this->getRequest()->isPost()) {
+
             $form->setData($this->params()->fromPost());
+
             if($form->isValid()) {
+
                 $data = $form->getData();
-                $sm = $this->getEvent()->getApplication()->getServiceManager();
-                $authManager = $sm->get(AuthManager::class);
-                $result = $authManager->login($data['email'], md5($data['password']));
+
+                $result = $this->authManager->login($data['email'], md5($data['password']));
 
                 if (Result::SUCCESS == $result->getCode()) {
                     return $this->getMessagePlugin()->show(
@@ -85,10 +106,7 @@ class IndexController extends AbstractActionController
      */
     public function logoutAction()
     {
-        $sm = $this->getEvent()->getApplication()->getServiceManager();
-        $authManager = $sm->get(AuthManager::class);
-
-        $authManager->logout();
+        $this->authManager->logout();
 
         return $this->getMessagePlugin()->show(
             'Identity cleaned',

@@ -42,8 +42,8 @@ class OldPasswordValidator extends AbstractValidator
     public function __construct($options = null)
     {
         if (is_array($options)) {
-            if (isset($options['adminerManager'])) {
-                $this->options['adminerManager'] = $options['adminerManager'];
+            if (isset($options['memberManager'])) {
+                $this->options['memberManager'] = $options['memberManager'];
             }
             if (isset($options['authService'])) {
                 $this->options['authService'] = $options['authService'];
@@ -62,16 +62,16 @@ class OldPasswordValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        $adminerManager = $this->options['adminerManager'];
+        $memberManager = $this->options['memberManager'];
         $authService = $this->options['authService'];
 
-        $adminer = $adminerManager->getAdministrator($authService->getIdentity());
-        if (null == $adminer) {
+        $member = $memberManager->getMember($authService->getIdentity());
+        if (null == $member) {
             $this->error(self::OLD_PWD_INVALID);
             return false;
         }
 
-        $password = $adminer->getAdminPasswd();
+        $password = $member->getMemberPassword();
         if (md5($value) != $password) {
             $this->error(self::OLD_PWD_INVALID);
             return false;
