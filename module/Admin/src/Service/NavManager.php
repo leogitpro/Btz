@@ -206,6 +206,19 @@ class NavManager
     {
         $this->sideTreeItems = [];
 
+        $url = $this->urlHelper;
+
+        $dept = $this->createNavItem('dept', 'users', 'Department');
+        $dept['dropdown'] = [
+            $this->createNavItem('dept_list', 'bars', 'Departments', $url('admin/dept')),
+            $this->createNavItem('dept_add', 'plus', 'Create Dept', $url('admin/dept', ['action' => 'add'])),
+        ];
+        $this->addSideTreeItem($dept);
+
+
+
+
+
         $topItem1 = $this->createItem('id100', 'Top Menu 1');
         $topItem2 = $this->createItem('id200', 'Top Menu 2');
         $topItem3 = $this->createItem('id300', 'Top Menu 3');

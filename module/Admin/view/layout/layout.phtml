@@ -44,7 +44,7 @@
         <?php echo $this->topRightMenu()->render(); ?>
 
         <!-- Side nav bar -->
-        <?php  echo $this->sideTreeMenu()->render(); ?>
+        <?php echo $this->sideTreeMenu()->render(); ?>
 
 
     </nav>
@@ -53,11 +53,11 @@
         <!-- Page title bar -->
         <?php echo $this->pageTitleBar()->render(); ?>
 
-        <!-- Page title bar -->
-        <?php echo $this->pageBreadcrumbBar()->render(); ?>
+        <!-- Page breadcrumb bar -->
+        <?php /** echo $this->pageBreadcrumbBar()->render(); */ ?>
 
 
-        <div><?php echo $this->content; ?></div>
+        <?php echo $this->content; ?>
 
 
     </div>

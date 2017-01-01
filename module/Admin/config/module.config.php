@@ -92,6 +92,22 @@ return [
                         ],
                     ], // End DashboardController router
 
+                    // DepartmentController router configuration
+                    'dept' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'department[/:action][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\DepartmentController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ], // End DepartmentController router
+
                 ],
             ],
         ],
@@ -103,6 +119,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\DashboardController::class => InvokableFactory::class,
             Controller\ProfileController::class => InvokableFactory::class,
+            Controller\DepartmentController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -146,11 +163,11 @@ return [
     'service_manager' => [
         'factories' => [
             Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
-            //Service\AdminerManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\MemberManager::class => Service\Factory\EntityManagerFactory::class,
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
+            Service\MemberManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
         ],
     ],
 
