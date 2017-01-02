@@ -6,6 +6,7 @@
 namespace Admin;
 
 
+use Admin\Controller\IndexController;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
@@ -106,7 +107,56 @@ return [
                                 'action' => 'index',
                             ],
                         ],
-                    ], // End DepartmentController router
+                    ],
+                    'dept_opt' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'department/:action/:key[:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\DepartmentController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                    // End DepartmentController router
+
+
+                    // MemberController router configuration
+                    'member' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'member[/:action][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\MemberController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                    'member_opt' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'member/:action/:key[:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\MemberController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                    // End MemberController router
 
                 ],
             ],
@@ -120,6 +170,7 @@ return [
             Controller\DashboardController::class => InvokableFactory::class,
             Controller\ProfileController::class => InvokableFactory::class,
             Controller\DepartmentController::class => InvokableFactory::class,
+            Controller\MemberController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

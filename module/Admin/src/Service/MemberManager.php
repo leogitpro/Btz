@@ -38,6 +38,17 @@ class MemberManager
 
 
     /**
+     * Get all members
+     *
+     * @return array
+     */
+    public function getAllMembers()
+    {
+        return $this->entityManager->getRepository(Member::class)->findAll();
+    }
+
+
+    /**
      * Get administrator information
      *
      * @param integer $member_id
@@ -99,5 +110,24 @@ class MemberManager
     }
 
 
+    /**
+     * Create new member
+     *
+     * @param array $data
+     * @return Member
+     */
+    public function createMember($data)
+    {
+        $member = new Member();
+
+        $member->setMemberEmail($data['email']);
+        $member->setMemberPassword($data['password']);
+        $member->setMemberName($data['name']);
+        $member->setMemberStatus($data['status']);
+        $member->setMemberLevel($data['level']);
+        $member->setMemberCreated(date('Y-m-d H:i:s'));
+
+        return $this->saveModifiedMember($member);
+    }
 
 }

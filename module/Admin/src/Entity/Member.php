@@ -25,9 +25,17 @@ use Doctrine\ORM\Mapping as ORM;
 class Member
 {
 
-    // Member account status
+    // Administrator status
     const STATUS_ACTIVATED = 1; // Activated
     const STATUS_RETRIED = 2; // Retried
+
+
+    // Administrator level
+    const LEVEL_SUPERIOR = 9; // Superior
+    const LEVEL_SENIOR = 5; // Senior
+    const LEVEL_JUNIOR = 1; // Junior
+    const LEVEL_INTERIOR = 0; //Interior
+
 
 
     /**
@@ -40,6 +48,7 @@ class Member
      */
     private $member_id;
 
+
     /**
      * Administrator email, unique
      *
@@ -47,6 +56,7 @@ class Member
      * @ORM\Column(name="member_email")
      */
     private $member_email;
+
 
     /**
      * Administrator password, md5 value
@@ -56,6 +66,7 @@ class Member
      */
     private $member_password;
 
+
     /**
      * Administrator name.
      *
@@ -64,6 +75,7 @@ class Member
      */
     private $member_name;
 
+
     /**
      * Administrator status, activated, retried, etc ...
      *
@@ -71,6 +83,16 @@ class Member
      * @ORM\Column(name="member_status")
      */
     private $member_status;
+
+
+    /**
+     * Administrator level.
+     *
+     * @var integer
+     * @ORM\Column(name="member_level")
+     */
+    private $member_level;
+
 
     /**
      * Administrator created. datetime
@@ -82,7 +104,7 @@ class Member
 
 
     /**
-     * Get the member status list
+     * Get the administrator status list
      *
      * @return array
      */
@@ -93,6 +115,23 @@ class Member
             self::STATUS_RETRIED => 'Retried',
         ];
     }
+
+
+    /**
+     * Get the administrator level list
+     *
+     * @return array
+     */
+    public static function getMemberLevelList()
+    {
+        return [
+            self::LEVEL_INTERIOR => 'Interior',
+            self::LEVEL_JUNIOR => 'Junior',
+            self::LEVEL_SENIOR => 'Senior',
+            self::LEVEL_SUPERIOR => 'Superior',
+        ];
+    }
+
 
     /**
      * @return int
@@ -175,6 +214,22 @@ class Member
     }
 
     /**
+     * @return int
+     */
+    public function getMemberLevel()
+    {
+        return $this->member_level;
+    }
+
+    /**
+     * @param int $member_level
+     */
+    public function setMemberLevel($member_level)
+    {
+        $this->member_level = $member_level;
+    }
+
+    /**
      * @return string
      */
     public function getMemberCreated()
@@ -191,7 +246,7 @@ class Member
     }
 
     /**
-     * Get member status as string
+     * Get administrator status as string
      *
      * @return string
      */
@@ -200,6 +255,21 @@ class Member
         $list = self::getMemberStatusList();
         if (isset($list[$this->getMemberStatus()])) {
             return $list[$this->getMemberStatus()];
+        }
+        return 'Unknown';
+    }
+
+
+    /**
+     * Get administrator level as string
+     *
+     * @return string
+     */
+    public function getMemberLevelAsString()
+    {
+        $list = self::getMemberLevelList();
+        if (isset($list[$this->getMemberLevel()])) {
+            return $list[$this->getMemberLevel()];
         }
         return 'Unknown';
     }

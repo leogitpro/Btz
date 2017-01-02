@@ -46,6 +46,9 @@ class Version20170101033202 extends AbstractMigration
         // Column: member_status
         $table->addColumn('member_status', 'smallint', ['default' => 0, 'comment' => 'Account status']);
 
+        // Column: member_level
+        $table->addColumn('member_level', 'smallint', ['default' => 0, 'comment' => 'Account level']);
+
         // Column: member_created
         $table->addColumn('member_created', 'datetime');
 

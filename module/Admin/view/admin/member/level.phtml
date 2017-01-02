@@ -1,0 +1,45 @@
+<?php
+$this->pageTitleBar('Add new administrator');
+
+$this->sideTreeMenu()->setActiveId('member');
+
+$form->get('level')->setAttributes([
+    'class' => 'form-control',
+    //'value' => 1, // Default administrator level: Member::LEVEL_JUNIOR
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$helper = $this->formElementErrors();
+$helper->setMessageOpenFormat('<p class="text-danger">');
+$helper->setMessageSeparatorString('</p><p class="text-danger">');
+$helper->setMessageCloseString('</p>');
+
+$form->prepare();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('level')); ?>
+            <?php echo $this->formElement($form->get('level')); ?>
+            <?php echo $this->formElementErrors($form->get('level')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

@@ -23,7 +23,7 @@ class Version20170101040114 extends AbstractMigration
     {
         $table = $schema->createTable('sys_department_member');
 
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => ture]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('dept_id', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('member_id', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('status', 'smallint', ['default' => 0]);

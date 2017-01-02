@@ -27,15 +27,15 @@ $this->pageTitleBar('Departments');
                     <td><?php echo $dept->getDeptStatusAsString(); ?></td>
                     <td>
                         <?php if($dept->getDeptId() > 1) { ?>
-                        <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'dept_id' => $dept->getDeptId()]); ?>">
+                        <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
                             <span class="glyphicon glyphicon-pencil"></span> Edit
                         </a>
                             <?php if(!$dept->getDeptStatus()) { ?>
-                                <a class="btn btn-success btn-xs" href="<?php echo $this->url('admin/dept', ['action' => 'delete', 'dept_id' => $dept->getDeptId()]); ?>">
+                                <a class="btn btn-success btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'delete', 'key' => $dept->getDeptId()]); ?>">
                                     <span class="glyphicon glyphicon-ok"></span> Open
                                 </a>
                             <?php } else { ?>
-                                <a class="btn btn-danger btn-xs" href="<?php echo $this->url('admin/dept', ['action' => 'delete', 'dept_id' => $dept->getDeptId()]); ?>">
+                                <a class="btn btn-danger btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'delete', 'key' => $dept->getDeptId()]); ?>">
                                     <span class="glyphicon glyphicon-remove"></span> Close
                                 </a>
                             <?php } ?>

@@ -23,9 +23,9 @@ class Version20170101041510 extends AbstractMigration
     {
         // Init member table
         $this->addSql(
-            'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_created`) VALUES (?, ?, ?, ?, ?, ?)', //Sql
-            [1, 'admin@example.com', md5('admin'), 'Administrator', 1, date('Y-m-d H:i:s')], // Params
-            ['integer', 'string', 'string', 'string', 'smallint', 'string'] // Types
+            'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?)', //Sql
+            [1, 'admin@example.com', md5('admin'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
+            ['integer', 'string', 'string', 'string', 'smallint', 'smallint', 'string'] // Types
         );
 
         // Init department table

@@ -49,6 +49,18 @@ class DepartmentManager
 
 
     /**
+     * Get department information
+     *
+     * @param integer $dept_id
+     * @return Department
+     */
+    public function getDepartment($dept_id)
+    {
+        return $this->entityManager->getRepository(Department::class)->find($dept_id);
+    }
+
+
+    /**
      * Get department information by name.
      *
      * @param string $name
@@ -61,12 +73,28 @@ class DepartmentManager
 
 
     /**
+     * Save modified department data
+     *
+     * @param Department $dept
+     * @return Department
+     */
+    public function saveModifiedDepartment(Department $dept)
+    {
+        $this->entityManager->persist($dept);
+        $this->entityManager->flush();
+
+        return $dept;
+    }
+
+
+
+    /**
      * Create an department information.
      *
      * @param string $name
      * @return Department
      */
-    public function craeteDepartment($name)
+    public function createDepartment($name)
     {
         $dept = new Department();
         $dept->setDeptName($name);

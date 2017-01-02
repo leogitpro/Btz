@@ -208,10 +208,17 @@ class NavManager
 
         $url = $this->urlHelper;
 
+        $member = $this->createNavItem('member', 'user', 'Administrator');
+        $member['dropdown'] = [
+            $this->createNavItem('member_list', 'bars', 'Administrators', $url('admin/member')),
+            $this->createNavItem('member_add', 'user-plus', 'New Administrator', $url('admin/member', ['action' => 'add'])),
+        ];
+        $this->addSideTreeItem($member);
+
         $dept = $this->createNavItem('dept', 'users', 'Department');
         $dept['dropdown'] = [
             $this->createNavItem('dept_list', 'bars', 'Departments', $url('admin/dept')),
-            $this->createNavItem('dept_add', 'plus', 'Create Dept', $url('admin/dept', ['action' => 'add'])),
+            $this->createNavItem('dept_add', 'plus', 'New Department', $url('admin/dept', ['action' => 'add'])),
         ];
         $this->addSideTreeItem($dept);
 
