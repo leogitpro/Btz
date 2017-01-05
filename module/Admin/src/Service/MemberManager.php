@@ -13,29 +13,9 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Member;
-use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
 
-class MemberManager
+class MemberManager extends BaseEntityManager
 {
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-
-    public function __construct(EntityManager $entityManager, Logger $logger)
-    {
-        $this->entityManager = $entityManager;
-        $this->logger = $logger;
-    }
-
 
     /**
      * Get all members
@@ -45,6 +25,19 @@ class MemberManager
     public function getAllMembers()
     {
         return $this->entityManager->getRepository(Member::class)->findAll();
+    }
+
+
+    /**
+     * Get activated members
+     *
+     * @return array
+     */
+    public function getMembers()
+    {
+        return $this->entityManager->getRepository(Member::class)->findBy([
+            'member_status' => Member::STATUS_ACTIVATED
+        ]);
     }
 
 
@@ -123,9 +116,9 @@ class MemberManager
         $member->setMemberEmail($data['email']);
         $member->setMemberPassword($data['password']);
         $member->setMemberName($data['name']);
-        $member->setMemberStatus($data['status']);
-        $member->setMemberLevel($data['level']);
-        $member->setMemberCreated(date('Y-m-d H:i:s'));
+        //$member->setMemberStatus($data['status']);
+        //$member->setMemberLevel($data['level']);
+        $member->setMemberCreated(new \DateTime());
 
         return $this->saveModifiedMember($member);
     }

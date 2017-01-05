@@ -264,7 +264,7 @@ class MemberController extends AbstractActionController
      */
     public function addAction()
     {
-        $form = new MemberForm($this->memberManager);
+        $form = new MemberForm($this->memberManager, null, ['email', 'password', 'name']);
 
         if($this->getRequest()->isPost()) {
 

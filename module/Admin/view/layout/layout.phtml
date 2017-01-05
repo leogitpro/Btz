@@ -18,10 +18,11 @@
 
     <!-- Le styles -->
     <?php echo $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/favicon.ico'])
-        ->prependStylesheet($this->basePath('css/admin/sb-admin-2.css'))
-        ->prependStylesheet($this->basePath('vendor/metisMenu/metisMenu.min.css'))
-        ->prependStylesheet($this->basePath('font-awesome-4.6.3/css/font-awesome.min.css'))
-        ->prependStylesheet($this->basePath('bootstrap-3.3.7-dist/css/bootstrap.min.css'));
+        ->prependStylesheet($this->basePath('css/admin/style.css'))
+        ->prependStylesheet($this->basePath('open-source-assets/sb-admin-2/css/sb-admin-2.css'))
+        ->prependStylesheet($this->basePath('open-source-assets/metisMenu/metisMenu.min.css'))
+        ->prependStylesheet($this->basePath('open-source-assets/font-awesome-4.6.3/css/font-awesome.min.css'))
+        ->prependStylesheet($this->basePath('open-source-assets/bootstrap-3.3.7-dist/css/bootstrap.min.css'));
     ?>
 
 </head>
@@ -65,13 +66,22 @@
 </div>
 
 
+<!-- Modal -->
+<div class="modal" id="pageModal" tabindex="-1" role="dialog" aria-labelledby="pageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
 
 <!-- Scripts -->
 <?php echo $this->headScript()
-    ->prependFile($this->basePath('js/admin/sb-admin-2.js'))
-    ->prependFile($this->basePath('vendor/metisMenu/metisMenu.min.js'))
-    ->prependFile($this->basePath('bootstrap-3.3.7-dist/js/bootstrap.min.js'))
-    ->prependFile($this->basePath('js/jquery-3.1.0.min.js'));
+    ->prependFile($this->basePath('js/admin/form.js'))
+    ->prependFile($this->basePath('open-source-assets/sb-admin-2/js/sb-admin-2.js'))
+    ->prependFile($this->basePath('open-source-assets/metisMenu/metisMenu.min.js'))
+    ->prependFile($this->basePath('open-source-assets/bootstrap-3.3.7-dist/js/bootstrap.min.js'))
+    ->prependFile($this->basePath('open-source-assets/jquery-3.1.1/jquery-3.1.1.min.js'));
 ?>
 
 <?php echo $this->inlineScript(); ?>

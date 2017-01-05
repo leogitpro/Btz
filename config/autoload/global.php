@@ -42,7 +42,7 @@ return [
     'session_manager' => [ // Session manager configuration.
         'validators' => [
             \Zend\Session\Validator\RemoteAddr::class,
-            \Zend\Session\Validator\HttpUserAgent::class,
+            //\Zend\Session\Validator\HttpUserAgent::class,
         ],
     ],
 

@@ -13,7 +13,8 @@ $this->pageTitleBar('Departments');
             <tr>
                 <th>ID</th>
                 <th>Department name</th>
-                <th>Date Created</th>
+                <th>Created</th>
+                <th>Members</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -23,22 +24,26 @@ $this->pageTitleBar('Departments');
                 <tr valign="middle">
                     <td><?php echo $dept->getDeptId(); ?></td>
                     <td><?php echo $dept->getDeptName(); ?></td>
-                    <td><?php echo $dept->getDeptCreated(); ?></td>
+                    <td><?php echo $dept->getDeptCreated()->format('Y-m-d H:i:s'); ?></td>
+                    <td><?php echo $dept->getDeptMembers(); ?></td>
                     <td><?php echo $dept->getDeptStatusAsString(); ?></td>
                     <td>
                         <?php if($dept->getDeptId() > 1) { ?>
-                        <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
+                        <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
                             <span class="glyphicon glyphicon-pencil"></span> Edit
                         </a>
                             <?php if(!$dept->getDeptStatus()) { ?>
-                                <a class="btn btn-success btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'delete', 'key' => $dept->getDeptId()]); ?>">
+                                <a class="btn btn-success btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
                                     <span class="glyphicon glyphicon-ok"></span> Open
                                 </a>
                             <?php } else { ?>
-                                <a class="btn btn-danger btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'delete', 'key' => $dept->getDeptId()]); ?>">
+                                <a class="btn btn-danger btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
                                     <span class="glyphicon glyphicon-remove"></span> Close
                                 </a>
                             <?php } ?>
+                            <a class="btn btn-info btn-xs" href="#">
+                                <span class="glyphicon glyphicon-user"></span> Members
+                            </a>
                         <?php } ?>
                     </td>
                 </tr>

@@ -11,31 +11,9 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
-use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
 
-class DepartmentManager
+class DepartmentManager extends BaseEntityManager
 {
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-
-
-    public function __construct(EntityManager $entityManager, Logger $logger)
-    {
-        $this->entityManager = $entityManager;
-        $this->logger = $logger;
-    }
-
 
     /**
      * Get all departments
@@ -45,6 +23,18 @@ class DepartmentManager
     public function getAllDepartments()
     {
         return $this->entityManager->getRepository(Department::class)->findAll();
+    }
+
+    /**
+     * Get all valid departments
+     *
+     * @return array
+     */
+    public function getDepartments()
+    {
+        return $this->entityManager->getRepository(Department::class)->findBy([
+            'dept_status' => Department::STATUS_VALID,
+        ]);
     }
 
 
@@ -98,8 +88,9 @@ class DepartmentManager
     {
         $dept = new Department();
         $dept->setDeptName($name);
-        $dept->setDeptStatus(Department::STATUS_VALID);
-        $dept->setDeptCreated(date('Y-m-d H:i:s'));
+        $dept->setDeptMembers(0);
+        //$dept->setDeptStatus(Department::STATUS_VALID);
+        $dept->setDeptCreated(new \DateTime());
 
         $this->entityManager->persist($dept);
         $this->entityManager->flush();

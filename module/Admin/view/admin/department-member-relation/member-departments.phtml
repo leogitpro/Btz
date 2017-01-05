@@ -1,0 +1,51 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title" id="pageModalLabel"><?php echo $data['member']->getMemberName() . "'s departments"; ?></h4>
+</div>
+
+<style>
+
+</style>
+
+<div class="modal-body" id="member-department-container">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Joined</h3>
+        </div>
+        <div class="panel-body">
+            <?php foreach($data['inner'] as $dept) { ?>
+                <label class="btn btn-default checkbox-container">
+                    <input type="checkbox" value="<?php echo $dept->getDeptId(); ?>"<?php echo (1 == $dept->getDeptId()) ? ' disabled' : ''; ?> checked>
+                    <?php echo $dept->getDeptName(); ?> (<?php echo $dept->getDeptMembers(); ?>)
+                </label>
+            <?php } ?>
+        </div>
+    </div>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Not joined</h3>
+        </div>
+        <div class="panel-body">
+            <?php foreach($data['outer'] as $dept) { ?>
+                <label class="btn btn-default checkbox-container">
+                    <input type="checkbox" value="<?php echo $dept->getDeptId(); ?>">
+                    <?php echo $dept->getDeptName(); ?> (<?php echo $dept->getDeptMembers(); ?>)
+                </label>
+            <?php } ?>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" id="save-member-dept" path="<?php echo $this->url('admin/dmr', ['action' => 'save-member-departments', 'key' => $data['member']->getMemberId()]); ?>">Save changes</button>
+</div>

@@ -3,6 +3,18 @@ body {
     background-color: #f1f3f7;
 }
 
+.table > tbody > tr > td
+{
+    vertical-align: middle;
+}
+
+.panel-body .checkbox-container {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+
+
 .centered
 {
     position: absolute;

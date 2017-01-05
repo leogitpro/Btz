@@ -37,14 +37,13 @@ class Member
     const LEVEL_INTERIOR = 0; //Interior
 
 
-
     /**
      * Primary key, auto increment
      *
      * @var integer
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(name="member_id")
+     * @ORM\Column(name="member_id", type="integer")
      */
     private $member_id;
 
@@ -53,54 +52,54 @@ class Member
      * Administrator email, unique
      *
      * @var string
-     * @ORM\Column(name="member_email")
+     * @ORM\Column(name="member_email", type="string", length=45, unique=true)
      */
-    private $member_email;
+    private $member_email = '';
 
 
     /**
      * Administrator password, md5 value
      *
      * @var string
-     * @ORM\Column(name="member_password")
+     * @ORM\Column(name="member_password", type="string", length=32)
      */
-    private $member_password;
+    private $member_password = '';
 
 
     /**
      * Administrator name.
      *
      * @var string
-     * @ORM\Column(name="member_name")
+     * @ORM\Column(name="member_name", type="string", length=45)
      */
-    private $member_name;
+    private $member_name = '';
 
 
     /**
      * Administrator status, activated, retried, etc ...
      *
      * @var integer
-     * @ORM\Column(name="member_status")
+     * @ORM\Column(name="member_status", type="smallint")
      */
-    private $member_status;
+    private $member_status = self::STATUS_RETRIED;
 
 
     /**
      * Administrator level.
      *
      * @var integer
-     * @ORM\Column(name="member_level")
+     * @ORM\Column(name="member_level", type="smallint")
      */
-    private $member_level;
+    private $member_level = self::LEVEL_INTERIOR;
 
 
     /**
      * Administrator created. datetime
      *
-     * @var string
-     * @ORM\Column(name="member_created")
+     * @var \DateTime
+     * @ORM\Column(name="member_created", type="datetime")
      */
-    private $member_created;
+    private $member_created = null;
 
 
     /**
@@ -230,7 +229,7 @@ class Member
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getMemberCreated()
     {
@@ -238,7 +237,7 @@ class Member
     }
 
     /**
-     * @param string $member_created
+     * @param \DateTime $member_created
      */
     public function setMemberCreated($member_created)
     {

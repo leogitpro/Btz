@@ -25,6 +25,7 @@ class Version20170101035232 extends AbstractMigration
 
         $table->addColumn('dept_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('dept_name', 'string', ['length' => 45, 'default' => '']);
+        $table->addColumn('dept_members', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('dept_status', 'smallint', ['default' => 0]);
         $table->addColumn('dept_created', 'datetime');
 

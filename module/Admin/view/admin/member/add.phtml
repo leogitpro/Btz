@@ -16,15 +16,6 @@ $form->get('name')->setAttributes([
     'placeholder' => 'Enter the administrator name'
 ]);
 
-$form->get('status')->setAttributes([
-    'class' => 'form-control',
-]);
-
-$form->get('level')->setAttributes([
-    'class' => 'form-control',
-    'value' => 1, // Default administrator level: Member::LEVEL_JUNIOR
-]);
-
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $helper = $this->formElementErrors();
@@ -44,43 +35,37 @@ $form->prepare();
 
         <div class="form-group">
             <?php echo $this->formElement($form->get('csrf')); ?>
+
         </div>
 
         <div class="form-group">
             <?php echo $this->formLabel($form->get('email')); ?>
             <?php echo $this->formElement($form->get('email')); ?>
             <?php echo $this->formElementErrors($form->get('email')); ?>
+
         </div>
 
         <div class="form-group">
             <?php echo $this->formLabel($form->get('password')); ?>
             <?php echo $this->formElement($form->get('password')); ?>
             <?php echo $this->formElementErrors($form->get('password')); ?>
+
         </div>
 
         <div class="form-group">
             <?php echo $this->formLabel($form->get('name')); ?>
             <?php echo $this->formElement($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
-        </div>
 
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('status')); ?>
-            <?php echo $this->formElement($form->get('status')); ?>
-            <?php echo $this->formElementErrors($form->get('status')); ?>
-        </div>
-
-        <div class="form-group">
-            <?php echo $this->formLabel($form->get('level')); ?>
-            <?php echo $this->formElement($form->get('level')); ?>
-            <?php echo $this->formElementErrors($form->get('level')); ?>
         </div>
 
         <div class="form-group">
             <?php echo $this->formElement($form->get('submit')); ?>
+
         </div>
 
         <?php echo $this->form()->closeTag(); ?>
+
 
     </div>
 </div>

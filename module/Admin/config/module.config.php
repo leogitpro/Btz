@@ -130,9 +130,10 @@ return [
                     'member' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'member[/:action][:suffix]',
+                            'route' => 'member[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9_-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -141,17 +142,21 @@ return [
                             ],
                         ],
                     ],
-                    'member_opt' => [
+                    // End MemberController router
+
+
+                    // DepartmentMemberRelationController router configuration
+                    'dmr' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'member/:action/:key[:suffix]',
+                            'route' => 'dmr[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
                                 'key' => '[a-zA-Z0-9]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
-                                'controller' => Controller\MemberController::class,
+                                'controller' => Controller\DepartmentMemberRelationController::class,
                                 'action' => 'index',
                             ],
                         ],
@@ -171,6 +176,7 @@ return [
             Controller\ProfileController::class => InvokableFactory::class,
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,
+            Controller\DepartmentMemberRelationController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -191,6 +197,9 @@ return [
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
         ],
     ],
 
@@ -217,8 +226,10 @@ return [
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
+            Service\BaseEntityManager::class => Service\Factory\EntityManagerFactory::class,
             Service\MemberManager::class => Service\Factory\EntityManagerFactory::class,
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\DepartmentMemberRelationManager::class => Service\Factory\EntityManagerFactory::class,
         ],
     ],
 

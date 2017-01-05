@@ -1,6 +1,8 @@
 <?php
 $this->pageTitleBar('Administrator');
 
+$this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
+
 ?>
 
 <div class="row">
@@ -22,27 +24,54 @@ $this->pageTitleBar('Administrator');
 
             <?php foreach ($rows as $member) { ?>
 
-                <tr valign="middle">
+                <tr>
                     <td><?php echo $member->getMemberId(); ?></td>
                     <td><?php echo $member->getMemberName(); ?></td>
                     <td><?php echo $member->getMemberEmail(); ?></td>
-                    <td><?php echo $member->getMemberCreated(); ?></td>
+                    <td><?php echo $member->getMemberCreated()->format('Y-m-d H:i:s'); ?></td>
                     <td><?php echo $member->getMemberLevelAsString(); ?></td>
                     <td><?php echo $member->getMemberStatusAsString(); ?></td>
                     <td>
                         <?php if($member->getMemberId() > 1) { ?>
-                            <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/member_opt', ['action' => 'edit', 'key' => $member->getMemberId()]); ?>">
-                                <span class="glyphicon glyphicon-pencil"></span> Edit
-                            </a>
-                            <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/member_opt', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
-                                <span class="glyphicon glyphicon-pencil"></span> Status
-                            </a>
-                            <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/member_opt', ['action' => 'level', 'key' => $member->getMemberId()]); ?>">
-                                <span class="glyphicon glyphicon-pencil"></span> Level
-                            </a>
-                            <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/member_opt', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
-                                <span class="glyphicon glyphicon-pencil"></span> Password
-                            </a>
+                        <ul class="nav nav-pills" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    Actions <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/member', ['action' => 'edit', 'key' => $member->getMemberId()]); ?>">
+                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
+                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Status
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/member', ['action' => 'level', 'key' => $member->getMemberId()]); ?>">
+                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Level
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/member', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
+                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Password
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="<?php echo $this->url('admin/dmr', ['action' => 'member-departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                            <i class="fa fa-users fa-fw" aria-hidden="true"></i> Departments
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </li>
+                        </ul>
+                        <?php } else { ?>
+
                         <?php } ?>
                     </td>
                 </tr>
@@ -51,6 +80,6 @@ $this->pageTitleBar('Administrator');
 
         </table>
 
-
     </div>
 </div>
+

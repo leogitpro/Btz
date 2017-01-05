@@ -31,27 +31,33 @@ class Department
      * @var integer
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(name="dept_id")
+     * @ORM\Column(name="dept_id", type="integer")
      */
     private $dept_id;
 
     /**
      * @var string
-     * @ORM\Column(name="dept_name")
+     * @ORM\Column(name="dept_name", type="string", length=45, unique=true)
      */
-    private $dept_name;
+    private $dept_name = '';
 
     /**
      * @var integer
-     * @ORM\Column(name="dept_status")
+     * @ORM\Column(name="dept_members", type="integer")
      */
-    private $dept_status;
+    private $dept_members = 0;
 
     /**
-     * @var string
-     * @ORM\Column(name="dept_created")
+     * @var integer
+     * @ORM\Column(name="dept_status", type="smallint")
      */
-    private $dept_created;
+    private $dept_status = self::STATUS_INVALID;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="dept_created", type="datetime")
+     */
+    private $dept_created = null;
 
 
 
@@ -85,6 +91,22 @@ class Department
     public function setDeptName($dept_name)
     {
         $this->dept_name = $dept_name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeptMembers()
+    {
+        return $this->dept_members;
+    }
+
+    /**
+     * @param int $dept_members
+     */
+    public function setDeptMembers($dept_members)
+    {
+        $this->dept_members = $dept_members;
     }
 
     /**
@@ -127,7 +149,7 @@ class Department
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getDeptCreated()
     {
@@ -135,7 +157,7 @@ class Department
     }
 
     /**
-     * @param string $dept_created
+     * @param \DateTime $dept_created
      */
     public function setDeptCreated($dept_created)
     {

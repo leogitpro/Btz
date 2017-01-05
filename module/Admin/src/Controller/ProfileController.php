@@ -73,7 +73,9 @@ class ProfileController extends AbstractActionController
 
                 $data = $form->getData();
 
-                $this->memberManager->updateMemberPassword($this->authService->getIdentity(), md5($data['new_password']));
+                $encryptedPassword = md5($data['new_password']); // Simple MD5 encrypt
+
+                $this->memberManager->updateMemberPassword($this->authService->getIdentity(), $encryptedPassword);
 
                 $this->authService->clearIdentity();
 
@@ -132,6 +134,7 @@ class ProfileController extends AbstractActionController
 
         return new ViewModel([
             'form' => $form,
+            'member' => $member,
         ]);
 
     }

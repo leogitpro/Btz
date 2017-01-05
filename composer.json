@@ -12,6 +12,7 @@
         "zendframework/zend-mail": "^2.7",
         "zendframework/zend-math": "^3.0",
         "zendframework/zend-captcha": "^2.6",
+        "zendframework/zend-json": "^3.0",
         "firephp/firephp-core": "^0.4",
         "ccampbell/chromephp": "^4.1",
         "doctrine/doctrine-orm-module": "^1.1",

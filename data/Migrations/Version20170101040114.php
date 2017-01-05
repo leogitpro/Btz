@@ -31,6 +31,8 @@ class Version20170101040114 extends AbstractMigration
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['dept_id', 'member_id'], 'index_dept_member');
+        $table->addIndex(['dept_id', 'status'], 'index_dept_status');
+        $table->addIndex(['member_id', 'status'], 'index_member_status');
     }
 
     /**
