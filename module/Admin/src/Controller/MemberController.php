@@ -38,7 +38,24 @@ class MemberController extends AbstractActionController
     public function indexAction()
     {
 
-        $rows = $this->memberManager->getAllMembers();
+        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $size = 5;
+
+        $count = $this->memberManager->getAllMembersCount();
+
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/member', ['action' => 'index', 'key' => '%d']));
+
+        $rows = $this->memberManager->getAllMembersByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,

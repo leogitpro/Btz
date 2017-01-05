@@ -173,7 +173,12 @@ class SideTreeMenu extends AbstractHelper
             }
 
             if (empty($item['dropdown'])) {
-                $html .= '<a href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a>';
+                if (!empty($item['active']) && $item['active']) {
+                    $html .= '<a class="active" ';
+                } else {
+                    $html .= '<a ';
+                }
+                $html .= 'href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a>';
             } else {
                 $link = '#';
                 $html .= '<a href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . ' <span class="fa arrow"></span></a>';
@@ -227,15 +232,21 @@ class SideTreeMenu extends AbstractHelper
         $link = isset($item['link']) ? $item['link'] : '#';
         $title = isset($item['title']) ? ' title="' . $item['title'] . '"' : '';
 
-        $html = '<li';
-        if(empty($item['active'])) {
-            $html .= '>';
+        $html = '';
+        if(!empty($item['active']) && $item['active']) {
+            $html .= '<li class="active">';
         } else {
-            $html .= ' class="active">';
+            $html .= '<li>';
         }
 
         if (empty($item['dropdown'])) {
-            $html .= '<a href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a>';
+            if (!empty($item['active']) && $item['active']) {
+                $html .= '<a class="active" ';
+            } else {
+                $html .= '<a ';
+            }
+
+            $html .= 'href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a>';
         } else {
             $link = '#';
             $html .= '<a href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . ' <span class="fa arrow"></span></a>';
@@ -282,7 +293,7 @@ class SideTreeMenu extends AbstractHelper
         $title = isset($item['title']) ? ' title="' . $item['title'] . '"' : '';
         $active = isset($item['active']) ? ' class="active"' : '';
 
-        return '<li'. $active .'><a href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a></li>';
+        return '<li'. $active .'><a'. $active .' href="' . $link . '"' . $title . '>' . $icon . ' ' . $label . '</a></li>';
     }
 
 }

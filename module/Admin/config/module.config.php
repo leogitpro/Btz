@@ -209,12 +209,14 @@ return [
             View\Helper\SideTreeMenu::class => View\Helper\Factory\MenuFactory::class,
             View\Helper\PageTitleBar::class => InvokableFactory::class,
             View\Helper\PageBreadcrumbBar::class => View\Helper\Factory\MenuFactory::class,
+            View\Helper\Pagination::class => InvokableFactory::class,
         ],
         'aliases' => [
             'topRightMenu' => View\Helper\TopRightMenu::class,
             'sideTreeMenu' => View\Helper\SideTreeMenu::class,
             'pageTitleBar' => View\Helper\PageTitleBar::class,
             'pageBreadcrumbBar' => View\Helper\PageBreadcrumbBar::class,
+            'pagination' => View\Helper\Pagination::class,
         ],
     ],
 

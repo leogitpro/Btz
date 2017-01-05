@@ -1,5 +1,6 @@
 <?php
 $this->pageTitleBar('Administrator');
+$this->sideTreeMenu()->setActiveId('member_list');
 
 $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
 
@@ -82,4 +83,11 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
 
     </div>
 </div>
+
+
+<?php
+
+echo $this->pagination()->render();
+
+?>
 

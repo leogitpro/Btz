@@ -18,6 +18,18 @@ class MemberManager extends BaseEntityManager
 {
 
     /**
+     * Get all members count
+     *
+     * @return integer
+     */
+    public function getAllMembersCount()
+    {
+        $qb = $this->entityManager->getRepository(Member::class)->createQueryBuilder('t');
+        return $qb->select('count(t.member_id)')->getQuery()->getSingleScalarResult();
+    }
+
+
+    /**
      * Get all members
      *
      * @return array
@@ -25,6 +37,19 @@ class MemberManager extends BaseEntityManager
     public function getAllMembers()
     {
         return $this->entityManager->getRepository(Member::class)->findAll();
+    }
+
+
+    /**
+     * Get all members by limit page
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getAllMembersByLimitPage($page = 1, $size = 10)
+    {
+        return $this->entityManager->getRepository(Member::class)->findBy([], ['member_id' => 'DESC',], $size, ($page - 1) * $size);
     }
 
 

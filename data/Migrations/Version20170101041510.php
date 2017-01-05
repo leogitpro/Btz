@@ -57,7 +57,7 @@ class Version20170101041510 extends AbstractMigration
             $dt = date('Y-m-d H:i:s');
             $this->addSql(
                 'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?)', //Sql
-                [$i, $email, $password, $name, 0, 0, $dt],
+                [$i, $email, $password, $name, 2, 0, $dt],
                 ['integer', 'string', 'string', 'string', 'smallint', 'smallint', 'string']
             );
 
