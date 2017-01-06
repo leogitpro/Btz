@@ -36,6 +36,8 @@ class Member
     const LEVEL_JUNIOR = 1; // Junior
     const LEVEL_INTERIOR = 0; //Interior
 
+    const DEFAULT_MEMBER_ID = 1;
+
 
     /**
      * Primary key, auto increment

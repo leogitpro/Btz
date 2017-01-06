@@ -13,9 +13,29 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Member;
+use Doctrine\ORM\EntityManager;
+use Zend\Log\Logger;
 
 class MemberManager extends BaseEntityManager
 {
+
+    /**
+     * @var DepartmentMemberRelationManager
+     */
+    private $dmRelationManager;
+
+
+    public function __construct(
+        EntityManager $entityManager,
+        Logger $logger,
+        DepartmentMemberRelationManager $departmentMemberRelationManager
+    )
+    {
+        $this->dmRelationManager = $departmentMemberRelationManager;
+
+        parent::__construct($entityManager, $logger);
+    }
+
 
     /**
      * Get all members count
@@ -49,7 +69,7 @@ class MemberManager extends BaseEntityManager
      */
     public function getAllMembersByLimitPage($page = 1, $size = 10)
     {
-        return $this->entityManager->getRepository(Member::class)->findBy([], ['member_id' => 'DESC',], $size, ($page - 1) * $size);
+        return $this->entityManager->getRepository(Member::class)->findBy([], ['member_id' => 'ASC',], $size, ($page - 1) * $size);
     }
 
 
@@ -98,12 +118,33 @@ class MemberManager extends BaseEntityManager
      */
     public function saveModifiedMember(Member $member)
     {
-        //if ($member instanceof Member) {
-        $this->entityManager->persist($member);
-        $this->entityManager->flush();
-        //}
+        return $this->saveModifiedEntity($member);
+    }
 
-        return $member;
+
+    /**
+     * Update member status
+     *
+     * @param Member $member
+     * @param integer $status
+     * @return Member
+     */
+    public function updateMemberStatus(Member $member, $status)
+    {
+        $oldStatus = $member->getMemberStatus();
+        if ($oldStatus == $status) {
+            return $member;
+        }
+
+        if ($oldStatus == Member::STATUS_ACTIVATED) { // to be retried
+            $this->dmRelationManager->closedOneMember($member->getMemberId());
+        } else { // to be activated, only restore with default department relation
+            $this->dmRelationManager->openedOneMember($member->getMemberId());
+        }
+
+        $member->setMemberStatus($status);
+
+        return $this->saveModifiedMember($member);
     }
 
 
@@ -145,7 +186,12 @@ class MemberManager extends BaseEntityManager
         //$member->setMemberLevel($data['level']);
         $member->setMemberCreated(new \DateTime());
 
-        return $this->saveModifiedMember($member);
+        $this->entityManager->persist($member);
+        $this->entityManager->flush();
+
+        $this->dmRelationManager->initNewMemberDepartments($member->getMemberId());
+
+        return $member;
     }
 
 }

@@ -22,7 +22,6 @@ class DepartmentMember
     const STATUS_INVALID = 0; // Status invalid
     const STATUS_VALID = 1; // Status valid
 
-
     /**
      * @var integer
      * @ORM\Id

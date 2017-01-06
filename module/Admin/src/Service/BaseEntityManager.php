@@ -38,4 +38,17 @@ class BaseEntityManager
     }
 
 
+    /**
+     * @param mixed $entity
+     * @return mixed
+     */
+    public function saveModifiedEntity($entity)
+    {
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        return $entity;
+    }
+
+
 }

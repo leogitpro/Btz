@@ -9,19 +9,19 @@ $(function () {
       $(this).removeData("bs.modal");
    });
 
-   $("body").on("click", "#save-member-dept", function () {
+   $("body").on("click", "#save-dept-member", function () {
        var url = $(this).attr("path");
        var _target = $(this);
 
-       var dept_ids = new Array();
+       var member_ids = new Array();
        $("#member-department-container").find("input[type='checkbox']").each(function () {
           if (this.checked) {
-             dept_ids.push(this.value);
+              member_ids.push(this.value);
           }
        });
 
        $(this).attr("disabled", true);
-       $.post(url, {"selected": dept_ids}, function (dt) {
+       $.post(url, {"selected": member_ids}, function (dt) {
             if (dt.success) {
                console.log(dt);
                 $("#pageModal").modal('hide');

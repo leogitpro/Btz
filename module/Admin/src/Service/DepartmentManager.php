@@ -11,6 +11,7 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
+use Admin\Entity\DepartmentMember;
 
 class DepartmentManager extends BaseEntityManager
 {
@@ -51,6 +52,17 @@ class DepartmentManager extends BaseEntityManager
 
 
     /**
+     * Get default department
+     *
+     * @return Department
+     */
+    public function getDefaultDepartment()
+    {
+        return $this->getDepartment(Department::DEFAULT_DEPT_ID);
+    }
+
+
+    /**
      * Get department information by name.
      *
      * @param string $name
@@ -70,12 +82,62 @@ class DepartmentManager extends BaseEntityManager
      */
     public function saveModifiedDepartment(Department $dept)
     {
-        $this->entityManager->persist($dept);
-        $this->entityManager->flush();
-
-        return $dept;
+        return $this->saveModifiedEntity($dept);
     }
 
+
+    /**
+     * Update a department members count
+     *
+     * @param integer $dept_id
+     * @param integer $members_count
+     * @return Department
+     */
+    public function updateDepartmentMembersCount($dept_id, $members_count)
+    {
+        $department = $this->getDepartment($dept_id);
+        if (null != $department) {
+            $department->setDeptMembers($members_count);
+            return $this->saveModifiedEntity($department);
+        }
+        return $department;
+    }
+
+
+    /**
+     * Update department status
+     *
+     * @param Department $dept
+     * @param int $status
+     * @return Department
+     */
+    public function updateDepartmentStatus(Department $dept, $status)
+    {
+        $oldStatus = $dept->getDeptStatus();
+        if ($oldStatus == $status) {
+            return false;
+        }
+
+        if ($oldStatus == Department::STATUS_VALID) { // to be invalid
+            // Clean all relationship
+            $rows = $this->entityManager->getRepository(DepartmentMember::class)->findBy([
+                'dept_id' => $dept->getDeptId(),
+                'status' => DepartmentMember::STATUS_VALID,
+            ]);
+            foreach ($rows as $row) {
+                if ($row instanceof DepartmentMember) {
+                    $row->setStatus(DepartmentMember::STATUS_INVALID);
+                    $this->entityManager->persist($row);
+                }
+            }
+            $this->entityManager->flush();
+        } else { // to be valid
+            $dept->setDeptStatus(Department::STATUS_VALID);
+        }
+
+        $dept->setDeptMembers(0);
+        return $this->saveModifiedEntity($dept);
+    }
 
 
     /**

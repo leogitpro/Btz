@@ -49,7 +49,7 @@ class DepartmentController extends AbstractActionController
     public function statusAction()
     {
         $dept_id = (int)$this->params()->fromRoute('key', 0);
-        if($dept_id <= 1) {
+        if($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid update Default department status');
             return ;
@@ -63,12 +63,12 @@ class DepartmentController extends AbstractActionController
         }
 
         if (Department::STATUS_VALID == $department->getDeptStatus()) {
-            $department->setDeptStatus(Department::STATUS_INVALID);
+            $status = Department::STATUS_INVALID;
         } else {
-            $department->setDeptStatus(Department::STATUS_VALID);
+            $status = Department::STATUS_VALID;
         }
 
-        $this->deptManager->saveModifiedDepartment($department);
+        $this->deptManager->updateDepartmentStatus($department, $status);
 
         return $this->getMessagePlugin()->show(
             'Department updated',
@@ -88,7 +88,7 @@ class DepartmentController extends AbstractActionController
     public function editAction()
     {
         $dept_id = (int)$this->params()->fromRoute('key', 0);
-        if($dept_id <= 1) {
+        if($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit Default department');
             return ;

@@ -228,10 +228,10 @@ return [
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
-            Service\BaseEntityManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\MemberManager::class => Service\Factory\EntityManagerFactory::class,
+            //Service\BaseEntityManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\DepartmentMemberRelationManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\DepartmentMemberRelationManager::class => Service\Factory\DMRelationManagerFactory::class,
         ],
     ],
 

@@ -10,6 +10,7 @@
 namespace Admin\Controller;
 
 
+use Admin\Entity\Member;
 use Admin\Form\MemberForm;
 use Admin\Service\MemberManager;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -29,7 +30,6 @@ class MemberController extends AbstractActionController
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $this->memberManager = $serviceManager->get(MemberManager::class);
-
 
         return parent::onDispatch($e);
     }
@@ -71,7 +71,7 @@ class MemberController extends AbstractActionController
     public function editAction()
     {
         $member_id = (int)$this->params()->fromRoute('key', 0);
-        if($member_id <= 1) {
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
             return ;
@@ -125,7 +125,7 @@ class MemberController extends AbstractActionController
     public function statusAction()
     {
         $member_id = (int)$this->params()->fromRoute('key', 0);
-        if($member_id <= 1) {
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
             return ;
@@ -147,10 +147,7 @@ class MemberController extends AbstractActionController
             if ($form->isValid()) {
 
                 $data = $form->getData();
-
-                $member->setMemberStatus($data['status']);
-
-                $this->memberManager->saveModifiedMember($member);
+                $this->memberManager->updateMemberStatus($member, $data['status']);
 
                 return $this->getMessagePlugin()->show(
                     'Administrator status updated',
@@ -177,7 +174,7 @@ class MemberController extends AbstractActionController
     public function levelAction()
     {
         $member_id = (int)$this->params()->fromRoute('key', 0);
-        if($member_id <= 1) {
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
             return ;
@@ -230,7 +227,7 @@ class MemberController extends AbstractActionController
     public function passwordAction()
     {
         $member_id = (int)$this->params()->fromRoute('key', 0);
-        if($member_id <= 1) {
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
             return ;

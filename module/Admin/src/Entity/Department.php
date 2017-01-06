@@ -25,6 +25,8 @@ class Department
     const STATUS_VALID = 1;
     const STATUS_INVALID = 0;
 
+    const DEFAULT_DEPT_ID = 1;
+
     /**
      * Primary key, auto increment
      *
