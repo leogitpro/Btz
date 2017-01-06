@@ -132,8 +132,8 @@ class NavManager
         $memberItem = $this->createNavItem('profile_menu', 'user', $member->getMemberName());
         $memberItem['dropdown'] = [
             $this->createNavItem('summary', 'user', 'Summary', $url('admin/profile'), $member->getMemberName()),
-            $this->createNavItem('password', 'key', 'Password', $url('admin/profile', ['action' => 'password'])),
-            $this->createNavItem('profile_detail', 'cog', 'Profile detail', $url('admin/profile', ['action' => 'update'])),
+            $this->createNavItem('password', 'hashtag', 'Password', $url('admin/profile', ['action' => 'password'])),
+            $this->createNavItem('profile_detail', 'edit', 'Profiles', $url('admin/profile', ['action' => 'update'])),
             $this->createNavItem('', '', '', '', '', 'divider'),
             $this->createNavItem('profile_logout', 'sign-out', 'Logout', $url('admin/index', ['action' => 'logout', 'suffix' => '.html'])),
         ];

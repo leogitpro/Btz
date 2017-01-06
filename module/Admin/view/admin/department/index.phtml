@@ -25,7 +25,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
 
             <?php foreach ($rows as $dept) { ?>
 
-                <tr valign="middle">
+                <tr>
                     <td><?php echo $dept->getDeptId(); ?></td>
                     <td><?php echo $dept->getDeptName(); ?></td>
                     <td><?php echo $dept->getDeptCreated()->format('Y-m-d H:i:s'); ?></td>
@@ -33,21 +33,42 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
                     <td><?php echo $dept->getDeptStatusAsString(); ?></td>
                     <td>
                         <?php if($dept->getDeptId() > 1) { ?>
-                        <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
-                            <span class="glyphicon glyphicon-pencil"></span> Edit
-                        </a>
-                            <?php if(!$dept->getDeptStatus()) { ?>
-                                <a class="btn btn-success btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
-                                    <span class="glyphicon glyphicon-ok"></span> Open
-                                </a>
-                            <?php } else { ?>
-                                <a class="btn btn-danger btn-xs" href="<?php echo $this->url('admin/dept_opt', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
-                                    <span class="glyphicon glyphicon-remove"></span> Close
-                                </a>
-                            <?php } ?>
-                            <a class="btn btn-info btn-xs" href="<?php echo $this->url('admin/dmr', ['action' => 'department-members', 'key' => $dept->getDeptId()]); ?>" data-toggle="modal" data-target="#pageModal">
-                                <span class="glyphicon glyphicon-user"></span> Members
-                            </a>
+                            <ul class="nav nav-pills actions-list" role="tablist">
+                                <li role="presentation" class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        Actions <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <?php if (\Admin\Entity\Department::STATUS_VALID != $dept->getDeptStatus()) { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
+                                                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> Open
+                                                </a>
+                                            </li>
+
+                                        <?php } else { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
+                                                    <i class="fa fa-times fa-fw" aria-hidden="true"></i> Close
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
+                                                    <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/dmr', ['action' => 'department-members', 'key' => $dept->getDeptId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                    <i class="fa fa-users fa-fw" aria-hidden="true"></i> Members
+                                                </a>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                </li>
+                            </ul>
+                        <?php } else { ?>
+                            <ul class="nav nav-pills actions-list" role="tablist"><li><a>&nbsp;</a></li></ul>
                         <?php } ?>
                     </td>
                 </tr>
@@ -56,7 +77,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
 
         </table>
 
-
-
     </div>
 </div>
+
+<?php echo $this->pagination()->render(); ?>

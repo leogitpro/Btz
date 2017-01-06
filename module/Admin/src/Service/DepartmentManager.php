@@ -17,6 +17,31 @@ class DepartmentManager extends BaseEntityManager
 {
 
     /**
+     * Get all departments count
+     *
+     * @return integer
+     */
+    public function getAllDepartmentsCount()
+    {
+        $qb = $this->entityManager->getRepository(Department::class)->createQueryBuilder('t');
+        return $qb->select('count(t.dept_id)')->getQuery()->getSingleScalarResult();
+    }
+
+
+    /**
+     * Get departments by page and offset
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getAllDepartmentByLimitPage($page = 1, $size = 10)
+    {
+        return $this->entityManager->getRepository(Department::class)->findBy([], ['dept_id' => 'ASC',], $size, ($page - 1) * $size);
+    }
+
+
+    /**
      * Get all departments
      *
      * @return array
@@ -131,6 +156,8 @@ class DepartmentManager extends BaseEntityManager
                 }
             }
             $this->entityManager->flush();
+
+            $dept->setDeptStatus(Department::STATUS_INVALID);
         } else { // to be valid
             $dept->setDeptStatus(Department::STATUS_VALID);
         }

@@ -35,6 +35,9 @@ class MemberController extends AbstractActionController
     }
 
 
+    /**
+     * @return ViewModel
+     */
     public function indexAction()
     {
 
@@ -46,8 +49,7 @@ class MemberController extends AbstractActionController
             $page = 1;
         }
 
-        $size = 5;
-
+        $size = 10;
         $count = $this->memberManager->getAllMembersCount();
 
         $paginationHelper->setPage($page);

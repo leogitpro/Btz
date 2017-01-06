@@ -114,7 +114,7 @@ class Pagination extends AbstractHelper
     public function render()
     {
         $pages = ceil($this->count / $this->size);
-        if ($pages <= 1) {
+        if ($pages <= 1 || $this->page > $pages) {
             return '';
         }
 
@@ -130,12 +130,49 @@ class Pagination extends AbstractHelper
         $html .= '<div class="col-sm-6 text-right">';
         $html .= '<ul class="pagination">';
 
-        for ($i = 1; $i <= $pages; $i++) {
-            $active = '';
-            if ($i == $this->page) {
-                $active = ' class="active"';
+
+        if (1 == $this->page) {
+            $html .= '<li class="disabled"><span>First</span></li>';
+            $html .= '<li class="disabled"><span>&lt;</span></li>';
+        } else {
+            $html .= '<li><a href="' . sprintf($this->urlTpl, 1) . '">First</a></li>';
+            $html .= '<li><a href="' . sprintf($this->urlTpl, ($this->page - 1)) . '">&lt;</a></li>';
+        }
+
+        $showLinksCount = 7;
+        if ($showLinksCount >= $pages) {
+            $start = 1;
+            $end = $pages;
+        } else {
+            $sideLength = intval($showLinksCount / 2);
+
+            $start = $this->page - $sideLength;
+            $end = $this->page + $sideLength;
+            if ($start <= 0) {
+                $end += (1 - $start);
+                $start = 1;
             }
-            $html .= '<li' . $active . '><a href="' . sprintf($this->urlTpl, $i) . '">' . $i . '</a></li>';
+            if ($end > $pages) {
+                $start -= ($end - $pages);
+                $end = $pages;
+            }
+        }
+
+
+        for ($i = $start; $i <= $end; $i++) {
+            if ($i == $this->page) {
+                $html .= '<li class="active"><a href="' . sprintf($this->urlTpl, $i) . '">' . $i . '</a></li>';
+            } else {
+                $html .= '<li><a href="' . sprintf($this->urlTpl, $i) . '">' . $i . '</a></li>';
+            }
+        }
+
+        if ($pages == $this->page) {
+            $html .= '<li class="disabled"><span>&gt;</span></li>';
+            $html .= '<li class="disabled"><span>Last</span></li>';
+        } else {
+            $html .= '<li><a href="' . sprintf($this->urlTpl, ($this->page + 1)) . '">&gt;</a></li>';
+            $html .= '<li><a href="' . sprintf($this->urlTpl, $pages) . '">Last</a></li>';
         }
 
 

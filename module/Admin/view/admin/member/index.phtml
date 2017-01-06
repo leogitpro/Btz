@@ -34,45 +34,52 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                     <td><?php echo $member->getMemberStatusAsString(); ?></td>
                     <td>
                         <?php if($member->getMemberId() > 1) { ?>
-                        <ul class="nav nav-pills" role="tablist">
+                        <ul class="nav nav-pills actions-list" role="tablist">
                             <li role="presentation" class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                     Actions <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="<?php echo $this->url('admin/member', ['action' => 'edit', 'key' => $member->getMemberId()]); ?>">
-                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
-                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Status
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="<?php echo $this->url('admin/member', ['action' => 'level', 'key' => $member->getMemberId()]); ?>">
-                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Level
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="<?php echo $this->url('admin/member', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
-                                            <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Password
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="<?php echo $this->url('admin/dmr', ['action' => 'member-departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
-                                            <i class="fa fa-users fa-fw" aria-hidden="true"></i> Departments
-                                        </a>
-                                    </li>
+                                    <?php if(\Admin\Entity\Member::STATUS_ACTIVATED != $member->getMemberStatus()) { ?>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> Activate
+                                            </a>
+                                        </li>
+                                    <?php } else { ?>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-times fa-fw" aria-hidden="true"></i> Retried
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'edit', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'level', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-level-up fa-fw" aria-hidden="true"></i> Level
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-hashtag fa-fw" aria-hidden="true"></i> Password
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/dmr', ['action' => 'member-departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                <i class="fa fa-users fa-fw" aria-hidden="true"></i> Departments
+                                            </a>
+                                        </li>
+                                    <?php } ?>
                                 </ul>
-
                             </li>
                         </ul>
                         <?php } else { ?>
-
+                            <ul class="nav nav-pills actions-list" role="tablist"><li><a>&nbsp;</a></li></ul>
                         <?php } ?>
                     </td>
                 </tr>
@@ -84,10 +91,5 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
     </div>
 </div>
 
-
-<?php
-
-echo $this->pagination()->render();
-
-?>
+<?php echo $this->pagination()->render(); ?>
 

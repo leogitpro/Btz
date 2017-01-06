@@ -97,24 +97,10 @@ return [
                     'dept' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'department[/:action][:suffix]',
+                            'route' => 'department[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\DepartmentController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    'dept_opt' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'department/:action/:key[:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
+                                'key' => '[a-zA-Z0-9_-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -228,7 +214,6 @@ return [
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
-            //Service\BaseEntityManager::class => Service\Factory\EntityManagerFactory::class,
             Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\DepartmentMemberRelationManager::class => Service\Factory\DMRelationManagerFactory::class,

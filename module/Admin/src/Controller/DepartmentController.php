@@ -35,9 +35,31 @@ class DepartmentController extends AbstractActionController
     }
 
 
+    /**
+     * List departments
+     *
+     * @return ViewModel
+     */
     public function indexAction()
     {
-        $rows = $this->deptManager->getAllDepartments();
+
+        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $size = 10;
+        $count = $this->deptManager->getAllDepartmentsCount();
+
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/dept', ['action' => 'index', 'key' => '%d']));
+
+        $rows = $this->deptManager->getAllDepartmentByLimitPage($page, $size);
 
         return new ViewModel(['rows' => $rows]);
     }
