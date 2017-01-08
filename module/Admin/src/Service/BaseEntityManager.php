@@ -39,10 +39,24 @@ class BaseEntityManager
 
 
     /**
+     * Simple count entities
+     *
+     * @param string $entity
+     * @param string $countedField
+     * @return integer
+     */
+    protected function getEntitiesCount($entity, $countedField)
+    {
+        $qb = $this->entityManager->getRepository($entity)->createQueryBuilder('t');
+        return $qb->select('count(t.' . $countedField . ')')->getQuery()->getSingleScalarResult();
+    }
+
+
+    /**
      * @param mixed $entity
      * @return mixed
      */
-    public function saveModifiedEntity($entity)
+    protected function saveModifiedEntity($entity)
     {
         $this->entityManager->persist($entity);
         $this->entityManager->flush();

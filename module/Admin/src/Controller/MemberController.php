@@ -13,11 +13,10 @@ namespace Admin\Controller;
 use Admin\Entity\Member;
 use Admin\Form\MemberForm;
 use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
-class MemberController extends AbstractActionController
+class MemberController extends BaseController
 {
 
     /**
@@ -34,33 +33,113 @@ class MemberController extends AbstractActionController
         return parent::onDispatch($e);
     }
 
+    public function autoRegisterComponent()
+    {
+        return [
+            'controller' => __CLASS__,
+            'name' => 'Administrator',
+            'route' => 'admin/member',
+            'menu' => true,
+            'icon' => 'user',
+            'rank' => 0,
+            'actions' => [
+                [
+                    'action' => 'index',
+                    'name' => 'Administrators',
+                    'icon' => 'bars',
+                    'menu' => true,
+                ],
+                [
+                    'action' => 'add',
+                    'name' => 'New administrator',
+                    'icon' => 'user-plus',
+                    'menu' => true,
+                ],
+                [
+                    'action' => 'edit',
+                    'name' => 'Edit admin info',
+                ],
+                [
+                    'action' => 'status',
+                    'name' => 'Change admin status'
+                ],
+                [
+                    'action' => 'level',
+                    'name' => 'Change admin level'
+                ],
+                [
+                    'action' => 'password',
+                    'name' => 'Change admin password'
+                ],
+            ],
+        ];
+    }
+
 
     /**
+     * Show administrator list page
+     *
      * @return ViewModel
      */
     public function indexAction()
     {
+        // Page configuration
+        $size = 10;
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) { $page = 1; }
+        $count = $this->memberManager->getAllMembersCount();
 
+        // Get pagination helper
         $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
-        $page = (int)$this->params()->fromRoute('key', 1);
-        if ($page < 1) {
-            $page = 1;
-        }
-
-        $size = 10;
-        $count = $this->memberManager->getAllMembersCount();
-
+        // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/member', ['action' => 'index', 'key' => '%d']));
 
+        // List data
         $rows = $this->memberManager->getAllMembersByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
+        ]);
+    }
+
+
+    /**
+     * Create new administrator
+     *
+     * @return ViewModel
+     */
+    public function addAction()
+    {
+        $form = new MemberForm($this->memberManager, null, ['email', 'password', 'name']);
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+                $data['password'] = md5($data['password']);
+
+                $this->memberManager->createMember($data);
+
+                return $this->getMessagePlugin()->show(
+                    'Administrator added',
+                    'The new administrator: ' . $data['name'] . ' has been created success!',
+                    $this->url()->fromRoute('admin/member'),
+                    'Members',
+                    3
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
         ]);
     }
 
@@ -270,42 +349,6 @@ class MemberController extends AbstractActionController
             'member' => $member,
         ]);
 
-    }
-
-
-    /**
-     * Create new administrator
-     *
-     * @return ViewModel
-     */
-    public function addAction()
-    {
-        $form = new MemberForm($this->memberManager, null, ['email', 'password', 'name']);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-                $data['password'] = md5($data['password']);
-
-                $this->memberManager->createMember($data);
-
-                return $this->getMessagePlugin()->show(
-                    'Administrator added',
-                    'The new administrator: ' . $data['name'] . ' has been created success!',
-                    $this->url()->fromRoute('admin/member'),
-                    'Members',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-        ]);
     }
 
 }

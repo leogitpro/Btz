@@ -14,12 +14,11 @@ use Admin\Entity\Member;
 use Admin\Service\DepartmentManager;
 use Admin\Service\DepartmentMemberRelationManager;
 use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-class DepartmentMemberRelationController extends AbstractActionController
+class DepartmentMemberRelationController extends BaseController
 {
 
     /**
@@ -50,11 +49,33 @@ class DepartmentMemberRelationController extends AbstractActionController
         return parent::onDispatch($e);
     }
 
-
-    public function indexAction()
+    public function autoRegisterComponent()
     {
-        return $this->getResponse();
+        return [
+            'controller' => __CLASS__,
+            'name' => 'D-M Relationship',
+            'route' => 'admin/dmr',
+            'actions' => [
+                [
+                    'action' => 'department-members',
+                    'name' => 'View a department members',
+                ],
+                [
+                    'action' => 'save-department-members',
+                    'name' => 'Save department members data',
+                ],
+                [
+                    'action' => 'member-departments',
+                    'name' => 'View a member departments',
+                ],
+                [
+                    'action' => 'save-member-departments',
+                    'name' => 'Save member departments data',
+                ],
+            ],
+        ];
     }
+
 
     /**
      * View a department with all members relationship

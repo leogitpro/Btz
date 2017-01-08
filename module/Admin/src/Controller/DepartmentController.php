@@ -13,11 +13,10 @@ namespace Admin\Controller;
 use Admin\Entity\Department;
 use Admin\Form\DepartmentForm;
 use Admin\Service\DepartmentManager;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
-class DepartmentController extends AbstractActionController
+class DepartmentController extends BaseController
 {
 
     /**
@@ -31,7 +30,46 @@ class DepartmentController extends AbstractActionController
 
         $this->deptManager = $serviceManager->get(DepartmentManager::class);
 
+        $logger = $e->getApplication()->getServiceManager()->get('Logger');
+        $logger->debug(__METHOD__ . PHP_EOL . 'Called dispatched for me');
+
         return parent::onDispatch($e);
+    }
+
+
+    public function autoRegisterComponent()
+    {
+        return [
+            'controller' => __CLASS__,
+            'name' => 'Department',
+            'route' => 'admin/dept',
+            'menu' => true,
+            'icon' => 'users',
+            'rank' => 0,
+            'actions' => [
+                [
+                    'action' => 'index',
+                    'name' => 'Departments',
+                    'menu' => true,
+                    'icon' => 'bars',
+                ],
+                [
+                    'action' => 'add',
+                    'name' => 'New department',
+                    'menu' => true,
+                    'icon' => 'plus',
+                ],
+                [
+                    'action' => 'edit',
+                    'name' => 'Edit department',
+                ],
+                [
+                    'action' => 'status',
+                    'name' => 'Change status',
+                ],
+            ],
+        ];
+
     }
 
 

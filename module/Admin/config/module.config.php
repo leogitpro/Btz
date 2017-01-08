@@ -32,9 +32,10 @@ return [
                     'index' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'index[/:action][:suffix]',
+                            'route' => 'index[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -48,23 +49,7 @@ return [
                     'dashboard' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'dashboard[/:action][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\DashboardController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ], // End DashboardController router
-
-
-                    'dashboard_detail' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'dashboard/:action/:key[:suffix]',
+                            'route' => 'dashboard[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
                                 'key' => '[a-zA-Z0-9]+',
@@ -75,15 +60,16 @@ return [
                                 'action' => 'index',
                             ],
                         ],
-                    ],
+                    ], // End DashboardController router
 
                     // DashboardController router configuration
                     'profile' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'profile[/:action][:suffix]',
+                            'route' => 'profile[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -149,6 +135,25 @@ return [
                     ],
                     // End MemberController router
 
+
+                    // DepartmentMemberRelationController router configuration
+                    'component' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'component[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\ComponentController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                    // End MemberController router
+
                 ],
             ],
         ],
@@ -163,6 +168,7 @@ return [
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,
             Controller\DepartmentMemberRelationController::class => InvokableFactory::class,
+            Controller\ComponentController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -217,6 +223,7 @@ return [
             Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\DepartmentMemberRelationManager::class => Service\Factory\DMRelationManagerFactory::class,
+            Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
         ],
     ],
 

@@ -1,0 +1,72 @@
+<?php
+$this->pageTitleBar('Components');
+
+$this->sideTreeMenu()->setActiveId('component');
+
+$this->headScript()->appendFile($this->basePath('js/admin/component.index.js'));
+
+?>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <p>
+                <a id="sync-link" class="btn btn-default" href="<?php echo $this->url('admin/component', ['action'=>'sync']); ?>"><i class="fa fa-refresh fa-fw" ></i> Sync component</a>
+            </p>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>ID</th>
+                    <th>Component</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+                <?php foreach ($rows as $entity) { ?>
+
+                    <tr>
+                        <td><?php echo $entity->getComId(); ?></td>
+                        <td><i class="fa fa-<?php echo $entity->getComIcon(); ?> fa-fw" aria-hidden="true"></i> <?php echo $entity->getComName(); ?><br><?php echo substr(strrchr($entity->getComClass(), '\\'), 1); ?></td>
+                        <td><?php echo $entity->getComCreated()->format('Y-m-d H:i:s'); ?></td>
+                        <td><?php echo $entity->getComStatusAsString(); ?></td>
+                        <td>
+                            <ul class="nav nav-pills actions-list" role="tablist">
+                                <li role="presentation" class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        Actions <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <?php if (\Admin\Entity\Component::STATUS_VALIDITY != $entity->getComStatus()) { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/component', ['action' => 'status', 'key' => $entity->getComId()]); ?>">
+                                                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> Open
+                                                </a>
+                                            </li>
+
+                                        <?php } else { ?>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/component', ['action' => 'status', 'key' => $entity->getComId()]); ?>">
+                                                    <i class="fa fa-times fa-fw" aria-hidden="true"></i> Close
+                                                </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="<?php echo $this->url('admin/component', ['action' => 'department-members', 'key' => $entity->getComId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                    <i class="fa fa-list fa-fw" aria-hidden="true"></i> Actions
+                                                </a>
+                                            </li>
+                                        <?php } ?>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+
+                <?php } ?>
+
+            </table>
+
+        </div>
+    </div>
+
+<?php echo $this->pagination()->render(); ?>

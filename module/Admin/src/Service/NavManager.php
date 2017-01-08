@@ -179,26 +179,6 @@ class NavManager
     }
 
 
-
-    /**
-     * Test tree menu
-     *
-     * @param $id
-     * @param $label
-     * @return array
-     */
-    public function createItem($id, $label)
-    {
-        $url = $this->urlHelper;
-        return [
-            'id' => $id,
-            'icon' => 'user',
-            'label' => $label,
-            'link' => $url('admin/dashboard_detail', ['key' => rand(1001, 9999), 'suffix' => '.html']),
-            'title' => $label,
-        ];
-    }
-
     /**
      * Test tree menu
      */
@@ -222,48 +202,12 @@ class NavManager
         ];
         $this->addSideTreeItem($dept);
 
-
-
-
-
-        $topItem1 = $this->createItem('id100', 'Top Menu 1');
-        $topItem2 = $this->createItem('id200', 'Top Menu 2');
-        $topItem3 = $this->createItem('id300', 'Top Menu 3');
-
-
-        $topItem2['dropdown'] = [
-            $this->createItem('id210', 'Sub Menu 1'),
-            $this->createItem('id220', 'Sub Menu 2'),
-            $this->createItem('id230', 'Sub Menu 3')
+        $component = $this->createNavItem('component', 'cubes', 'Component');
+        $component['dropdown'] = [
+            $this->createNavItem('component_list', 'bars', 'Components', $url('admin/component')),
+            //$this->createNavItem('dept_add', 'plus', 'New Department', $url('admin/dept', ['action' => 'add'])),
         ];
-
-        $subItem31 = $this->createItem('id310', 'Sub Menu 1');
-        $subItem32 = $this->createItem('id320', 'Sub Menu 2');
-        $subItem33 = $this->createItem('id330', 'Sub Menu 3');
-        //$topItem3['dropdown'] = [$subItem31, $subItem32, $subItem33];
-
-        //**
-        $subItem31['dropdown'] = [
-            $this->createItem('id311', 'Sub Sub Menu 1'),
-            $this->createItem('id312', 'Sub Sub Menu 2'),
-            $this->createItem('id313', 'Sub Sub Menu 3'),
-        ];
-        $subItem32['dropdown'] = [
-            $this->createItem('id321', 'Sub Sub Menu 1'),
-            $this->createItem('id322', 'Sub Sub Menu 2'),
-            $this->createItem('id323', 'Sub Sub Menu 3'),
-        ];
-        $subItem33['dropdown'] = [
-            $this->createItem('id331', 'Sub Sub Menu 1'),
-            $this->createItem('id332', 'Sub Sub Menu 2'),
-            $this->createItem('id333', 'Sub Sub Menu 3'),
-        ];
-        $topItem3['dropdown'] = [$subItem31, $subItem32, $subItem33];
-        //*/
-
-        $this->addSideTreeItem($topItem1);
-        $this->addSideTreeItem($topItem2);
-        $this->addSideTreeItem($topItem3);
+        $this->addSideTreeItem($component);
 
     }
 

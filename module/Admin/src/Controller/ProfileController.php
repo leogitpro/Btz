@@ -10,14 +10,12 @@ namespace Admin\Controller;
 
 use Admin\Form\UpdatePasswordForm;
 use Admin\Form\UpdateProfileForm;
-use Admin\Service\AdminerManager;
 use Admin\Service\AuthService;
 use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
-class ProfileController extends AbstractActionController
+class ProfileController extends BaseController
 {
 
     /**
@@ -41,6 +39,29 @@ class ProfileController extends AbstractActionController
         return parent::onDispatch($e);
     }
 
+    public function autoRegisterComponent()
+    {
+        return [
+            'controller' => __CLASS__,
+            'name' => 'My Profile',
+            'route' => 'admin/profile',
+            'actions' => [
+                [
+                    'action' => 'index',
+                    'name' => 'View my profile',
+                ],
+                [
+                    'action' => 'password',
+                    'name' => 'Change password',
+                ],
+                [
+                    'action' => 'update',
+                    'name' => 'Update my profile',
+                ],
+            ],
+        ];
+    }
+
 
     /**
      * Show administrator summary information page.
@@ -50,6 +71,11 @@ class ProfileController extends AbstractActionController
     public function indexAction()
     {
         $member = $this->memberManager->getMember($this->authService->getIdentity());
+        if (null == $member) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
+            return ;
+        }
 
         return new ViewModel(['member' => $member]);
     }
@@ -62,6 +88,12 @@ class ProfileController extends AbstractActionController
      */
     public function passwordAction()
     {
+        $member = $this->memberManager->getMember($this->authService->getIdentity());
+        if (null == $member) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
+            return ;
+        }
 
         $form = new UpdatePasswordForm($this->memberManager, $this->authService);
 
