@@ -10,10 +10,23 @@
 namespace Admin\Service;
 
 
+use Admin\Entity\Action;
 use Admin\Entity\Component;
 
 class ComponentManager extends BaseEntityManager
 {
+
+
+    /**
+     * Get one component
+     *
+     * @param int $component_id
+     * @return Component
+     */
+    public function getComponent($component_id)
+    {
+        return $this->entityManager->getRepository(Component::class)->find($component_id);
+    }
 
 
     /**
@@ -91,7 +104,9 @@ class ComponentManager extends BaseEntityManager
     {
         if (null == $orders) {
             $orders = [
+                'comStatus' => 'DESC',
                 'comRank' => 'DESC',
+                'comMenu' => 'DESC',
                 'comName' => 'ASC',
             ];
         }
@@ -125,6 +140,48 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * Get a component all actions
+     *
+     * @param Component $component
+     * @return array
+     */
+    public function getComponentAllActions(Component $component)
+    {
+        return $this->getUniverseComponentActions($component);
+    }
+
+
+    /**
+     * Get a component all actions
+     *
+     * @param Component $component
+     * @param null|array $order
+     * @return array
+     */
+    private function getUniverseComponentActions(Component $component, $order = null)
+    {
+        if (null == $order) {
+            $order = ['actionRank' => 'DESC', 'actionMenu' => 'DESC', 'actionName' => 'ASC'];
+        }
+        return $this->entityManager->getRepository(Action::class)->findBy([
+            'controllerClass' => $component->getComClass()
+        ], $order, 100);
+    }
+
+
+    /**
+     * Save edited component entity
+     *
+     * @param Component $component
+     * @return Component
+     */
+    public function saveModifiedComponent(Component $component)
+    {
+        return $this->saveModifiedEntity($component);
+    }
+
+
+    /**
      * Sync all component information
      *
      * @param array $items
@@ -133,13 +190,41 @@ class ComponentManager extends BaseEntityManager
     public function syncComponents($items)
     {
         if (empty($items)) {
+            $this->logger->info('No component got, stop sync component');
             return false;
         }
 
         foreach($items as $item) {
-            $existed = $this->getComponentByClass($item['controller']);
-            if ($existed instanceof Component) {
-                // check actions
+
+            $this->logger->debug('Sync component: ' . $item['controller']);
+
+            $entity = $this->getComponentByClass($item['controller']);
+            if ($entity instanceof Component) {
+                // Modify component
+                $entity->setComName($item['name']);
+                $entity->setComRoute($item['route']);
+
+                if (isset($item['menu'])) {
+                    $entity->setComMenu($item['menu']);
+                } else {
+                    $entity->setComMenu(Component::MENU_NO);
+                }
+
+                if (isset($item['icon'])) {
+                    $entity->setComIcon($item['icon']);
+                } else {
+                    $entity->setComIcon(Component::ICON_DEFAULT);
+                }
+
+                if (isset($item['rank'])) {
+                    $entity->setComRank($item['rank']);
+                } else {
+                    $entity->setComRank(Component::RANK_DEFAULT);
+                }
+
+                $this->entityManager->persist($entity);
+                $this->logger->debug('The component: ' . $item['controller'] . ' is existed, modify it.');
+
             } else {
                 // New component
                 $entity = new Component();
@@ -160,12 +245,117 @@ class ComponentManager extends BaseEntityManager
                 }
 
                 $this->entityManager->persist($entity);
+                $this->logger->debug('The component: ' . $item['controller'] . ' is a new component, create it.');
+            }
+        }
+        $this->entityManager->flush();
+
+        $this->logger->debug("Start sync component actions");
+        foreach($items as $item) {
+            $actions = isset($item['actions']) ? $item['actions'] : [];
+            $this->syncActions($actions, $item['controller']);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Sync component actions
+     *
+     * @param array $items
+     * @param string $component
+     */
+    private function syncActions($items, $component)
+    {
+        $actions = $this->entityManager->getRepository(Action::class)->findBy(['controllerClass' => $component]);
+        $this->logger->debug('Sync component:' . $component . ' actions');
+
+        $existedIndexs = [];
+        foreach ($actions as $action) {
+            if ($action instanceof Action) {
+                $actionKey = $action->getActionKey();
+                $index = array_search($actionKey, array_column($items, 'action'));
+
+                if (false !== $index) { // searched, modified action data. skip status.
+                    $item = $items[$index];
+                    $existedIndexs[] = $index;
+                    $action->setActionName($item['name']);
+
+                    if (isset($item['menu']) && $item['menu']) {
+                        $action->setActionMenu(Action::MENU_YES);
+                    } else {
+                        $action->setActionMenu(Action::MENU_NO);
+                    }
+
+                    if (isset($item['icon'])) {
+                        $action->setActionIcon($item['icon']);
+                    } else {
+                        $action->setActionIcon(Action::ICON_DEFAULT);
+                    }
+
+                    if (isset($item['rank'])) {
+                        $action->setActionRank($item['rank']);
+                    } else {
+                        $action->setActionRank(Action::RANK_DEFAULT);
+                    }
+
+                    $this->entityManager->persist($action);
+                    $this->logger->debug('The action: ' . $actionKey . ' is existed, modify it.');
+
+                } else { // has removed action, set to invalid
+                    $action->setActionStatus(Action::STATUS_INVALID);
+                    $this->entityManager->persist($action);
+                    $this->logger->debug('The action: ' . $actionKey . ' was removed, set it to invalid.');
+                }
+            }
+        }
+        $this->entityManager->flush();
+
+        foreach ($items as $key => $item) {
+            if (in_array($key, $existedIndexs)) {
+                unset($items[$key]);
             }
         }
 
+        if (count($items) < 1) {
+            return ;
+        }
+
+        $this->logger->debug('Start create new actions for component: ' . $component);
+        foreach ($items as $item) {
+            $action = new Action();
+            $action->setControllerClass($component);
+            $action->setActionKey($item['action']);
+            $action->setActionName($item['name']);
+
+            if (isset($item['menu']) && $item['menu']) {
+                $action->setActionMenu(Action::MENU_YES);
+            } else {
+                $action->setActionMenu(Action::MENU_NO);
+            }
+
+            if (isset($item['icon'])) {
+                $action->setActionIcon($item['icon']);
+            } else {
+                $action->setActionIcon(Action::ICON_DEFAULT);
+            }
+
+            if (isset($item['rank'])) {
+                $action->setActionRank($item['rank']);
+            } else {
+                $action->setActionRank(Action::RANK_DEFAULT);
+            }
+
+            $action->setActionStatus(Action::STATUS_VALIDITY);
+            $action->setActionCreated(new \DateTime());
+
+            $this->entityManager->persist($action);
+            $this->logger->debug('created new action: ' . $item['action']);
+        }
         $this->entityManager->flush();
 
-        return true;
+        return ;
     }
 
 }

@@ -22,6 +22,12 @@ class DashboardController extends BaseController
             'menu' => true,
             'rank' => 999,
             'icon' => 'dashboard',
+            'actions' => [
+                [
+                    'action' => 'index',
+                    'name' => 'Show dashboard',
+                ],
+            ],
         ];
     }
 

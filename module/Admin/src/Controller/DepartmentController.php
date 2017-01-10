@@ -30,8 +30,6 @@ class DepartmentController extends BaseController
 
         $this->deptManager = $serviceManager->get(DepartmentManager::class);
 
-        $logger = $e->getApplication()->getServiceManager()->get('Logger');
-        $logger->debug(__METHOD__ . PHP_EOL . 'Called dispatched for me');
 
         return parent::onDispatch($e);
     }

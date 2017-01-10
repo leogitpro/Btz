@@ -8,6 +8,9 @@
 namespace Admin\Service;
 
 
+use Admin\Entity\Action;
+use Admin\Entity\Component;
+use Doctrine\ORM\EntityManager;
 use Zend\View\Helper\Url;
 
 class NavManager
@@ -29,6 +32,11 @@ class NavManager
     private $memberManager;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var array
      */
     private $topRightItems;
@@ -45,11 +53,13 @@ class NavManager
     private $breadcrumbItems;
 
 
-    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url)
+    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url, EntityManager $entityManager)
     {
         $this->authService = $authService;
         $this->memberManager = $memberManager;
         $this->urlHelper = $url;
+
+        $this->entityManager = $entityManager;
 
         $this->initTopRightItem();
 
@@ -72,7 +82,64 @@ class NavManager
      */
     public function getSideTreeItems()
     {
-        return $this->sideTreeItems;
+        $url = $this->urlHelper;
+
+        $actions = $this->entityManager->getRepository(Action::class)->findBy([
+            'actionMenu' => Action::MENU_YES,
+            'actionStatus' => Action::STATUS_VALIDITY,
+        ], [
+            'actionRank' => 'DESC',
+            'actionName' => 'ASC',
+        ], 100);
+        $subMenus = [];
+        foreach ($actions as $action) {
+            if ($action instanceof Action) {
+                $subMenus[$action->getControllerClass()][] = [
+                    'id' => $action->getControllerClass() . '::' . $action->getActionKey(),
+                    'icon' => $action->getActionIcon(),
+                    'label' => $action->getActionName(),
+                    'action' => $action->getActionKey(),
+                ];
+            }
+        }
+
+        $components = $this->entityManager->getRepository(Component::class)->findBy([
+            'comStatus' => Component::STATUS_VALIDITY,
+            'comMenu' => Component::MENU_YES,
+        ], [
+            'comRank' => 'DESC',
+            'comName' => 'ASC',
+        ]);
+
+        $menus = [];
+        foreach ($components as $component) {
+            if ($component instanceof Component) {
+                $controller = $component->getComClass();
+                $item = $this->createNavItem(
+                    $controller,
+                    $component->getComIcon(),
+                    $component->getComName(),
+                    $url($component->getComRoute())
+                );
+                if (array_key_exists($controller, $subMenus)) {
+                    $item['dropdown'] = [];
+                    foreach ($subMenus[$controller] as $subMenu) {
+                        $item['dropdown'][] = $this->createNavItem(
+                            $subMenu['id'],
+                            $subMenu['icon'],
+                            $subMenu['label'],
+                            $url($component->getComRoute(), ['action' => $subMenu['action']])
+                        );
+                    }
+
+                }
+                $menus[] = $item;
+            }
+        }
+
+        return $menus;
+
+        //return $this->sideTreeItems;
     }
 
     /**

@@ -24,6 +24,13 @@ class Component
     const STATUS_VALIDITY = 1; // Validity component
     const STATUS_INVALID = 0; // Invalid component
 
+    const MENU_YES = 1; // Is menu component
+    const MENU_NO = 0; // not a menu component
+
+    const ICON_DEFAULT = 'list';
+
+    const RANK_DEFAULT = 0; //
+
 
     /**
      * @var integer
@@ -49,7 +56,7 @@ class Component
      * @var string
      * @ORM\Column(name="controller_icon", type="string", length=45)
      */
-    private $comIcon = 'circle-o';
+    private $comIcon = self::ICON_DEFAULT;
 
     /**
      * @var string
@@ -61,13 +68,13 @@ class Component
      * @var integer
      * @ORM\Column(name="controller_rank", type="smallint")
      */
-    private $comRank = 0;
+    private $comRank = self::RANK_DEFAULT;
 
     /**
      * @var integer
      * @ORM\Column(name="controller_menu", type="smallint")
      */
-    private $comMenu = 0;
+    private $comMenu = self::MENU_NO;
 
     /**
      * @var integer

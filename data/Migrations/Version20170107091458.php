@@ -37,6 +37,7 @@ class Version20170107091458 extends AbstractMigration
         $table->setPrimaryKey(['action_id']);
         $table->addIndex(['action_rank']);
         $table->addIndex(['controller_class']);
+        $table->addIndex(['action_rank', 'action_menu', 'action_name']);
         $table->addIndex(['controller_class', 'action_menu', 'action_status']);
         $table->addIndex(['controller_class', 'action_key', 'action_status']);
 

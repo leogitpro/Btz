@@ -25,6 +25,14 @@ class Action
     const STATUS_INVALID = 0; // Invalid
     const STATUS_VALIDITY = 1; // Validity
 
+    const ICON_DEFAULT = 'caret-right';
+
+    const MENU_YES = 1; //
+    const MENU_NO = 0; //
+
+    const RANK_DEFAULT = 0; //
+
+
     /**
      * @var integer
      * @ORM\Id
@@ -55,19 +63,19 @@ class Action
      * @var string
      * @ORM\Column(name="action_icon", type="string", length=45)
      */
-    private $actionIcon = '';
+    private $actionIcon = self::ICON_DEFAULT;
 
     /**
      * @var int
      * @ORM\Column(name="action_rank", type="integer")
      */
-    private $actionRank = 0;
+    private $actionRank = self::RANK_DEFAULT;
 
     /**
      * @var int
      * @ORM\Column(name="action_menu", type="integer")
      */
-    private $actionMenu = 0;
+    private $actionMenu = self::MENU_NO;
 
     /**
      * @var int

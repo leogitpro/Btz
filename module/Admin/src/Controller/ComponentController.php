@@ -10,6 +10,7 @@
 namespace Admin\Controller;
 
 
+use Admin\Entity\Component;
 use Admin\Service\ComponentManager;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
@@ -90,12 +91,71 @@ class ComponentController extends BaseController
 
 
     /**
+     * Change component status
+     */
+    public function statusAction()
+    {
+        $component_id = $this->params()->fromRoute('key', 0);
+        $component = $this->componentManager->getComponent($component_id);
+        if (!($component instanceof Component)) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid component id:' . $component_id);
+            return ;
+        }
+
+        if ($component->getComStatus() == Component::STATUS_INVALID) {
+            $component->setComStatus(Component::STATUS_VALIDITY);
+        } else {
+            $component->setComStatus(Component::STATUS_INVALID);
+        }
+
+        $component = $this->componentManager->saveModifiedComponent($component);
+
+        return $this->getMessagePlugin()->show(
+            'Component updated',
+            'The Component: ' . $component->getComName() . ' status has been updated!',
+            $this->url()->fromRoute('admin/component'),
+            'Components',
+            3
+        );
+    }
+
+
+    /**
+     * Component actions list
+     *
+     * @return ViewModel
+     */
+    public function actionsAction()
+    {
+        $component_id = $this->params()->fromRoute('key', 0);
+
+        $component = $this->componentManager->getComponent($component_id);
+        if (!($component instanceof Component)) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid component id:' . $component_id);
+            return ;
+        }
+
+        $actions = $this->componentManager->getComponentAllActions($component);
+
+        $viewModel = new ViewModel();
+        $viewModel->setVariables([
+            'entity' => $component,
+            'entities' => $actions,
+        ]);
+        $viewModel->setTerminal(true);
+        return $viewModel;
+    }
+
+
+    /**
      * Ajax call sync component data
      */
     public function syncAction()
     {
         if (!$this->getRequest()->isXmlHttpRequest()) {
-            //return $this->getResponse();
+            return $this->getResponse();
         }
 
         $controllers = $this->getConfigPlugin()->get('controllers.factories');
@@ -128,7 +188,8 @@ class ComponentController extends BaseController
             return $this->getResponse();
         }
 
-        //echo '<pre>'; print_r($items); echo '</pre>';
+        //$items = [$this->autoRegisterComponent()];
+        //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
 
         $this->componentManager->syncComponents($items);
 

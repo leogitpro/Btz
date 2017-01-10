@@ -28,7 +28,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/component.index.js'));
                         <td><?php echo $entity->getComId(); ?></td>
                         <td><i class="fa fa-<?php echo $entity->getComIcon(); ?> fa-fw" aria-hidden="true"></i> <?php echo $entity->getComName(); ?><br><?php echo substr(strrchr($entity->getComClass(), '\\'), 1); ?></td>
                         <td><?php echo $entity->getComCreated()->format('Y-m-d H:i:s'); ?></td>
-                        <td><?php echo $entity->getComStatusAsString(); ?></td>
+                        <td><span class="label label-<?php echo \Admin\Entity\Component::STATUS_VALIDITY == $entity->getComStatus() ? 'success' : 'danger'; ?>"><?php echo $entity->getComStatusAsString(); ?></span></td>
                         <td>
                             <ul class="nav nav-pills actions-list" role="tablist">
                                 <li role="presentation" class="dropdown">
@@ -51,7 +51,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/component.index.js'));
                                             </li>
                                             <li class="divider"></li>
                                             <li>
-                                                <a href="<?php echo $this->url('admin/component', ['action' => 'department-members', 'key' => $entity->getComId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                <a href="<?php echo $this->url('admin/component', ['action' => 'actions', 'key' => $entity->getComId()]); ?>" data-toggle="modal" data-target="#pageModal">
                                                     <i class="fa fa-list fa-fw" aria-hidden="true"></i> Actions
                                                 </a>
                                             </li>
