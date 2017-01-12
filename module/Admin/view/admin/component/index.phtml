@@ -3,6 +3,8 @@ $this->pageTitleBar('Components');
 
 $this->sideTreeMenu()->setActiveId('component');
 
+$this->headLink()->appendStylesheet($this->basePath('open-source-assets/select2-4.0.3/css/select2.min.css'));
+$this->headScript()->appendFile($this->basePath('open-source-assets/select2-4.0.3/js/select2.min.js'));
 $this->headScript()->appendFile($this->basePath('js/admin/component.index.js'));
 
 ?>

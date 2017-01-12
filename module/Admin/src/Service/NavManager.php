@@ -10,6 +10,7 @@ namespace Admin\Service;
 
 use Admin\Entity\Action;
 use Admin\Entity\Component;
+use Admin\Entity\Member;
 use Doctrine\ORM\EntityManager;
 use Zend\View\Helper\Url;
 
@@ -61,11 +62,11 @@ class NavManager
 
         $this->entityManager = $entityManager;
 
+        $this->initSideTreeItem();
+
         $this->initTopRightItem();
 
         $this->initBreadcrumbItem();
-
-        $this->initSideTreeItem();
 
     }
 
@@ -82,64 +83,7 @@ class NavManager
      */
     public function getSideTreeItems()
     {
-        $url = $this->urlHelper;
-
-        $actions = $this->entityManager->getRepository(Action::class)->findBy([
-            'actionMenu' => Action::MENU_YES,
-            'actionStatus' => Action::STATUS_VALIDITY,
-        ], [
-            'actionRank' => 'DESC',
-            'actionName' => 'ASC',
-        ], 100);
-        $subMenus = [];
-        foreach ($actions as $action) {
-            if ($action instanceof Action) {
-                $subMenus[$action->getControllerClass()][] = [
-                    'id' => $action->getControllerClass() . '::' . $action->getActionKey(),
-                    'icon' => $action->getActionIcon(),
-                    'label' => $action->getActionName(),
-                    'action' => $action->getActionKey(),
-                ];
-            }
-        }
-
-        $components = $this->entityManager->getRepository(Component::class)->findBy([
-            'comStatus' => Component::STATUS_VALIDITY,
-            'comMenu' => Component::MENU_YES,
-        ], [
-            'comRank' => 'DESC',
-            'comName' => 'ASC',
-        ]);
-
-        $menus = [];
-        foreach ($components as $component) {
-            if ($component instanceof Component) {
-                $controller = $component->getComClass();
-                $item = $this->createNavItem(
-                    $controller,
-                    $component->getComIcon(),
-                    $component->getComName(),
-                    $url($component->getComRoute())
-                );
-                if (array_key_exists($controller, $subMenus)) {
-                    $item['dropdown'] = [];
-                    foreach ($subMenus[$controller] as $subMenu) {
-                        $item['dropdown'][] = $this->createNavItem(
-                            $subMenu['id'],
-                            $subMenu['icon'],
-                            $subMenu['label'],
-                            $url($component->getComRoute(), ['action' => $subMenu['action']])
-                        );
-                    }
-
-                }
-                $menus[] = $item;
-            }
-        }
-
-        return $menus;
-
-        //return $this->sideTreeItems;
+        return $this->sideTreeItems;
     }
 
     /**
@@ -204,6 +148,11 @@ class NavManager
             $this->createNavItem('', '', '', '', '', 'divider'),
             $this->createNavItem('profile_logout', 'sign-out', 'Logout', $url('admin/index', ['action' => 'logout', 'suffix' => '.html'])),
         ];
+        if (empty($this->getSideTreeItems()) && Member::LEVEL_SUPERIOR == $member->getMemberLevel()) {
+            $memberItem['dropdown'][] = $this->createNavItem('', '', '', '', '', 'divider');
+            $memberItem['dropdown'][] = $this->createNavItem('init_menu', 'cog', 'Init menu', $url('admin/component', ['action' => 'sync', 'key' => 'init']));
+        }
+
         $this->addTopRightItem($memberItem);
 
         // Logout menu configuration
@@ -252,9 +201,9 @@ class NavManager
     public function initSideTreeItem()
     {
         $this->sideTreeItems = [];
-
         $url = $this->urlHelper;
 
+        /**
         $member = $this->createNavItem('member', 'user', 'Administrator');
         $member['dropdown'] = [
             $this->createNavItem('member_list', 'bars', 'Administrators', $url('admin/member')),
@@ -275,7 +224,59 @@ class NavManager
             //$this->createNavItem('dept_add', 'plus', 'New Department', $url('admin/dept', ['action' => 'add'])),
         ];
         $this->addSideTreeItem($component);
+        //*/
 
+        $actions = $this->entityManager->getRepository(Action::class)->findBy([
+            'actionMenu' => Action::MENU_YES,
+            'actionStatus' => Action::STATUS_VALIDITY,
+        ], [
+            'actionRank' => 'DESC',
+            'actionName' => 'ASC',
+        ], 100);
+        $subMenus = [];
+        foreach ($actions as $action) {
+            if ($action instanceof Action) {
+                $subMenus[$action->getControllerClass()][] = [
+                    'id' => $action->getControllerClass() . '::' . $action->getActionKey(),
+                    'icon' => $action->getActionIcon(),
+                    'label' => $action->getActionName(),
+                    'action' => $action->getActionKey(),
+                ];
+            }
+        }
+
+        $components = $this->entityManager->getRepository(Component::class)->findBy([
+            'comStatus' => Component::STATUS_VALIDITY,
+            'comMenu' => Component::MENU_YES,
+        ], [
+            'comRank' => 'DESC',
+            'comName' => 'ASC',
+        ]);
+
+        foreach ($components as $component) {
+            if ($component instanceof Component) {
+                $controller = $component->getComClass();
+                $item = $this->createNavItem(
+                    $controller,
+                    $component->getComIcon(),
+                    $component->getComName(),
+                    $url($component->getComRoute())
+                );
+                if (array_key_exists($controller, $subMenus)) {
+                    $item['dropdown'] = [];
+                    foreach ($subMenus[$controller] as $subMenu) {
+                        $item['dropdown'][] = $this->createNavItem(
+                            $subMenu['id'],
+                            $subMenu['icon'],
+                            $subMenu['label'],
+                            $url($component->getComRoute(), ['action' => $subMenu['action']])
+                        );
+                    }
+
+                }
+                $this->addSideTreeItem($item);
+            }
+        }
     }
 
     /**

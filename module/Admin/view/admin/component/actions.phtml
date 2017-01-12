@@ -1,39 +1,41 @@
 
-
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">
         <span aria-hidden="true">&times;</span>
         <span class="sr-only">Close</span>
     </button>
-    <h4 class="modal-title" id="pageModalLabel"><?php echo $entity->getComName(); ?></h4>
+    <h4 class="modal-title" id="pageModalLabel"><?php echo $entity->getComName(); ?> <small>Actions</small></h4>
 </div>
-
-<style>
-
-</style>
 
 <div class="modal-body">
 
     <table class="table table-striped">
         <tr>
-            <th>ID</th>
             <th>Name</th>
-            <th>Status</th>
+            <th>Actions</th>
         </tr>
-        <?php foreach ($entities as $obj) { if ($obj instanceof \Admin\Entity\Action) { ?>
+        <?php
+        $statusUrl = urldecode($this->url('admin/component', ['action' => 'actionstatus', 'key' => '%d']));
+        foreach ($entities as $obj) {
+            if ($obj instanceof \Admin\Entity\Action) {
+                $list = \Admin\Entity\Action::getActionStatusList();
+        ?>
             <tr>
-                <td><?php echo $obj->getActionId(); ?></td>
                 <td>
                     <i class="fa fa-<?php echo $obj->getActionIcon(); ?> fa-fw"></i>
-                    <?php echo $obj->getActionName(); ?>
-                    <small><?php echo $obj->getActionKey(); ?></small>
+                    <?php echo $obj->getActionName(); ?><br>
+                    <small><em><?php echo $this->url('admin/component', ['action' => $obj->getActionKey()]); ?></em></small>
                 </td>
-                <td><?php echo $obj->getActionStatusAsString(); ?></td>
+                <td>
+                    <select class="action-status-select">
+                        <?php foreach ($list as $k => $v) { ?>
+                            <option value="<?php echo sprintf($statusUrl, $obj->getActionId()); ?>"<?php echo $k == $obj->getActionStatus() ? ' selected' : ''; ?>><?php echo $v; ?></option>
+                        <?php } ?>
+                    </select>
+                </td>
             </tr>
         <?php } } ?>
     </table>
-
-
 
 </div>
 

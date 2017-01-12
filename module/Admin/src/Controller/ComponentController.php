@@ -10,9 +10,11 @@
 namespace Admin\Controller;
 
 
+use Admin\Entity\Action;
 use Admin\Entity\Component;
 use Admin\Service\ComponentManager;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class ComponentController extends BaseController
@@ -51,6 +53,18 @@ class ComponentController extends BaseController
                     'menu' => true,
                     'rank' => 0,
                     'icon' => 'bars',
+                ],
+                [
+                    'action' => 'actions',
+                    'name' => 'View component actions',
+                ],
+                [
+                    'action' => 'status',
+                    'name' => 'Change component status',
+                ],
+                [
+                    'action' => 'actionstatus',
+                    'name' => 'Change action status',
                 ],
                 [
                     'action' => 'sync',
@@ -150,13 +164,45 @@ class ComponentController extends BaseController
 
 
     /**
+     * Ajax call change action status
+     *
+     * @return JsonModel
+     */
+    public function actionstatusAction()
+    {
+        $action_id = $this->params()->fromRoute('key', 0);
+        $action = $this->componentManager->getAction($action_id);
+        if (!($action instanceof Action)) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid action id:' . $action_id);
+            return ;
+        }
+
+        if ($action->getActionStatus() == Action::STATUS_VALIDITY) {
+            $action->setActionStatus(Action::STATUS_INVALID);
+        } else {
+            $action->setActionStatus(Action::STATUS_VALIDITY);
+        }
+
+        $this->componentManager->saveModifiedAction($action);
+
+        return new JsonModel(['success' => true]);
+    }
+
+
+    /**
      * Ajax call sync component data
      */
     public function syncAction()
     {
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         if (!$this->getRequest()->isXmlHttpRequest()) {
-            return $this->getResponse();
+            //return $this->getResponse();
         }
+
+        $this->getLoggerPlugin()->debug(__METHOD__ . PHP_EOL . 'Start sync component and actions');
 
         $controllers = $this->getConfigPlugin()->get('controllers.factories');
         $controllerManager = $this->getEvent()->getApplication()->getServiceManager()->get('ControllerManager');
@@ -192,6 +238,12 @@ class ComponentController extends BaseController
         //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
 
         $this->componentManager->syncComponents($items);
+
+        $key = $this->params()->fromRoute('key');
+        if ('init' == $key) {
+            return $this->redirect()->toRoute('admin');
+        }
+        echo 'initialized';
 
         return $this->getResponse();
     }

@@ -35,10 +35,15 @@ class Version20170107090339 extends AbstractMigration
 
         $table->setPrimaryKey(['controller_id']);
         $table->addUniqueIndex(['controller_class']);
-        $table->addIndex(['controller_rank']);
-        $table->addIndex(['controller_status']);
-        $table->addIndex(['controller_status', 'controller_rank', 'controller_menu', 'controller_name']);
-        $table->addIndex(['controller_class', 'controller_status']);
+
+        // Index for: generate menu,
+        $table->addIndex(['controller_status', 'controller_menu']);
+        $table->addIndex(['controller_rank', 'controller_name']);
+
+
+        //$table->addIndex(['controller_status']);
+        //$table->addIndex(['controller_status', 'controller_rank', 'controller_menu', 'controller_name']);
+        //$table->addIndex(['controller_class', 'controller_status']);
 
     }
 

@@ -6,6 +6,13 @@ $(function () {
         $(this).removeData("bs.modal");
     });
 
+    $("body").on("change", ".action-status-select", function () {
+        var url = $(this).val();
+        $(this).blur();
+        $.get(url);
+    });
+
+
     $("#sync-link").click(function(){
         if ("disabled" == $(this).attr("disabled")) {
             return false;

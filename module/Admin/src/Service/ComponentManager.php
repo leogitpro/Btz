@@ -147,25 +147,46 @@ class ComponentManager extends BaseEntityManager
      */
     public function getComponentAllActions(Component $component)
     {
-        return $this->getUniverseComponentActions($component);
+        return $this->getUniverseActions(['controllerClass' => $component->getComClass()]);
     }
 
 
     /**
      * Get a component all actions
      *
-     * @param Component $component
-     * @param null|array $order
+     * @param array $criteria
+     * @param null|array $orders
      * @return array
      */
-    private function getUniverseComponentActions(Component $component, $order = null)
+    private function getUniverseActions($criteria, $orders = null)
     {
-        if (null == $order) {
-            $order = ['actionRank' => 'DESC', 'actionMenu' => 'DESC', 'actionName' => 'ASC'];
+        if (null == $orders) {
+            $orders = ['actionRank' => 'DESC', 'actionMenu' => 'DESC', 'actionName' => 'ASC'];
         }
-        return $this->entityManager->getRepository(Action::class)->findBy([
-            'controllerClass' => $component->getComClass()
-        ], $order, 100);
+        return $this->entityManager->getRepository(Action::class)->findBy($criteria, $orders, 100);
+    }
+
+
+    /**
+     * Get a action by id
+     *
+     * @param integer $action_id
+     * @return Action
+     */
+    public function getAction($action_id)
+    {
+        return $this->getUniverseAction(['actionId' => $action_id]);
+    }
+
+    /**
+     * Get a action
+     *
+     * @param array $criteria
+     * @param null|array $orders
+     * @return Action
+     */
+    private function getUniverseAction($criteria, $orders = null) {
+        return $this->entityManager->getRepository(Action::class)->findOneBy($criteria, $orders);
     }
 
 
@@ -178,6 +199,17 @@ class ComponentManager extends BaseEntityManager
     public function saveModifiedComponent(Component $component)
     {
         return $this->saveModifiedEntity($component);
+    }
+
+
+    /**
+     * Save edited action entity
+     *
+     * @param Action $action
+     * @return Action
+     */
+    public function saveModifiedAction(Action $action) {
+        return $this->saveModifiedEntity($action);
     }
 
 

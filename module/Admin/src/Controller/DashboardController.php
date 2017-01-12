@@ -7,7 +7,6 @@
 
 namespace Admin\Controller;
 
-
 use Zend\View\Model\ViewModel;
 
 class DashboardController extends BaseController
