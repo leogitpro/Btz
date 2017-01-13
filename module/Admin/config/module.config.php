@@ -154,6 +154,24 @@ return [
                     ],
                     // End MemberController router
 
+                    // DepartmentMemberRelationController router configuration
+                    'acl' => [
+                        'type' => Segment::class,
+                        'options' => [
+                            'route' => 'acl[/:action[/:key]][:suffix]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'key' => '[a-zA-Z0-9]+',
+                                'suffix' => '(/|.html)',
+                            ],
+                            'defaults' => [
+                                'controller' => Controller\AclController::class,
+                                'action' => 'member',
+                            ],
+                        ],
+                    ],
+                    // End MemberController router
+
                 ],
             ],
         ],
@@ -224,6 +242,7 @@ return [
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\DepartmentMemberRelationManager::class => Service\Factory\DMRelationManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\AclManager::class => Service\Factory\EntityManagerFactory::class,
         ],
     ],
 
