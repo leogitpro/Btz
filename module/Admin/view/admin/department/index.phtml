@@ -1,7 +1,7 @@
 <?php
 $this->pageTitleBar('Departments');
 
-$this->sideTreeMenu()->setActiveId('dept_list');
+$this->sideTreeMenu()->setActiveId($activeId);
 
 $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'));
 

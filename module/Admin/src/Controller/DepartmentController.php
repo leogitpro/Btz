@@ -16,6 +16,7 @@ use Admin\Service\DepartmentManager;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
+
 class DepartmentController extends BaseController
 {
 
@@ -24,12 +25,12 @@ class DepartmentController extends BaseController
      */
     private $deptManager;
 
+
     public function onDispatch(MvcEvent $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $this->deptManager = $serviceManager->get(DepartmentManager::class);
-
 
         return parent::onDispatch($e);
     }
@@ -95,9 +96,12 @@ class DepartmentController extends BaseController
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/dept', ['action' => 'index', 'key' => '%d']));
 
-        $rows = $this->deptManager->getAllDepartmentByLimitPage($page, $size);
+        $rows = $this->deptManager->getAllDepartmentsByLimitPage($page, $size);
 
-        return new ViewModel(['rows' => $rows]);
+        return new ViewModel([
+            'rows' => $rows,
+            'activeId' => __METHOD__,
+        ]);
     }
 
 
@@ -185,6 +189,7 @@ class DepartmentController extends BaseController
         return new ViewModel([
             'form' => $form,
             'dept' => $department,
+            'activeId' => __CLASS__,
         ]);
 
     }

@@ -16,6 +16,7 @@ use Admin\Service\MemberManager;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
+
 class MemberController extends BaseController
 {
 
@@ -23,6 +24,7 @@ class MemberController extends BaseController
      * @var MemberManager
      */
     private $memberManager;
+
 
     public function onDispatch(MvcEvent $e)
     {
@@ -32,6 +34,7 @@ class MemberController extends BaseController
 
         return parent::onDispatch($e);
     }
+
 
     public function autoRegisterComponent()
     {
@@ -104,6 +107,7 @@ class MemberController extends BaseController
 
         return new ViewModel([
             'rows' => $rows,
+            'activeId' => __METHOD__,
         ]);
     }
 
@@ -193,6 +197,7 @@ class MemberController extends BaseController
         return new ViewModel([
             'form' => $form,
             'member' => $member,
+            'activeId' => __CLASS__,
         ]);
 
     }
@@ -243,6 +248,7 @@ class MemberController extends BaseController
         return new ViewModel([
             'form' => $form,
             'member' => $member,
+            'activeId' => __CLASS__,
         ]);
     }
 
@@ -295,6 +301,7 @@ class MemberController extends BaseController
         return new ViewModel([
             'form' => $form,
             'member' => $member,
+            'activeId' => __CLASS__,
         ]);
 
     }
@@ -347,6 +354,7 @@ class MemberController extends BaseController
         return new ViewModel([
             'form' => $form,
             'member' => $member,
+            'activeId' => __CLASS__,
         ]);
 
     }

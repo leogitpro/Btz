@@ -8,10 +8,11 @@
 namespace Admin\Service\Factory;
 
 
-use Admin\Service\DepartmentMemberRelationManager;
+use Admin\Service\DMRelationManager;
 use Admin\Service\MemberManager;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+
 
 class MemberManagerFactory implements FactoryInterface
 {
@@ -23,9 +24,9 @@ class MemberManagerFactory implements FactoryInterface
         // Get logger support
         $logger = $serviceManager->get('Logger');
 
-        $dmRelationManager = $serviceManager->get(DepartmentMemberRelationManager::class);
+        $dmrManager = $serviceManager->get(DMRelationManager::class);
 
-        return new MemberManager($entityManager, $logger, $dmRelationManager);
+        return new MemberManager($dmrManager, $entityManager, $logger);
     }
 
 

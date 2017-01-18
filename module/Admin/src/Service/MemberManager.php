@@ -16,24 +16,21 @@ use Admin\Entity\Member;
 use Doctrine\ORM\EntityManager;
 use Zend\Log\Logger;
 
+
 class MemberManager extends BaseEntityManager
 {
 
     /**
-     * @var DepartmentMemberRelationManager
+     * @var DMRelationManager
      */
-    private $dmRelationManager;
+    private $dmrManager;
 
 
-    public function __construct(
-        EntityManager $entityManager,
-        Logger $logger,
-        DepartmentMemberRelationManager $departmentMemberRelationManager
-    )
+    public function __construct(DMRelationManager $dmrManager, EntityManager $entityManager, Logger $logger)
     {
-        $this->dmRelationManager = $departmentMemberRelationManager;
-
         parent::__construct($entityManager, $logger);
+
+        $this->dmrManager = $dmrManager;
     }
 
 
@@ -44,19 +41,18 @@ class MemberManager extends BaseEntityManager
      */
     public function getAllMembersCount()
     {
-        $qb = $this->entityManager->getRepository(Member::class)->createQueryBuilder('t');
-        return $qb->select('count(t.member_id)')->getQuery()->getSingleScalarResult();
+        return $this->getEntitiesCount(Member::class, 'member_id');
     }
 
 
     /**
-     * Get all members
+     * Get all members, max records: 200
      *
      * @return array
      */
     public function getAllMembers()
     {
-        return $this->entityManager->getRepository(Member::class)->findAll();
+        return $this->getUniverseMembers([], null, 200);
     }
 
 
@@ -69,20 +65,62 @@ class MemberManager extends BaseEntityManager
      */
     public function getAllMembersByLimitPage($page = 1, $size = 10)
     {
-        return $this->entityManager->getRepository(Member::class)->findBy([], ['member_id' => 'ASC',], $size, ($page - 1) * $size);
+        return $this->getUniverseMembers([], null, $size, ($page - 1) * $size);
     }
 
 
     /**
-     * Get activated members
+     * Get activated members count
+     */
+    public function getMembersCount()
+    {
+        return $this->getEntitiesCount(Member::class, 'member_id', ['member_status = :status'], ['status' => Member::STATUS_ACTIVATED]);
+    }
+
+
+    /**
+     * Get activated members, mas records: 200
      *
      * @return array
      */
     public function getMembers()
     {
-        return $this->entityManager->getRepository(Member::class)->findBy([
-            'member_status' => Member::STATUS_ACTIVATED
-        ]);
+        return $this->getUniverseMembers(['member_status' => Member::STATUS_ACTIVATED], null, 200);
+    }
+
+
+    /**
+     * Get activated members by page
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getMembersByLimitPage($page = 1, $size = 10)
+    {
+        return $this->getUniverseMembers(['member_status' => Member::STATUS_ACTIVATED], null, $size, ($page - 1) * $size);
+    }
+
+
+    /**
+     * Get members from repository
+     *
+     * @param array $criteria
+     * @param null|array $order
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    private function getUniverseMembers($criteria, $order = null, $limit = 10, $offset = 0)
+    {
+        if (null == $order) {
+            $order = [
+                'member_status' => 'ASC',
+                'member_level' => 'DESC',
+                'member_name' => 'ASC',
+            ];
+        }
+        return $this->entityManager->getRepository(Member::class)->findBy($criteria, $order, $limit, $offset);
     }
 
 
@@ -94,7 +132,7 @@ class MemberManager extends BaseEntityManager
      */
     public function getMember($member_id)
     {
-        return $this->entityManager->getRepository(Member::class)->find($member_id);
+        return $this->getUniverseMember(['member_id' => $member_id]);
     }
 
 
@@ -106,7 +144,20 @@ class MemberManager extends BaseEntityManager
      */
     public function getMemberByEmail($email)
     {
-        return $this->entityManager->getRepository(Member::class)->findOneBy(['member_email' => $email]);
+        return $this->getUniverseMember(['member_email' => $email]);
+    }
+
+
+    /**
+     * Get a member from repository
+     *
+     * @param array $criteria
+     * @param null|array $order
+     * @return null|object
+     */
+    private function getUniverseMember($criteria, $order = null)
+    {
+        return $this->entityManager->getRepository(Member::class)->findOneBy($criteria, $order);
     }
 
 
@@ -137,14 +188,22 @@ class MemberManager extends BaseEntityManager
         }
 
         if ($oldStatus == Member::STATUS_ACTIVATED) { // to be retried
-            $this->dmRelationManager->closedOneMember($member->getMemberId());
+
+            $this->dmrManager->memberToBeInvalid($member->getMemberId());
+
+            $member->setMemberStatus(Member::STATUS_RETRIED);
+            $member = $this->saveModifiedEntity($member);
+
         } else { // to be activated, only restore with default department relation
-            $this->dmRelationManager->openedOneMember($member->getMemberId());
+
+            $member->setMemberStatus(Member::STATUS_ACTIVATED);
+            $member = $this->saveModifiedEntity($member);
+
+            $this->dmrManager->memberBeActivated($member->getMemberId());
+
         }
 
-        $member->setMemberStatus($status);
-
-        return $this->saveModifiedMember($member);
+        return $member;
     }
 
 
@@ -169,6 +228,7 @@ class MemberManager extends BaseEntityManager
     }
 
 
+
     /**
      * Create new member
      *
@@ -182,14 +242,13 @@ class MemberManager extends BaseEntityManager
         $member->setMemberEmail($data['email']);
         $member->setMemberPassword($data['password']);
         $member->setMemberName($data['name']);
-        //$member->setMemberStatus($data['status']);
-        //$member->setMemberLevel($data['level']);
+        $member->setMemberStatus(Member::STATUS_RETRIED);
+        $member->setMemberLevel(Member::LEVEL_INTERIOR);
         $member->setMemberCreated(new \DateTime());
 
-        $this->entityManager->persist($member);
-        $this->entityManager->flush();
+        $member = $this->saveModifiedEntity($member);
 
-        $this->dmRelationManager->initNewMemberDepartments($member->getMemberId());
+        $this->dmrManager->initNewMemberCreated($member->getMemberId());
 
         return $member;
     }

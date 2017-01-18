@@ -19,7 +19,10 @@ body {
     margin-bottom: 10px;
 }
 
-
+.color-disabled
+{
+    color: lightgray;
+}
 
 .centered
 {

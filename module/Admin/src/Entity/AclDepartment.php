@@ -21,8 +21,8 @@ use Doctrine\ORM\Mapping as ORM;
 class AclDepartment
 {
 
-    const STATUS_VALIDITY = 1;
-    const STATUS_INVALID = 0;
+    const STATUS_ALLOWED = 1;
+    const STATUS_FORBIDDEN = 0;
 
     /**
      * @var integer
@@ -48,7 +48,7 @@ class AclDepartment
      * @var int
      * @ORM\Column(name="status", type="smallint")
      */
-    private $status = self::STATUS_INVALID;
+    private $status = self::STATUS_FORBIDDEN;
 
     /**
      * @var \DateTime
@@ -63,8 +63,8 @@ class AclDepartment
     public static function getAclStatusList()
     {
         return [
-            self::STATUS_INVALID => 'Invalid',
-            self::STATUS_VALIDITY => 'Validity',
+            self::STATUS_ALLOWED => 'Allowed',
+            self::STATUS_FORBIDDEN => 'Forbidden',
         ];
     }
 

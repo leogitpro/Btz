@@ -1,0 +1,40 @@
+<?php
+$this->pageTitleBar('Access control', 'For a member');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+?>
+
+    <div class="row">
+        <div class="col-lg-12">
+
+            <table class="table table-striped">
+                <tr>
+                    <th>Administrator</th>
+                    <th>E-mail Address</th>
+                    <th>Level</th>
+                    <th>Actions</th>
+                </tr>
+
+                <?php foreach ($entities as $member) { ?>
+
+                    <tr>
+                        <td><?php echo $member->getMemberName(); ?></td>
+                        <td><?php echo $member->getMemberEmail(); ?></td>
+                        <td><?php echo $member->getMemberLevelAsString(); ?></td>
+                        <td>
+                            <?php if($member->getMemberId() > 1) { ?>
+                                <a href="<?php echo $this->url('admin/acl', ['action' => 'acl-member', 'key' => $member->getMemberId()]); ?>">ACL Setting</a>
+                            <?php } ?>
+                        </td>
+                    </tr>
+
+                <?php } ?>
+
+            </table>
+
+
+        </div>
+    </div>
+
+<?php echo $this->pagination()->render(); ?>

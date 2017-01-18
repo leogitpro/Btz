@@ -25,6 +25,13 @@ class Version20170112090228 extends AbstractMigration
 
         $table->setPrimaryKey(['id']);
 
+        // For query a member owned all actions
+        $table->addIndex(['member_id']);
+        // For query a member owned all valid actions
+        $table->addIndex(['member_id', 'status']);
+
+        // For query member and action relationship
+        $table->addIndex(['action_id', 'member_id']);
     }
 
     /**

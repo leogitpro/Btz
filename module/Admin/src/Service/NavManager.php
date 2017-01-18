@@ -203,6 +203,9 @@ class NavManager
         $this->sideTreeItems = [];
         $url = $this->urlHelper;
 
+        $dashboard = $this->createNavItem('dashboard', 'dashboard', 'Dashboard', $url('admin/dashboard'));
+        $this->addSideTreeItem($dashboard);
+
         /**
         $member = $this->createNavItem('member', 'user', 'Administrator');
         $member['dropdown'] = [
@@ -237,7 +240,7 @@ class NavManager
         foreach ($actions as $action) {
             if ($action instanceof Action) {
                 $subMenus[$action->getControllerClass()][] = [
-                    'id' => $action->getControllerClass() . '::' . $action->getActionKey(),
+                    'id' => $action->getControllerClass() . '::' . $action->getActionKey() . 'Action',
                     'icon' => $action->getActionIcon(),
                     'label' => $action->getActionName(),
                     'action' => $action->getActionKey(),

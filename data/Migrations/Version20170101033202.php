@@ -58,6 +58,9 @@ class Version20170101033202 extends AbstractMigration
         // Add Unique index
         $table->addUniqueIndex(['member_email'], 'unique_index_member_email');
 
+        // Index for default query order
+        $table->addIndex(['member_status', 'member_level', 'member_name']);
+
     }
 
     /**

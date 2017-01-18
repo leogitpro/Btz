@@ -22,8 +22,9 @@ use Doctrine\ORM\Mapping as ORM;
 class AclMember
 {
 
-    const STATUS_VALIDITY = 1;
-    const STATUS_INVALID = 0;
+    const STATUS_ALLOWED = 1;
+    const STATUS_FORBIDDEN = 2;
+    const STATUS_DEFAULT = 0;
 
     /**
      * @var integer
@@ -49,7 +50,7 @@ class AclMember
      * @var int
      * @ORM\Column(name="status", type="smallint")
      */
-    private $status = self::STATUS_INVALID;
+    private $status = self::STATUS_DEFAULT;
 
     /**
      * @var \DateTime
@@ -64,8 +65,9 @@ class AclMember
     public static function getAclStatusList()
     {
         return [
-            self::STATUS_INVALID => 'Invalid',
-            self::STATUS_VALIDITY => 'Validity',
+            self::STATUS_ALLOWED => 'Allowed',
+            self::STATUS_FORBIDDEN => 'Forbidden',
+            self::STATUS_DEFAULT => 'Default',
         ];
     }
 
@@ -76,8 +78,8 @@ class AclMember
     public function getStatusAsString()
     {
         $list = self::getAclStatusList();
-        if (isset($list[$this->getStatus()])) {
-            return $list[$this->getStatus()];
+        if (isset($list[$this->status])) {
+            return $list[$this->status];
         }
         return 'Unknown';
     }

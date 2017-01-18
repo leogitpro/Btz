@@ -7,30 +7,11 @@
 
 namespace Admin\Controller;
 
+use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class DashboardController extends BaseController
+class DashboardController extends AbstractActionController
 {
-
-    public function autoRegisterComponent()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => 'Dashboard',
-            'route' => 'admin/dashboard',
-            'menu' => true,
-            'rank' => 999,
-            'icon' => 'dashboard',
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => 'Show dashboard',
-                ],
-            ],
-        ];
-    }
-
-
     public function indexAction()
     {
         return new ViewModel();

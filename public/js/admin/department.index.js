@@ -25,6 +25,7 @@ $(function () {
             if (dt.success) {
                console.log(dt);
                 $("#pageModal").modal('hide');
+                document.location.reload();
                 //$("#pageModal").removeData("bs.modal");
             } else {
                 alert("Save changes failed, Please try again!");

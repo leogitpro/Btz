@@ -41,14 +41,32 @@ class BaseEntityManager
     /**
      * Simple count entities
      *
+     * $where = ['status => ?', 'age = ?'];
+     * $params = [0 => 1, 1 => 38];
+     *
      * @param string $entity
      * @param string $countedField
+     * @param array $where
+     * @param array $params
+     * @param string $alias
      * @return integer
      */
-    protected function getEntitiesCount($entity, $countedField)
+    protected function getEntitiesCount($entity, $countedField, $where = [], $params = [], $alias = 't')
     {
-        $qb = $this->entityManager->getRepository($entity)->createQueryBuilder('t');
-        return $qb->select('count(t.' . $countedField . ')')->getQuery()->getSingleScalarResult();
+        $qb = $this->entityManager->getRepository($entity)->createQueryBuilder($alias);
+        $qb->select('count(' . $alias . '.' . $countedField . ')');
+        if (!empty($where)) {
+            foreach ($where as $p) {
+                $qb->where($alias . '.' . $p);
+            }
+            if (!empty($params)) {
+                foreach ($params as $k => $v) {
+                    $qb->setParameter($k, $v);
+                }
+            }
+        }
+        //var_dump($qb->getDQL());
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
 

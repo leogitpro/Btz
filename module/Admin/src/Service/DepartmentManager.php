@@ -11,68 +11,24 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
-use Admin\Entity\DepartmentMember;
+use Doctrine\ORM\EntityManager;
+use Zend\Log\Logger;
+
 
 class DepartmentManager extends BaseEntityManager
 {
 
     /**
-     * Get all departments count
-     *
-     * @return integer
+     * @var DMRelationManager
      */
-    public function getAllDepartmentsCount()
+    private $dmrManager;
+
+
+    public function __construct(DMRelationManager $dmrManager, EntityManager $entityManager, Logger $logger)
     {
-        $qb = $this->entityManager->getRepository(Department::class)->createQueryBuilder('t');
-        return $qb->select('count(t.dept_id)')->getQuery()->getSingleScalarResult();
-    }
+        parent::__construct($entityManager, $logger);
 
-
-    /**
-     * Get departments by page and offset
-     *
-     * @param int $page
-     * @param int $size
-     * @return array
-     */
-    public function getAllDepartmentByLimitPage($page = 1, $size = 10)
-    {
-        return $this->entityManager->getRepository(Department::class)->findBy([], ['dept_id' => 'ASC',], $size, ($page - 1) * $size);
-    }
-
-
-    /**
-     * Get all departments
-     *
-     * @return array
-     */
-    public function getAllDepartments()
-    {
-        return $this->entityManager->getRepository(Department::class)->findAll();
-    }
-
-    /**
-     * Get all valid departments
-     *
-     * @return array
-     */
-    public function getDepartments()
-    {
-        return $this->entityManager->getRepository(Department::class)->findBy([
-            'dept_status' => Department::STATUS_VALID,
-        ]);
-    }
-
-
-    /**
-     * Get department information
-     *
-     * @param integer $dept_id
-     * @return Department
-     */
-    public function getDepartment($dept_id)
-    {
-        return $this->entityManager->getRepository(Department::class)->find($dept_id);
+        $this->dmrManager = $dmrManager;
     }
 
 
@@ -88,6 +44,18 @@ class DepartmentManager extends BaseEntityManager
 
 
     /**
+     * Get department information
+     *
+     * @param integer $dept_id
+     * @return Department
+     */
+    public function getDepartment($dept_id)
+    {
+        return $this->getUniverseDepartment(['dept_id' => $dept_id]);
+    }
+
+
+    /**
      * Get department information by name.
      *
      * @param string $name
@@ -95,7 +63,121 @@ class DepartmentManager extends BaseEntityManager
      */
     public function getDepartmentByName($name)
     {
-        return $this->entityManager->getRepository(Department::class)->findOneBy(['dept_name' => $name]);
+        return $this->getUniverseDepartment(['dept_name' => $name]);
+    }
+
+
+    /**
+     * Get a department
+     *
+     * @param array $criteria
+     * @param null|array $order
+     * @return Department
+     */
+    private function getUniverseDepartment($criteria = [], $order = null)
+    {
+        return $this->entityManager->getRepository(Department::class)->findOneBy($criteria, $order);
+    }
+
+
+
+    /**
+     * Get all departments count
+     *
+     * @return integer
+     */
+    public function getDepartmentsCount()
+    {
+        return $this->getEntitiesCount(
+            Department::class,
+            'dept_id',
+            ['dept_status = :status'],
+            ['status' => Department::STATUS_VALID]
+        );
+    }
+
+
+    /**
+     * Get departments by page and offset
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getDepartmentsByLimitPage($page = 1, $size = 10)
+    {
+        return $this->getUniverseDepartments([
+            'dept_status' => Department::STATUS_VALID,
+        ], null, $size, ($page - 1) * $size);
+    }
+
+
+    /**
+     * Get all valid departments, Maxsize: 200
+     *
+     * @return array
+     */
+    public function getDepartments()
+    {
+        return $this->getUniverseDepartments([
+            'dept_status' => Department::STATUS_VALID,
+        ], null, 200);
+    }
+
+
+    /**
+     * Get all departments count
+     *
+     * @return integer
+     */
+    public function getAllDepartmentsCount()
+    {
+        return $this->getEntitiesCount(Department::class, 'dept_id');
+    }
+
+
+    /**
+     * Get departments by page and offset
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getAllDepartmentsByLimitPage($page = 1, $size = 10)
+    {
+        return $this->getUniverseDepartments([], null, $size, ($page - 1) * $size);
+    }
+
+
+    /**
+     * Get all departments, Maxsize: 200
+     *
+     * @return array
+     */
+    public function getAllDepartments()
+    {
+        return $this->getUniverseDepartments([], null, 200);
+    }
+
+
+    /**
+     * Get departments
+     *
+     * @param array $criteria
+     * @param null|array $order
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    private function getUniverseDepartments($criteria = [], $order = null, $limit = 10, $offset = 0)
+    {
+        if (null == $order) {
+            $order = [
+                'dept_status' => 'DESC',
+                'dept_name' => 'ASC',
+            ];
+        }
+        return $this->entityManager->getRepository(Department::class)->findBy($criteria, $order, $limit, $offset);
     }
 
 
@@ -112,29 +194,11 @@ class DepartmentManager extends BaseEntityManager
 
 
     /**
-     * Update a department members count
-     *
-     * @param integer $dept_id
-     * @param integer $members_count
-     * @return Department
-     */
-    public function updateDepartmentMembersCount($dept_id, $members_count)
-    {
-        $department = $this->getDepartment($dept_id);
-        if (null != $department) {
-            $department->setDeptMembers($members_count);
-            return $this->saveModifiedEntity($department);
-        }
-        return $department;
-    }
-
-
-    /**
      * Update department status
      *
      * @param Department $dept
      * @param int $status
-     * @return Department
+     * @return void
      */
     public function updateDepartmentStatus(Department $dept, $status)
     {
@@ -144,26 +208,22 @@ class DepartmentManager extends BaseEntityManager
         }
 
         if ($oldStatus == Department::STATUS_VALID) { // to be invalid
-            // Clean all relationship
-            $rows = $this->entityManager->getRepository(DepartmentMember::class)->findBy([
-                'dept_id' => $dept->getDeptId(),
-                'status' => DepartmentMember::STATUS_VALID,
-            ]);
-            foreach ($rows as $row) {
-                if ($row instanceof DepartmentMember) {
-                    $row->setStatus(DepartmentMember::STATUS_INVALID);
-                    $this->entityManager->persist($row);
-                }
-            }
-            $this->entityManager->flush();
+
+            $this->dmrManager->departmentToBeInvalid($dept->getDeptId()); // Remove all members relationship
 
             $dept->setDeptStatus(Department::STATUS_INVALID);
+            $dept->setDeptMembers(0);
+            $this->saveModifiedEntity($dept);
+
         } else { // to be valid
+
             $dept->setDeptStatus(Department::STATUS_VALID);
+            $this->saveModifiedEntity($dept);
+
+            $this->dmrManager->departmentBeActivated($dept->getDeptId());
+
         }
 
-        $dept->setDeptMembers(0);
-        return $this->saveModifiedEntity($dept);
     }
 
 
@@ -178,13 +238,10 @@ class DepartmentManager extends BaseEntityManager
         $dept = new Department();
         $dept->setDeptName($name);
         $dept->setDeptMembers(0);
-        //$dept->setDeptStatus(Department::STATUS_VALID);
+        $dept->setDeptStatus(Department::STATUS_VALID);
         $dept->setDeptCreated(new \DateTime());
 
-        $this->entityManager->persist($dept);
-        $this->entityManager->flush();
-
-        return $dept;
+        return $this->saveModifiedEntity($dept);
     }
 
 

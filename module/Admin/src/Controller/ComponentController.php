@@ -95,12 +95,15 @@ class ComponentController extends BaseController
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/component', ['action' => 'index', 'key' => '%d']));
-        $paginationHelper->setCount($this->componentManager->getComponentsCount());
+        $paginationHelper->setCount($this->componentManager->getAllComponentsCount());
 
         // Render view data
         $components = $this->componentManager->getAllComponentsByLimitPage($page, $size);
 
-        return new ViewModel(['rows' => $components]);
+        return new ViewModel([
+            'rows' => $components,
+            'activeId' => __METHOD__,
+        ]);
     }
 
 
@@ -198,9 +201,13 @@ class ComponentController extends BaseController
         ignore_user_abort(true);
         set_time_limit(0);
 
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            //return $this->getResponse();
-        }
+        $result = [
+            'success' => false,
+            'code' => 0,
+            'message' => '',
+        ];
+
+        // if (!$this->getRequest()->isXmlHttpRequest()) { return $this->getResponse(); }
 
         $this->getLoggerPlugin()->debug(__METHOD__ . PHP_EOL . 'Start sync component and actions');
 
@@ -230,22 +237,15 @@ class ComponentController extends BaseController
             }
         }
 
-        if (empty($items)) {
-            return $this->getResponse();
-        }
-
         //$items = [$this->autoRegisterComponent()];
         //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
 
         $this->componentManager->syncComponents($items);
 
-        $key = $this->params()->fromRoute('key');
-        if ('init' == $key) {
-            return $this->redirect()->toRoute('admin');
-        }
-        echo 'initialized';
+        $this->getLoggerPlugin()->debug(__METHOD__ . PHP_EOL . 'End synced component and actions');
 
-        return $this->getResponse();
+        $result['success'] = true;
+        return new JsonModel($result);
     }
 
 }

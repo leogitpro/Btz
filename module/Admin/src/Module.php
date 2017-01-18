@@ -6,7 +6,10 @@
 namespace Admin;
 
 
+use Admin\Controller\DashboardController;
 use Admin\Controller\IndexController;
+use Admin\Controller\ProfileController;
+use Admin\Service\AclManager;
 use Admin\Service\AuthService;
 use Zend\Mvc\MvcEvent;
 
@@ -99,10 +102,22 @@ class Module
         // Set module default template
         $viewModel->setTemplate('layout/admin_layout');
 
+        $whiteListControllers = [
+            ProfileController::class,
+            DashboardController::class,
+        ];
+        if (in_array($controller, $whiteListControllers)) {
+            return ;
+        }
+
         // ACL filter
         $action = $event->getRouteMatch()->getParam('action', null);
         $action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
-        // Todo
+
+        $aclManager = $serviceManager->get(AclManager::class);
+        if (!$aclManager->isValid($authService->getIdentity(), $controller, $action)) {
+            die('forbid access!');
+        }
 
     }
 

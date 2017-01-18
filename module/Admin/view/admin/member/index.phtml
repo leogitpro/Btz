@@ -1,6 +1,6 @@
 <?php
 $this->pageTitleBar('Administrator');
-$this->sideTreeMenu()->setActiveId('member_list');
+$this->sideTreeMenu()->setActiveId($activeId);
 
 $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
 

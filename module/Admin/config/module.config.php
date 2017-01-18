@@ -133,10 +133,10 @@ return [
                             ],
                         ],
                     ],
-                    // End MemberController router
+                    // End DepartmentMemberRelationController router
 
 
-                    // DepartmentMemberRelationController router configuration
+                    // ComponentController router configuration
                     'component' => [
                         'type' => Segment::class,
                         'options' => [
@@ -152,25 +152,25 @@ return [
                             ],
                         ],
                     ],
-                    // End MemberController router
+                    // End ComponentController router
 
-                    // DepartmentMemberRelationController router configuration
+                    // AclController router configuration
                     'acl' => [
                         'type' => Segment::class,
                         'options' => [
                             'route' => 'acl[/:action[/:key]][:suffix]',
                             'constraints' => [
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
+                                'key' => '[a-zA-Z0-9-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
                                 'controller' => Controller\AclController::class,
-                                'action' => 'member',
+                                'action' => 'index',
                             ],
                         ],
                     ],
-                    // End MemberController router
+                    // End AclController router
 
                 ],
             ],
@@ -183,10 +183,12 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\DashboardController::class => InvokableFactory::class,
             Controller\ProfileController::class => InvokableFactory::class,
+
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,
             Controller\DepartmentMemberRelationController::class => InvokableFactory::class,
             Controller\ComponentController::class => InvokableFactory::class,
+            Controller\AclController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -238,11 +240,14 @@ return [
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
-            Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
-            Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\DepartmentMemberRelationManager::class => Service\Factory\DMRelationManagerFactory::class,
+
+            Service\MemberManager::class => Service\Factory\DmManagerFactory::class,
+            Service\DepartmentManager::class => Service\Factory\DmManagerFactory::class,
+
+            Service\DMRelationManager::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\AclManager::class => Service\Factory\EntityManagerFactory::class,
+
+            Service\AclManager::class => Service\Factory\AclManagerFactory::class,
         ],
     ],
 

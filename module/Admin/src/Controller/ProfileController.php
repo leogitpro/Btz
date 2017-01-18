@@ -12,10 +12,11 @@ use Admin\Form\UpdatePasswordForm;
 use Admin\Form\UpdateProfileForm;
 use Admin\Service\AuthService;
 use Admin\Service\MemberManager;
+use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
-class ProfileController extends BaseController
+class ProfileController extends AbstractActionController
 {
 
     /**
@@ -37,29 +38,6 @@ class ProfileController extends BaseController
         $this->memberManager = $serviceManager->get(MemberManager::class);
 
         return parent::onDispatch($e);
-    }
-
-    public function autoRegisterComponent()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => 'My Profile',
-            'route' => 'admin/profile',
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => 'View my profile',
-                ],
-                [
-                    'action' => 'password',
-                    'name' => 'Change password',
-                ],
-                [
-                    'action' => 'update',
-                    'name' => 'Update my profile',
-                ],
-            ],
-        ];
     }
 
 

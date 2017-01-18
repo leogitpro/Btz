@@ -13,6 +13,7 @@ use Admin\Entity\DepartmentMember;
 use Doctrine\ORM\EntityManager;
 use Zend\Log\Logger;
 
+
 class DepartmentMemberRelationManager extends BaseEntityManager
 {
     /**

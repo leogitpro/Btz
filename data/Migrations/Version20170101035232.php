@@ -30,7 +30,15 @@ class Version20170101035232 extends AbstractMigration
         $table->addColumn('dept_created', 'datetime');
 
         $table->setPrimaryKey(['dept_id']);
+
+        // Query for dept by name
         $table->addUniqueIndex(['dept_name'], 'unique_index_dept_name');
+
+        // Query for activated dept
+        $table->addIndex(['dept_status']);
+
+        // Query for default order
+        $table->addIndex(['dept_status', 'dept_name']);
     }
 
     /**

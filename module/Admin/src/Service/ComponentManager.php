@@ -32,7 +32,7 @@ class ComponentManager extends BaseEntityManager
     /**
      * @return integer
      */
-    public function getComponentsCount()
+    public function getAllComponentsCount()
     {
         return $this->getEntitiesCount(Component::class, 'comId');
     }
@@ -63,6 +63,15 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * @return integer
+     */
+    public function getComponentsCount()
+    {
+        return $this->getEntitiesCount(Component::class, 'comId', ['comStatus = :status'], ['status' => Component::STATUS_VALIDITY]);
+    }
+
+
+    /**
      * Get all valid components
      *
      * @return array
@@ -87,6 +96,29 @@ class ComponentManager extends BaseEntityManager
         return $this->getUniverseComponents([
             'comStatus' => Component::STATUS_VALIDITY,
         ], null, $size, ($page - 1) * $size );
+    }
+
+
+    /**
+     * Get components with it actions
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getComponentsWithActionsByLimitPage($page = 1, $size = 10)
+    {
+        $entities = $this->getComponentsByLimitPage($page, $size);
+        $actions = [];
+        foreach ($entities as $entity) {
+            if ($entity instanceof Component) {
+                $actions[$entity->getComClass()] = $this->getComponentAllActions($entity);
+            }
+        }
+        return [
+            'components' => $entities,
+            'actions' => $actions,
+        ];
     }
 
 
@@ -177,6 +209,23 @@ class ComponentManager extends BaseEntityManager
     {
         return $this->getUniverseAction(['actionId' => $action_id]);
     }
+
+
+    /**
+     * Get the action
+     *
+     * @param string $controller_class
+     * @param string $action_key
+     * @return Action
+     */
+    public function getComponentAction($controller_class, $action_key)
+    {
+        return $this->getUniverseAction([
+            'controllerClass' => $controller_class,
+            'actionKey' => $action_key,
+        ]);
+    }
+
 
     /**
      * Get a action

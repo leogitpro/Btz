@@ -12,19 +12,15 @@ use Admin\Entity\Department;
 use Admin\Entity\DepartmentMember;
 use Admin\Entity\Member;
 use Admin\Service\DepartmentManager;
-use Admin\Service\DepartmentMemberRelationManager;
+use Admin\Service\DMRelationManager;
 use Admin\Service\MemberManager;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+
 class DepartmentMemberRelationController extends BaseController
 {
-
-    /**
-     * @var DepartmentMemberRelationManager
-     */
-    private $relationshipManager;
 
     /**
      * @var MemberManager
@@ -36,15 +32,20 @@ class DepartmentMemberRelationController extends BaseController
      */
     private $departmentManager;
 
+    /**
+     * @var DMRelationManager
+     */
+    private $dmrManager;
+
 
 
     public function onDispatch(MvcEvent $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
-        $this->relationshipManager = $serviceManager->get(DepartmentMemberRelationManager::class);
         $this->memberManager = $serviceManager->get(MemberManager::class);
         $this->departmentManager = $serviceManager->get(DepartmentManager::class);
+        $this->dmrManager = $serviceManager->get(DMRelationManager::class);
 
         return parent::onDispatch($e);
     }
@@ -97,7 +98,7 @@ class DepartmentMemberRelationController extends BaseController
             'dept' => $dept,
         ];
 
-        $relations = $this->relationshipManager->getDepartmentMemberRelations($dept_id);
+        $relations = $this->dmrManager->departmentRelations($dept_id);
         $joined = [];
         foreach ($relations as $relation) {
             if ($relation instanceof DepartmentMember) {
@@ -161,12 +162,7 @@ class DepartmentMemberRelationController extends BaseController
                 $joined[$id] = $id;
             }
 
-            $this->relationshipManager->closedOneDepartment($dept_id);
-            $this->relationshipManager->openedOneDepartment($dept_id);
-
-            foreach ($joined as $member_id) {
-                $this->relationshipManager->increaseMemberToDepartment($member_id, $dept_id);
-            }
+            $this->dmrManager->rebuildDepartmentMembers($dept_id, $joined);
 
             $json['success'] = true;
         } else {
@@ -197,7 +193,7 @@ class DepartmentMemberRelationController extends BaseController
             'member' => $member, //['member_id' => $member->getMemberId(), 'member_name' => $member->getMemberName(),],
         ];
 
-        $relations = $this->relationshipManager->getMemberDepartmentRelations($member_id);
+        $relations = $this->dmrManager->memberRelations($member_id);
         $joined = [];
         foreach ($relations as $relation) {
             if ($relation instanceof DepartmentMember) {
@@ -262,12 +258,13 @@ class DepartmentMemberRelationController extends BaseController
                 $joined[$id] = $id;
             }
 
-            $this->relationshipManager->closedOneMember($member_id); // Clean all old relationship
-            $this->relationshipManager->openedOneMember($member_id); // For restore default department
+            //$this->relationshipManager->closedOneMember($member_id); // Clean all old relationship
+            //$this->relationshipManager->openedOneMember($member_id); // For restore default department
 
-            foreach ($joined as $dept_id) {
-                $this->relationshipManager->increaseMemberToDepartment($member_id, $dept_id);
-            }
+            //foreach ($joined as $dept_id) {
+                //$this->relationshipManager->increaseMemberToDepartment($member_id, $dept_id);
+            //}
+            $this->dmrManager->rebuildMemberDepartments($member_id, $joined);
 
             $json['success'] = true;
         } else {

@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class Version20170112095854 extends AbstractMigration
 {
+
     /**
      * @param Schema $schema
      */
@@ -24,7 +25,13 @@ class Version20170112095854 extends AbstractMigration
         $table->addColumn('created', 'datetime');
 
         $table->setPrimaryKey(['id']);
+
+        $table->addIndex(['dept_id']);
+        $table->addIndex(['dept_id', 'status']);
+
+        $table->addIndex(['dept_id', 'action_id']);
     }
+
 
     /**
      * @param Schema $schema
