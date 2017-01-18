@@ -19,7 +19,7 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
-class DepartmentMemberRelationController extends BaseController
+class DmrController extends BaseController
 {
 
     /**

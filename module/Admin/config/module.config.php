@@ -117,7 +117,7 @@ return [
                     // End MemberController router
 
 
-                    // DepartmentMemberRelationController router configuration
+                    // DmrController router configuration
                     'dmr' => [
                         'type' => Segment::class,
                         'options' => [
@@ -128,12 +128,12 @@ return [
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
-                                'controller' => Controller\DepartmentMemberRelationController::class,
+                                'controller' => Controller\DmrController::class,
                                 'action' => 'index',
                             ],
                         ],
                     ],
-                    // End DepartmentMemberRelationController router
+                    // End DmrController router
 
 
                     // ComponentController router configuration
@@ -186,7 +186,7 @@ return [
 
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,
-            Controller\DepartmentMemberRelationController::class => InvokableFactory::class,
+            Controller\DmrController::class => InvokableFactory::class,
             Controller\ComponentController::class => InvokableFactory::class,
             Controller\AclController::class => InvokableFactory::class,
         ],
