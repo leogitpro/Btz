@@ -49,8 +49,7 @@ class Version20170101041510 extends AbstractMigration
         );
 
 
-
-
+        /**
         $count = 0;
         for($i = 2; $i <= 31; $i++) {
             $rank = random_int(1000, 9999);
@@ -85,9 +84,7 @@ class Version20170101041510 extends AbstractMigration
                 ['integer', 'string', 'smallint', 'string']
             );
         }
-
-
-
+        //*/
 
 
     }

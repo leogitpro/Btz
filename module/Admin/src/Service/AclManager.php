@@ -123,6 +123,85 @@ class AclManager extends BaseEntityManager
 
 
     /**
+     * Get a member custom menus
+     *
+     * @param int $memberId
+     * @return array
+     */
+    public function getMemberMenus($memberId)
+    {
+        $actionIds = [];
+
+        // Administrator personal acl
+        $acls = $this->getMemberAcls($memberId);
+        foreach ($acls as $acl) {
+            if ($acl instanceof AclMember) {
+                $actionIds[$acl->getActionId()] = $acl->getActionId();
+            }
+        }
+
+        // Administrator departments
+        $deptIds = [];
+        $relations = $this->dmrManager->memberRelations($memberId);
+        foreach ($relations as $relation) {
+            if ($relation instanceof DepartmentMember) {
+                $deptIds[$relation->getDeptId()] = $relation->getDeptId();
+            }
+        }
+
+        // Department acls
+        foreach ($deptIds as $deptId) {
+            $acls = $this->getDepartmentAcls($deptId);
+            foreach ($acls as $acl) {
+                if ($acl instanceof AclDepartment) {
+                    $actionIds[$acl->getActionId()] = $acl->getActionId();
+                }
+            }
+        }
+
+        // Get the action components
+        if (empty($actionIds)) {
+            return [];
+        }
+
+        $actions = [];
+        $componentClasses = [];
+        $entities = $this->componentManager->getActionsByIds($actionIds);
+        foreach ($entities as $entity) {
+            if ($entity instanceof Action) {
+                if ($entity->getActionStatus() == Action::STATUS_VALIDITY && $entity->getActionMenu() == Action::MENU_YES) {
+                    $actions[$entity->getControllerClass()][$entity->getActionId()] = $entity;
+                    $componentClasses[$entity->getControllerClass()] = $entity->getControllerClass();
+                }
+            }
+        }
+
+        if (empty($componentClasses)) {
+            return [];
+        }
+
+        $components = [];
+        $entities = $this->componentManager->getComponentsByClasses($componentClasses);
+        foreach ($entities as $entity) {
+            if ($entity instanceof Component) {
+                if (Component::STATUS_VALIDITY == $entity->getComStatus() && Component::MENU_YES == $entity->getComMenu()) {
+                    $components[] = $entity;
+                }
+            }
+        }
+
+        if (empty($components)) {
+            return [];
+        }
+
+        return [
+            'components' => $components,
+            'actions' => $actions,
+        ];
+    }
+
+
+    /**
      * Get a acl for member and action
      *
      * @param $member_id
@@ -159,6 +238,21 @@ class AclManager extends BaseEntityManager
     public function getMemberAllAcls($member_id)
     {
         return $this->getMemberUniverseAcls(['memberId' => $member_id], null, 200);
+    }
+
+
+    /**
+     * Get member all allowed acls
+     *
+     * @param int $member_id
+     * @return array
+     */
+    public function getMemberAcls($member_id)
+    {
+        return $this->getMemberUniverseAcls([
+            'memberId' => $member_id,
+            'status' => AclMember::STATUS_ALLOWED,
+        ], null, 200);
     }
 
 
@@ -203,6 +297,22 @@ class AclManager extends BaseEntityManager
     private function getDepartmentUniverseAcl($criteria = [], $order = null)
     {
         return $this->entityManager->getRepository(AclDepartment::class)->findOneBy($criteria, $order);
+    }
+
+
+
+    /**
+     * Get a department all valid actions, max records: 200
+     *
+     * @param integer $dept_id
+     * @return array
+     */
+    public function getDepartmentAcls($dept_id)
+    {
+        return $this->getDepartmentUniverseAcls([
+            'deptId' => $dept_id,
+            'status' => AclDepartment::STATUS_ALLOWED,
+        ], null, 200);
     }
 
 

@@ -38,6 +38,11 @@ class NavManager
     private $entityManager;
 
     /**
+     * @var AclManager
+     */
+    private $aclManager;
+
+    /**
      * @var array
      */
     private $topRightItems;
@@ -54,10 +59,14 @@ class NavManager
     private $breadcrumbItems;
 
 
-    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url, EntityManager $entityManager)
+    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url, AclManager $aclManager, EntityManager $entityManager)
     {
         $this->authService = $authService;
+
         $this->memberManager = $memberManager;
+
+        $this->aclManager = $aclManager;
+
         $this->urlHelper = $url;
 
         $this->entityManager = $entityManager;
@@ -206,6 +215,11 @@ class NavManager
         $dashboard = $this->createNavItem('dashboard', 'dashboard', 'Dashboard', $url('admin/dashboard'));
         $this->addSideTreeItem($dashboard);
 
+
+
+
+
+
         /**
         $member = $this->createNavItem('member', 'user', 'Administrator');
         $member['dropdown'] = [
@@ -280,6 +294,45 @@ class NavManager
                 $this->addSideTreeItem($item);
             }
         }
+
+
+
+
+        $menus = $this->aclManager->getMemberMenus($this->authService->getIdentity());
+        if (empty($menus)) {
+            return;
+        }
+
+        $components = $menus['components'];
+        $actions = $menus['actions'];
+
+        foreach ($components as $component) {
+            if ($component instanceof Component) {
+                $item = $this->createNavItem(
+                    $component->getComClass(),
+                    $component->getComIcon(),
+                    $component->getComName(),
+                    $url($component->getComRoute())
+                );
+
+                if (array_key_exists($component->getComClass(), $actions)) {
+                    foreach ($actions[$component->getComClass()] as $action) {
+                        if ($action instanceof Action) {
+                            $subItem = $this->createNavItem(
+                                $action->getControllerClass() . '::' . $action->getActionKey() . 'Action',
+                                $action->getActionIcon(),
+                                $action->getActionName(),
+                                $url($component->getComRoute(), ['action' => $action->getActionKey()])
+                            );
+                            $item['dropdown'][] = $subItem;
+                        }
+                    }
+                }
+
+                $this->addSideTreeItem($item);
+            }
+        }
+
     }
 
     /**

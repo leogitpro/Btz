@@ -116,7 +116,7 @@ class Module
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($authService->getIdentity(), $controller, $action)) {
-            die('forbid access!');
+            return $event->getTarget()->redirect()->toRoute('admin/dashboard', ['action' => 'forbidden', 'suffix' => '.html']);
         }
 
     }

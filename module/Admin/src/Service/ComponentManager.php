@@ -200,6 +200,36 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * Get components by classes for menu
+     *
+     * @param array $classes
+     * @return array
+     */
+    public function getComponentsByClasses($classes)
+    {
+        return $this->entityManager->getRepository(Component::class)->findByComClass(
+            $classes,
+            ['comRank' => 'DESC', 'comName' => 'ASC']
+        );
+    }
+
+
+    /**
+     * Get actions by ids for menu
+     *
+     * @param array $actionIds
+     * @return array
+     */
+    public function getActionsByIds($actionIds)
+    {
+        return $this->entityManager->getRepository(Action::class)->findByActionId(
+            $actionIds,
+            ['actionRank' => 'DESC', 'actionName' => 'ASC']
+        );
+    }
+
+
+    /**
      * Get a action by id
      *
      * @param integer $action_id

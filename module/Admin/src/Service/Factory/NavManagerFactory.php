@@ -8,6 +8,7 @@
 namespace Admin\Service\Factory;
 
 
+use Admin\Service\AclManager;
 use Admin\Service\AuthService;
 use Admin\Service\MemberManager;
 use Admin\Service\NavManager;
@@ -26,7 +27,9 @@ class NavManagerFactory implements FactoryInterface
 
         $entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
 
-        return new NavManager($authService, $memberManager, $urlHelper, $entityManager);
+        $aclManager = $serviceManager->get(AclManager::class);
+
+        return new NavManager($authService, $memberManager, $urlHelper, $aclManager, $entityManager);
     }
 
 

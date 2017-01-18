@@ -17,4 +17,15 @@ class DashboardController extends AbstractActionController
         return new ViewModel();
     }
 
+
+    /**
+     * Display forbidden page
+     *
+     * @return ViewModel
+     */
+    public function forbiddenAction()
+    {
+        return new ViewModel();
+    }
+
 }
