@@ -56,7 +56,7 @@ class AclController extends BaseController
             'route' => 'admin/acl',
             'menu' => true,
             'rank' => 0,
-            'icon' => 'cubes',
+            'icon' => 'cogs',
             'actions' => [
                 [
                     'action' => 'member',

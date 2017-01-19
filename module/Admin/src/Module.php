@@ -112,7 +112,7 @@ class Module
 
         // ACL filter
         $action = $event->getRouteMatch()->getParam('action', null);
-        $action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
+        //$action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($authService->getIdentity(), $controller, $action)) {

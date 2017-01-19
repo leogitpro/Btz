@@ -56,14 +56,73 @@ class AclManager extends BaseEntityManager
 
 
     /**
-     * @param int $member_id
-     * @param string $controller_class
-     * @param string $action_key
+     * @param int $memberId
+     * @return array
+     */
+    private function getMemberMergedAcls($memberId)
+    {
+        $forbiddenActionIds = [];
+        $allowedActionIds = [];
+
+        $rows = $this->getMemberAllAcls($memberId);
+        foreach ($rows as $acl) {
+            if ($acl instanceof AclMember) {
+                if (AclMember::STATUS_FORBIDDEN == $acl->getStatus()) {
+                    $forbiddenActionIds[$acl->getActionId()] = $acl->getActionId();
+                }
+                if (AclMember::STATUS_ALLOWED == $acl->getStatus()) {
+                    $allowedActionIds[$acl->getActionId()] = $acl->getActionId();
+                }
+            }
+        }
+
+        $this->logger->debug('Member personal forbidden access actions:' . implode('-', $forbiddenActionIds));
+        $this->logger->debug('Member personal allowed access actions:' . implode('-', $allowedActionIds));
+
+        // Member departments
+        $deptIds = [];
+        $relations = $this->dmrManager->memberRelations($memberId);
+        foreach ($relations as $relation) {
+            if ($relation instanceof DepartmentMember) {
+                $deptIds[$relation->getDeptId()] = $relation->getDeptId();
+            }
+        }
+        $this->logger->debug('My belong departments:' . implode('-', $deptIds));
+
+        // Department acls
+        foreach ($deptIds as $deptId) {
+            $rows = $this->getDepartmentAcls($deptId);
+            foreach ($rows as $acl) {
+                if ($acl instanceof AclDepartment) {
+                    $allowedActionIds[$acl->getActionId()] = $acl->getActionId();
+                }
+            }
+        }
+
+        $actionIds = [];
+        foreach ($allowedActionIds as $id) {
+            if (!in_array($id, $forbiddenActionIds)) {
+                $actionIds[$id] = $id;
+            }
+        }
+        $this->logger->debug("The final can access actions: " . implode('-', $actionIds));
+
+        return [
+            'allowed' => $actionIds,
+            'forbidden' => $forbiddenActionIds,
+        ];
+    }
+
+
+    /**
+     * @param int $memberId
+     * @param string $controllerClass
+     * @param string $actionKey
      * @return bool
      */
-    public function isValid($member_id, $controller_class, $action_key)
+    public function isValid($memberId, $controllerClass, $actionKey)
     {
-        $member = $this->memberManager->getMember($member_id);
+        $member = $this->memberManager->getMember($memberId);
         if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             return false;
         }
@@ -72,54 +131,28 @@ class AclManager extends BaseEntityManager
             return true;
         }
 
-        $component = $this->componentManager->getComponentByClass($controller_class);
+        $component = $this->componentManager->getComponentByClass($controllerClass);
         if (null == $component || Component::STATUS_VALIDITY != $component->getComStatus()) {
             return false;
         }
 
-        $action = $this->componentManager->getComponentAction($controller_class, $action_key);
-        if (Action::STATUS_VALIDITY != $action->getActionStatus()) {
+        $action = $this->componentManager->getComponentAction($controllerClass, $actionKey);
+        if (null == $action || Action::STATUS_VALIDITY != $action->getActionStatus()) {
+            return false;
+        }
+        $actionId = $action->getActionId();
+
+        $acl = $this->getMemberMergedAcls($memberId);
+        if (in_array($actionId, $acl['forbidden'])) {
             return false;
         }
 
-        $actionId = $action->getActionId();
-        $memberId = $member->getMemberId();
-
-        $acl = $this->getMemberActionAcl($memberId, $actionId);
-        if ($acl instanceof AclMember) {
-            $status = $acl->getStatus();
-            if ($status == AclMember::STATUS_ALLOWED) {
-                return true;
-            }
-            if ($status == AclMember::STATUS_FORBIDDEN) {
-                return false;
-            }
+        if (in_array($actionId, $acl['allowed'])) {
+            return true;
         }
 
-        $access = false;
-
-        $relations = $this->dmrManager->memberRelations($memberId);
-        foreach ($relations as $relation) {
-            if ($relation instanceof DepartmentMember) {
-                if (DepartmentMember::STATUS_VALID != $relation->getStatus()) {
-                    continue;
-                }
-
-                $deptId = $relation->getDeptId();
-                $acl = $this->getDepartmentActionAcl($deptId, $actionId);
-                if ($acl instanceof AclDepartment) {
-                    if (AclDepartment::STATUS_ALLOWED == $acl->getStatus()) {
-                        $access = true;
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        return $access;
+        return false;
     }
-
 
 
     /**
@@ -130,36 +163,8 @@ class AclManager extends BaseEntityManager
      */
     public function getMemberMenus($memberId)
     {
-        $actionIds = [];
-
-        // Administrator personal acl
-        $acls = $this->getMemberAcls($memberId);
-        foreach ($acls as $acl) {
-            if ($acl instanceof AclMember) {
-                $actionIds[$acl->getActionId()] = $acl->getActionId();
-            }
-        }
-
-        // Administrator departments
-        $deptIds = [];
-        $relations = $this->dmrManager->memberRelations($memberId);
-        foreach ($relations as $relation) {
-            if ($relation instanceof DepartmentMember) {
-                $deptIds[$relation->getDeptId()] = $relation->getDeptId();
-            }
-        }
-
-        // Department acls
-        foreach ($deptIds as $deptId) {
-            $acls = $this->getDepartmentAcls($deptId);
-            foreach ($acls as $acl) {
-                if ($acl instanceof AclDepartment) {
-                    $actionIds[$acl->getActionId()] = $acl->getActionId();
-                }
-            }
-        }
-
-        // Get the action components
+        $acl = $this->getMemberMergedAcls($memberId);
+        $actionIds = $acl['allowed'];
         if (empty($actionIds)) {
             return [];
         }
@@ -170,8 +175,12 @@ class AclManager extends BaseEntityManager
         foreach ($entities as $entity) {
             if ($entity instanceof Action) {
                 if ($entity->getActionStatus() == Action::STATUS_VALIDITY && $entity->getActionMenu() == Action::MENU_YES) {
-                    $actions[$entity->getControllerClass()][$entity->getActionId()] = $entity;
                     $componentClasses[$entity->getControllerClass()] = $entity->getControllerClass();
+                    $actions[$entity->getControllerClass()][$entity->getActionId()] = [
+                        'key' => $entity->getActionKey(),
+                        'name' => $entity->getActionName(),
+                        'icon' => $entity->getActionIcon(),
+                    ];
                 }
             }
         }
@@ -185,19 +194,62 @@ class AclManager extends BaseEntityManager
         foreach ($entities as $entity) {
             if ($entity instanceof Component) {
                 if (Component::STATUS_VALIDITY == $entity->getComStatus() && Component::MENU_YES == $entity->getComMenu()) {
-                    $components[] = $entity;
+                    $item = [
+                        'class' => $entity->getComClass(),
+                        'name' => $entity->getComName(),
+                        'icon' => $entity->getComIcon(),
+                        'route' => $entity->getComRoute(),
+                        'actions' => $actions[$entity->getComClass()],
+                    ];
+                    $components[] = $item;
                 }
             }
         }
 
-        if (empty($components)) {
-            return [];
+        return $components;
+    }
+
+
+    /**
+     * Get global menu
+     *
+     * @return array
+     */
+    public function getGlobalMenus()
+    {
+        $menu = [];
+        $rows = $this->componentManager->getComponentsForAutoMenu();
+        foreach ($rows as $entity) {
+            if ($entity instanceof Component) {
+                $actions = [];
+                $_rows = $this->componentManager->getComponentActions($entity);
+                foreach ($_rows as $_entity) {
+                    if ($_entity instanceof Action) {
+                        if (Action::MENU_YES == $_entity->getActionMenu()) {
+                            $actions[] = [
+                                'key' => $_entity->getActionKey(),
+                                'name' => $_entity->getActionName(),
+                                'icon' => $_entity->getActionIcon(),
+                            ];
+                        }
+                    }
+                }
+
+                $item = [
+                    'class' => $entity->getComClass(),
+                    'name' => $entity->getComName(),
+                    'icon' => $entity->getComIcon(),
+                    'route' => $entity->getComRoute(),
+                ];
+                if (!empty($actions)) {
+                    $item['actions'] = $actions;
+                }
+
+                $menu[] = $item;
+            }
         }
 
-        return [
-            'components' => $components,
-            'actions' => $actions,
-        ];
+        return $menu;
     }
 
 
@@ -247,13 +299,29 @@ class AclManager extends BaseEntityManager
      * @param int $member_id
      * @return array
      */
-    public function getMemberAcls($member_id)
+    public function getMemberAllowedAcls($member_id)
     {
         return $this->getMemberUniverseAcls([
             'memberId' => $member_id,
             'status' => AclMember::STATUS_ALLOWED,
         ], null, 200);
     }
+
+
+    /**
+     * Get member all forbidden acls
+     *
+     * @param int $member_id
+     * @return array
+     */
+    public function getMemberForbiddenAcls($member_id)
+    {
+        return $this->getMemberUniverseAcls([
+            'memberId' => $member_id,
+            'status' => AclMember::STATUS_FORBIDDEN,
+        ], null, 200);
+    }
+
 
 
     /**

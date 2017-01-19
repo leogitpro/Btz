@@ -85,6 +85,20 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * Get all valid menu components
+     *
+     * @return array
+     */
+    public function getComponentsForAutoMenu()
+    {
+        return $this->getUniverseComponents([
+            'comStatus' => Component::STATUS_VALIDITY,
+            'comMenu' => Component::MENU_YES,
+        ], null, 200);
+    }
+
+
+    /**
      * Get some valid components
      *
      * @param int $page
@@ -172,6 +186,21 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * Get a component all valid actions
+     *
+     * @param Component $component
+     * @return array
+     */
+    public function getComponentActions(Component $component)
+    {
+        return $this->getUniverseActions([
+            'controllerClass' => $component->getComClass(),
+            'actionStatus' => Action::STATUS_VALIDITY,
+        ]);
+    }
+
+
+    /**
      * Get a component all actions
      *
      * @param Component $component
@@ -193,7 +222,7 @@ class ComponentManager extends BaseEntityManager
     private function getUniverseActions($criteria, $orders = null)
     {
         if (null == $orders) {
-            $orders = ['actionRank' => 'DESC', 'actionMenu' => 'DESC', 'actionName' => 'ASC'];
+            $orders = ['actionStatus' => 'DESC', 'actionRank' => 'DESC', 'actionMenu' => 'DESC', 'actionName' => 'ASC'];
         }
         return $this->entityManager->getRepository(Action::class)->findBy($criteria, $orders, 100);
     }

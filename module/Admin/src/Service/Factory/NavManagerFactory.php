@@ -25,11 +25,9 @@ class NavManagerFactory implements FactoryInterface
         $viewHelperManager = $serviceManager->get('ViewHelperManager');
         $urlHelper = $viewHelperManager->get('url');
 
-        $entityManager = $serviceManager->get('doctrine.entitymanager.orm_default');
-
         $aclManager = $serviceManager->get(AclManager::class);
 
-        return new NavManager($authService, $memberManager, $urlHelper, $aclManager, $entityManager);
+        return new NavManager($authService, $memberManager, $urlHelper, $aclManager);
     }
 
 
