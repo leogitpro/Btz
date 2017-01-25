@@ -63,8 +63,8 @@ class AclDepartment
     public static function getAclStatusList()
     {
         return [
-            self::STATUS_ALLOWED => 'Allowed',
-            self::STATUS_FORBIDDEN => 'Forbidden',
+            self::STATUS_ALLOWED => '允许访问',
+            self::STATUS_FORBIDDEN => '禁止访问',
         ];
     }
 

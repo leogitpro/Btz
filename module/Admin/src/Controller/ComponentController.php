@@ -41,34 +41,34 @@ class ComponentController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => 'Component',
+            'name' => '系统模块',
             'route' => 'admin/component',
             'menu' => true,
-            'rank' => 0,
+            'rank' => 14,
             'icon' => 'cubes',
             'actions' => [
                 [
                     'action' => 'index',
-                    'name' => 'Components',
+                    'name' => '查看模块列表',
                     'menu' => true,
                     'rank' => 0,
                     'icon' => 'bars',
                 ],
                 [
-                    'action' => 'actions',
-                    'name' => 'View component actions',
+                    'action' => 'status',
+                    'name' => '启用/禁用模块',
                 ],
                 [
-                    'action' => 'status',
-                    'name' => 'Change component status',
+                    'action' => 'actions',
+                    'name' => '查看模块功能列表',
                 ],
                 [
                     'action' => 'actionstatus',
-                    'name' => 'Change action status',
+                    'name' => '启用/禁用模块功能',
                 ],
                 [
                     'action' => 'sync',
-                    'name' => 'Sync components',
+                    'name' => '同步系统模块',
                 ],
             ],
         ];

@@ -52,37 +52,41 @@ class AclController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => 'Access control',
+            'name' => '权限控制',
             'route' => 'admin/acl',
             'menu' => true,
-            'rank' => 0,
+            'rank' => 16,
             'icon' => 'cogs',
             'actions' => [
                 [
                     'action' => 'member',
-                    'name' => 'Members ACL',
+                    'name' => '个人权限配置',
                     'menu' => true,
                     'rank' => 0,
                     'icon' => 'users',
                 ],
                 [
                     'action' => 'acl-member',
-                    'name' => 'List member ACL',
+                    'name' => '查看个人权限',
                 ],
                 [
                     'action' => 'acl-member-dispatch',
-                    'name' => 'Modify member ACL',
+                    'name' => '配置个人权限',
                 ],
                 [
                     'action' => 'department',
-                    'name' => 'Departments ACL',
+                    'name' => '分组权限配置',
                     'menu' => true,
                     'rank' => 0,
                     'icon' => 'bars',
                 ],
                 [
                     'action' => 'acl-department',
-                    'name' => 'Department access control',
+                    'name' => '查看分组权限',
+                ],
+                [
+                    'action' => 'acl-department-dispatch',
+                    'name' => '配置分组权限',
                 ],
             ],
         ];
@@ -314,7 +318,7 @@ class AclController extends BaseController
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
-        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'acl-member', 'key' =>  $dept_id . '-%d']));
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'acl-department', 'key' =>  $dept_id . '-%d']));
         $paginationHelper->setCount($this->componentManager->getComponentsCount());
 
         $data = $this->componentManager->getComponentsWithActionsByLimitPage($page, $size);

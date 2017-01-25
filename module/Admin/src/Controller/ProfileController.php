@@ -60,7 +60,7 @@ class ProfileController extends AbstractActionController
 
 
     /**
-     * Update administrator password page.
+     * Update administrator password.
      *
      * @return ViewModel
      */

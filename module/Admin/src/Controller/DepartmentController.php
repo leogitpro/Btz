@@ -40,31 +40,33 @@ class DepartmentController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => 'Department',
+            'name' => '部门管理',
             'route' => 'admin/dept',
             'menu' => true,
             'icon' => 'users',
-            'rank' => 0,
+            'rank' => 12,
             'actions' => [
                 [
                     'action' => 'index',
-                    'name' => 'Departments',
+                    'name' => '查看部门列表',
                     'menu' => true,
                     'icon' => 'bars',
+                    'rank' => 9,
                 ],
                 [
                     'action' => 'add',
-                    'name' => 'New department',
+                    'name' => '创建新部门',
                     'menu' => true,
                     'icon' => 'plus',
+                    'rank' => 1,
                 ],
                 [
                     'action' => 'edit',
-                    'name' => 'Edit department',
+                    'name' => '修改部门信息',
                 ],
                 [
                     'action' => 'status',
-                    'name' => 'Change status',
+                    'name' => '启用/禁用部门',
                 ],
             ],
         ];

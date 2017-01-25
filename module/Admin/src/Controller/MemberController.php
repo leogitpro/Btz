@@ -40,39 +40,41 @@ class MemberController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => 'Administrator',
+            'name' => '成员管理',
             'route' => 'admin/member',
             'menu' => true,
             'icon' => 'user',
-            'rank' => 0,
+            'rank' => 10,
             'actions' => [
                 [
                     'action' => 'index',
-                    'name' => 'Administrators',
+                    'name' => '查看成员列表',
                     'icon' => 'bars',
                     'menu' => true,
+                    'rank' => 9,
                 ],
                 [
                     'action' => 'add',
-                    'name' => 'New administrator',
+                    'name' => '创建成员',
                     'icon' => 'user-plus',
                     'menu' => true,
+                    'rank' => 1,
                 ],
                 [
                     'action' => 'edit',
-                    'name' => 'Edit admin info',
+                    'name' => '修改成员资料',
                 ],
                 [
                     'action' => 'status',
-                    'name' => 'Change admin status'
+                    'name' => '启用/禁用成员'
                 ],
                 [
                     'action' => 'level',
-                    'name' => 'Change admin level'
+                    'name' => '修改成员等级'
                 ],
                 [
                     'action' => 'password',
-                    'name' => 'Change admin password'
+                    'name' => '修改成员密码'
                 ],
             ],
         ];

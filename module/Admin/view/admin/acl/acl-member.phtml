@@ -1,5 +1,5 @@
 <?php
-$this->pageTitleBar('Access control', 'For ' . $member->getMemberName());
+$this->pageTitleBar('权限配置', '个人权限: ' . $member->getMemberName());
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
@@ -15,6 +15,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/acl.js'));
         <div class="col-lg-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    <i class="fa fa-<?php echo $component->getComIcon(); ?> fa-fw"></i>
                     <?php echo $component->getComName(); ?>
                 </div>
                 <div class="panel-body">
@@ -28,7 +29,10 @@ $this->headScript()->appendFile($this->basePath('js/admin/acl.js'));
                     ?>
                         <tr>
                             <td>
-                                <span class="<?php echo $disabled ? 'color-disabled': ''; ?>"><?php echo $action->getActionName(); ?></span>
+                                <span class="<?php echo $disabled ? 'color-disabled': ''; ?>">
+                                    <i class="fa fa-<?php echo $action->getActionIcon(); ?> fa-fw"></i>
+                                    <?php echo $action->getActionName(); ?>
+                                </span>
                             </td>
                             <td class="text-right">
                                 <select class="action-status"<?php echo $disabled ? ' disabled="disabled"': ''; ?>>

@@ -54,24 +54,24 @@ class DmrController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => 'D-M Relationship',
+            'name' => '成员部门管理',
             'route' => 'admin/dmr',
             'actions' => [
                 [
                     'action' => 'department-members',
-                    'name' => 'View a department members',
+                    'name' => '查看部门中所有成员列表',
                 ],
                 [
                     'action' => 'save-department-members',
-                    'name' => 'Save department members data',
+                    'name' => '配置部门中成员名单',
                 ],
                 [
                     'action' => 'member-departments',
-                    'name' => 'View a member departments',
+                    'name' => '查看成员的所有部门列表',
                 ],
                 [
                     'action' => 'save-member-departments',
-                    'name' => 'Save member departments data',
+                    'name' => '配置成员的所属部门',
                 ],
             ],
         ];
