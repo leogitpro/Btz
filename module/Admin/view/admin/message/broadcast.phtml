@@ -1,0 +1,21 @@
+<?php
+$this->pageTitleBar('站内广播');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$this->headScript()->appendFile($this->basePath('open-source-assets/MagicSuggest-v2.0/magicsuggest-min.js'));
+$this->headLink()->appendStylesheet($this->basePath('open-source-assets/MagicSuggest-v2.0/magicsuggest-min.css'));
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <select>
+                <option></option>
+            </select>
+
+        </div>
+    </div>
+</div>

@@ -6,7 +6,6 @@
 namespace Admin;
 
 
-use Admin\Controller\IndexController;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
@@ -26,153 +25,7 @@ return [
                     ],
                 ],
                 'may_terminate' => true,
-                'child_routes' => [
-
-                    // IndexController router configuration
-                    'index' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'index[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\IndexController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ], // End IndexController router
-
-                    // DashboardController router configuration
-                    'dashboard' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'dashboard[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\DashboardController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ], // End DashboardController router
-
-                    // DashboardController router configuration
-                    'profile' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'profile[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\ProfileController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ], // End DashboardController router
-
-                    // DepartmentController router configuration
-                    'dept' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'department[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9_-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\DepartmentController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    // End DepartmentController router
-
-
-                    // MemberController router configuration
-                    'member' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'member[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9_-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\MemberController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    // End MemberController router
-
-
-                    // DmrController router configuration
-                    'dmr' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'dmr[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\DmrController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    // End DmrController router
-
-
-                    // ComponentController router configuration
-                    'component' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'component[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\ComponentController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    // End ComponentController router
-
-                    // AclController router configuration
-                    'acl' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'acl[/:action[/:key]][:suffix]',
-                            'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'key' => '[a-zA-Z0-9-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\AclController::class,
-                                'action' => 'index',
-                            ],
-                        ],
-                    ],
-                    // End AclController router
-
-                ],
+                'child_routes' => require(__DIR__ . '/module.routes.php'),
             ],
         ],
     ],
@@ -189,6 +42,7 @@ return [
             Controller\DmrController::class => InvokableFactory::class,
             Controller\ComponentController::class => InvokableFactory::class,
             Controller\AclController::class => InvokableFactory::class,
+            Controller\MessageController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

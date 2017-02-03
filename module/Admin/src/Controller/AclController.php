@@ -75,18 +75,18 @@ class AclController extends BaseController
                 ],
                 [
                     'action' => 'department',
-                    'name' => '分组权限配置',
+                    'name' => '部门权限配置',
                     'menu' => true,
                     'rank' => 0,
                     'icon' => 'bars',
                 ],
                 [
                     'action' => 'acl-department',
-                    'name' => '查看分组权限',
+                    'name' => '查看部门权限',
                 ],
                 [
                     'action' => 'acl-department-dispatch',
-                    'name' => '配置分组权限',
+                    'name' => '配置部门权限',
                 ],
             ],
         ];

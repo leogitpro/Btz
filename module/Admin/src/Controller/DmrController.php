@@ -54,7 +54,7 @@ class DmrController extends BaseController
     {
         return [
             'controller' => __CLASS__,
-            'name' => '成员部门管理',
+            'name' => '部门与成员管理',
             'route' => 'admin/dmr',
             'actions' => [
                 [
