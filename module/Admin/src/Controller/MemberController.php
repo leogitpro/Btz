@@ -55,7 +55,7 @@ class MemberController extends BaseController
                 ],
                 [
                     'action' => 'add',
-                    'name' => '创建成员',
+                    'name' => '创建新成员',
                     'icon' => 'user-plus',
                     'menu' => true,
                     'rank' => 1,

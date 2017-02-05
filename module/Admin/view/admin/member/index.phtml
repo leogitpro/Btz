@@ -1,5 +1,5 @@
 <?php
-$this->pageTitleBar('Administrator');
+$this->pageTitleBar('成员管理');
 $this->sideTreeMenu()->setActiveId($activeId);
 
 $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
@@ -9,18 +9,20 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
 <div class="row">
     <div class="col-lg-12">
         <p>
-            <a class="btn btn-default" href="<?php echo $this->url('admin/member', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw" ></i> New Administrator</a>
+            <a class="btn btn-default" href="<?php echo $this->url('admin/member', ['action'=>'add']); ?>">
+                <i class="fa fa-plus fa-fw" ></i> 添加成员
+            </a>
         </p>
 
         <table class="table table-striped">
             <tr>
                 <th>ID</th>
-                <th>Administrator</th>
-                <th>E-mail Address</th>
-                <th>Date Created</th>
-                <th>Level</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>名字</th>
+                <th>登录账号</th>
+                <th>创建时间</th>
+                <th>等级</th>
+                <th>状态</th>
+                <th>操作</th>
             </tr>
 
             <?php foreach ($rows as $member) { ?>

@@ -74,7 +74,7 @@ class MemberForm extends Form
                     'value' => (null == $this->member) ? '' : $this->member->getMemberEmail(),
                 ],
                 'options' => [
-                    'label' => 'Administrator account(E-mail)',
+                    'label' => 'Member account(E-mail)',
                 ],
             ]);
         }
@@ -89,7 +89,7 @@ class MemberForm extends Form
                     'id' => 'password',
                 ],
                 'options' => [
-                    'label' => 'Administrator password',
+                    'label' => 'Member password',
                 ],
             ]);
         }
@@ -104,7 +104,7 @@ class MemberForm extends Form
                     'value' => (null == $this->member) ? '' : $this->member->getMemberName(),
                 ],
                 'options' => [
-                    'label' => 'Administrator name',
+                    'label' => 'Member name',
                 ],
             ]);
         }

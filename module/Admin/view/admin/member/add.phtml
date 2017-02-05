@@ -1,10 +1,10 @@
 <?php
-$this->pageTitleBar('Add new administrator');
+$this->pageTitleBar('创建新成员');
 
 
 $form->get('email')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the administrator email'
+    'placeholder' => 'Enter the member email'
 ]);
 
 $form->get('password')->setAttributes([
@@ -13,7 +13,7 @@ $form->get('password')->setAttributes([
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the administrator name'
+    'placeholder' => 'Enter the member name'
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
