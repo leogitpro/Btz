@@ -11,6 +11,7 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
+use Admin\Entity\DepartmentMember;
 use Doctrine\ORM\EntityManager;
 use Zend\Log\Logger;
 
@@ -178,6 +179,25 @@ class DepartmentManager extends BaseEntityManager
             ];
         }
         return $this->entityManager->getRepository(Department::class)->findBy($criteria, $order, $limit, $offset);
+    }
+
+
+    /**
+     * Get the department all member ids
+     *
+     * @param $dept_id
+     * @return array
+     */
+    public function getDepartmentAllMemberIds($dept_id)
+    {
+        $rows = $this->dmrManager->departmentRelations($dept_id);
+        $ids = [];
+        foreach ($rows as $entity) {
+            if ($entity instanceof DepartmentMember) {
+                $ids[$entity->getMemberId()] = $entity->getMemberId();
+            }
+        }
+        return $ids;
     }
 
 

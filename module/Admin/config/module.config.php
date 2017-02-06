@@ -90,16 +90,17 @@ return [
     // Service manager configuration
     'service_manager' => [
         'factories' => [
-            Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
             Service\AuthService::class => Service\Factory\AuthServiceFactory::class,
             Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
 
-            Service\MemberManager::class => Service\Factory\DmManagerFactory::class,
+            Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
             Service\DepartmentManager::class => Service\Factory\DmManagerFactory::class,
 
+            Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\DMRelationManager::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\MessageManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
         ],

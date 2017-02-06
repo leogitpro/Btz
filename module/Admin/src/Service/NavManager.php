@@ -21,11 +21,6 @@ class NavManager
     private $urlHelper;
 
     /**
-     * @var AuthService
-     */
-    private $authService;
-
-    /**
      * @var MemberManager
      */
     private $memberManager;
@@ -52,14 +47,8 @@ class NavManager
 
 
 
-    private $member = null;
-
-
-
-    public function __construct(AuthService $authService, MemberManager $memberManager, Url $url, AclManager $aclManager)
+    public function __construct(MemberManager $memberManager, Url $url, AclManager $aclManager)
     {
-        $this->authService = $authService;
-
         $this->memberManager = $memberManager;
 
         $this->aclManager = $aclManager;
@@ -72,26 +61,6 @@ class NavManager
 
         $this->initBreadcrumbItem();
 
-    }
-
-
-    /**
-     * Get current member
-     *
-     * @return Member|null
-     */
-    public function getCurrentMember()
-    {
-        if (null === $this->member) {
-            if(!$this->authService->hasIdentity()) {
-                return null;
-            }
-            $identity = $this->authService->getIdentity();
-
-            $this->member = $this->memberManager->getMember($identity);
-        }
-
-        return $this->member;
     }
 
 
@@ -152,7 +121,7 @@ class NavManager
     {
         $this->topRightItems = [];
 
-        $member = $this->getCurrentMember();
+        $member = $this->memberManager->getCurrentMember();
         if (!($member instanceof Member)) {
             return ;
         }
@@ -223,7 +192,7 @@ class NavManager
         $this->addSideTreeItem($dashboard);
 
 
-        $member = $this->getCurrentMember();
+        $member = $this->memberManager->getCurrentMember();
         if (!($member instanceof Member)) {
             return ;
         }

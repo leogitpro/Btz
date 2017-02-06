@@ -24,7 +24,7 @@ class Version20170119142408 extends AbstractMigration
 
         $content->setPrimaryKey(['id']);
 
-        $inbox = $schema->createTable('sys_message_inbox');
+        $inbox = $schema->createTable('sys_message_box');
         $inbox->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $inbox->addColumn('message_id', 'integer', ['unsigned' => true, 'default' => 0]);
         $inbox->addColumn('sender', 'integer', ['unsigned' => true, 'default' => 0]);
@@ -47,6 +47,6 @@ class Version20170119142408 extends AbstractMigration
     public function down(Schema $schema)
     {
         $schema->dropTable('sys_message_content');
-        $schema->dropTable('sys_message_inbox');
+        $schema->dropTable('sys_message_box');
     }
 }

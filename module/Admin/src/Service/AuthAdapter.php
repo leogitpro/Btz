@@ -12,13 +12,8 @@ use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
 
-class AuthAdapter implements AdapterInterface
+class AuthAdapter extends BaseEntityManager implements AdapterInterface
 {
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
 
     /**
      * @var string
@@ -31,11 +26,6 @@ class AuthAdapter implements AdapterInterface
     private $password;
 
 
-
-    public function __construct(MemberManager $memberManager)
-    {
-        $this->memberManager = $memberManager;
-    }
 
     /**
      * @return string
@@ -71,13 +61,23 @@ class AuthAdapter implements AdapterInterface
 
 
     /**
+     * @param string $email
+     * @return Member
+     */
+    public function getMemberByEmail($email)
+    {
+        return $this->entityManager->getRepository(Member::class)->findOneBy(['member_email' => $email]);
+    }
+
+
+    /**
      * Authenticate administrator login
      *
      * @return Result
      */
     public function authenticate()
     {
-        $member = $this->memberManager->getMemberByEmail($this->getEmail());
+        $member = $this->getMemberByEmail($this->getEmail());
         if (null == $member) {
             return new Result(
                 Result::FAILURE_IDENTITY_NOT_FOUND,

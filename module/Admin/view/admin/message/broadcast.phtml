@@ -6,16 +6,58 @@ $this->sideTreeMenu()->setActiveId($activeId);
 $this->headScript()->appendFile($this->basePath('open-source-assets/MagicSuggest-v2.0/magicsuggest-min.js'));
 $this->headLink()->appendStylesheet($this->basePath('open-source-assets/MagicSuggest-v2.0/magicsuggest-min.css'));
 
+
+$form->get('topic')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Enter the message topic'
+]);
+
+$form->get('content')->setAttributes([
+    'class' => 'form-control',
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$helper = $this->formElementErrors();
+$helper->setMessageOpenFormat('<p class="text-danger">');
+$helper->setMessageSeparatorString('</p><p class="text-danger">');
+$helper->setMessageCloseString('</p>');
+
+$form->prepare();
+
 ?>
 
 
 <div class="row">
     <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($form); ?>
+
         <div class="form-group">
-            <select>
-                <option></option>
-            </select>
+            <?php echo $this->formElement($form->get('csrf')); ?>
 
         </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('topic')); ?>
+            <?php echo $this->formElement($form->get('topic')); ?>
+            <?php echo $this->formElementErrors($form->get('topic')); ?>
+
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('content')); ?>
+            <?php echo $this->formElement($form->get('content')); ?>
+            <?php echo $this->formElementErrors($form->get('content')); ?>
+
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
     </div>
 </div>

@@ -25,12 +25,45 @@ class MemberManager extends BaseEntityManager
      */
     private $dmrManager;
 
+    /**
+     * @var AuthService
+     */
+    private $authService;
 
-    public function __construct(DMRelationManager $dmrManager, EntityManager $entityManager, Logger $logger)
+
+    /**
+     * @var Member
+     */
+    private $__member = null;
+
+
+    public function __construct(AuthService $authService,  DMRelationManager $dmrManager, EntityManager $entityManager, Logger $logger)
     {
         parent::__construct($entityManager, $logger);
 
+        $this->authService = $authService;
         $this->dmrManager = $dmrManager;
+        $this->__member = null;
+    }
+
+
+    /**
+     * Get current member
+     *
+     * @return Member|null
+     */
+    public function getCurrentMember()
+    {
+        if(!$this->authService->hasIdentity()) {
+            return null;
+        }
+
+        if (null === $this->__member) {
+            $identity = $this->authService->getIdentity();
+            $this->__member = $this->getMember($identity);
+        }
+
+        return $this->__member;
     }
 
 
