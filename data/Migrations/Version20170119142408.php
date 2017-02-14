@@ -16,7 +16,7 @@ class Version20170119142408 extends AbstractMigration
     public function up(Schema $schema)
     {
         $content = $schema->createTable('sys_message_content');
-        $content->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+        $content->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
         $content->addColumn('status', 'smallint', ['default' => 0]);
         $content->addColumn('topic', 'string', ['length' => 128, 'default' => '']);
         $content->addColumn('content', 'text');
@@ -24,20 +24,22 @@ class Version20170119142408 extends AbstractMigration
 
         $content->setPrimaryKey(['id']);
 
-        $inbox = $schema->createTable('sys_message_box');
-        $inbox->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $inbox->addColumn('message_id', 'integer', ['unsigned' => true, 'default' => 0]);
-        $inbox->addColumn('sender', 'integer', ['unsigned' => true, 'default' => 0]);
-        $inbox->addColumn('sender_status', 'smallint', ['default' => 0]);
-        $inbox->addColumn('receiver', 'integer', ['unsigned' => true, 'default' => 0]);
-        $inbox->addColumn('receiver_status', 'smallint', ['default' => 0]);
-        $inbox->addColumn('type', 'smallint', ['default' => 0]);
-        $inbox->addColumn('created', 'datetime');
 
-        $inbox->setPrimaryKey(['id']);
+        $box = $schema->createTable('sys_message_box');
+        $box->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $box->addColumn('message_id', 'string', ['fixed' => true, 'length' => 36]);
+        $box->addColumn('sender', 'integer', ['unsigned' => true, 'default' => 0]);
+        $box->addColumn('sender_status', 'smallint', ['default' => 0]);
+        $box->addColumn('receiver', 'integer', ['unsigned' => true, 'default' => 0]);
+        $box->addColumn('receiver_status', 'smallint', ['default' => 0]);
+        $box->addColumn('type', 'smallint', ['default' => 0]);
+        $box->addColumn('created', 'datetime');
 
-        $inbox->addIndex(['sender', 'sender_status']);
-        $inbox->addIndex(['receiver', 'receiver_status']);
+        $box->setPrimaryKey(['id']);
+
+        $box->addIndex(['message_id']);
+        $box->addIndex(['sender', 'sender_status']);
+        $box->addIndex(['receiver', 'receiver_status']);
 
     }
 

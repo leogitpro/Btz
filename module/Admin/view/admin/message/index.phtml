@@ -1,6 +1,6 @@
 <?php
 $this->pageTitleBar('收件箱');
-$this->sideTreeMenu()->setActiveId(null);
+$this->sideTreeMenu()->setActiveId($activeId);
 
 ?>
 
@@ -16,10 +16,22 @@ $this->sideTreeMenu()->setActiveId(null);
                 <th>主题</th>
                 <th>时间</th>
             </tr>
-
+            <?php foreach($rows as $row) { if ($row instanceof \Admin\Entity\MessageBox) { ?>
+                <tr>
+                    <td><i class="fa fa-square-o fa-fw"></i></td>
+                    <td><i class="fa fa-envelope-o fa-fw"></i></td>
+                    <td>发信人</td>
+                    <td>主题</td>
+                    <td><?php echo $row->getCreated()->format('Y-m-d H:i:s'); ?></td>
+                </tr>
+                <pre>
+                    <?php var_dump($row->getContent()); ?>
+                </pre>
+            <?php } } ?>
 
         </table>
 
     </div>
 </div>
 
+<?php echo $this->pagination()->render(); ?>

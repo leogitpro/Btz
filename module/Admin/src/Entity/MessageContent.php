@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class MessageContent
  * @package Admin\Entity
- * @ORM\Entity()
+ * @ORM\Entity
  * @ORM\Table(name="sys_message_content")
  */
 class MessageContent
@@ -26,10 +26,9 @@ class MessageContent
 
 
     /**
-     * @var integer
+     * @var string
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id", type="string", length=36, nullable=false)
      */
     private $id;
 
@@ -58,7 +57,7 @@ class MessageContent
     private $created;
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -66,7 +65,7 @@ class MessageContent
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {

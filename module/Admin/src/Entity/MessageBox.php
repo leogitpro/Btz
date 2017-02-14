@@ -33,19 +33,18 @@ class MessageBox
 
 
     /**
-     * @var integer
+     * @var string
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id", type="string", length=36, nullable=false)
      */
     private $id;
 
 
     /**
-     * @var integer
-     * @ORM\Column(name="message_id", type="integer")
+     * @var string
+     * @ORM\Column(name="message_id", type="string", length=36, nullable=false)
      */
-    private $messageId = 0;
+    private $messageId = '';
 
 
     /**
@@ -83,9 +82,20 @@ class MessageBox
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="created", type="datetime")
      */
     private $created;
+
+
+    /**
+     * @var MessageContent
+     *
+     * @ORM\OneToOne(targetEntity="Admin\Entity\MessageContent")
+     * @ORM\JoinColumn(name="id", referencedColumnName="messageId")
+     */
+    private $content;
+
 
 
     /**
@@ -139,7 +149,7 @@ class MessageBox
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -147,7 +157,7 @@ class MessageBox
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
@@ -155,7 +165,7 @@ class MessageBox
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getMessageId()
     {
@@ -163,7 +173,7 @@ class MessageBox
     }
 
     /**
-     * @param int $messageId
+     * @param string $messageId
      */
     public function setMessageId($messageId)
     {
@@ -265,6 +275,25 @@ class MessageBox
     {
         $this->created = $created;
     }
+
+    /**
+     * @return MessageContent
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param MessageContent $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+
+
 
 
 

@@ -11,6 +11,7 @@ use Application\Form\ContactUsForm;
 use Application\Service\ContactManager;
 use Application\Service\MailManager;
 use Application\Service\NavManager;
+use Ramsey\Uuid\Uuid;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
@@ -58,13 +59,17 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
-        $ip = $this->getServerPlugin()->ipAddress();
-        $ua = $this->getServerPlugin()->userAgent();
+        //$ip = $this->getServerPlugin()->ipAddress();
+        //$ua = $this->getServerPlugin()->userAgent();
 
-        echo '<p>ip: ' . $ip . '</p>';
-        echo '<p>ua: ' . $ua . '</p>';
+        //echo '<p>ip: ' . $ip . '</p>';
+        //echo '<p>ua: ' . $ua . '</p>';
 
-        echo '<pre>'; print_r($_SESSION); echo '</pre>';
+        //echo '<pre>'; print_r($_SESSION); echo '</pre>';
+
+        echo '<h1>';
+        echo Uuid::uuid1();
+        echo '</h1>';
 
         return new ViewModel();
     }

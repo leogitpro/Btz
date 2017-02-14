@@ -13,10 +13,11 @@
         "zendframework/zend-math": "^3.0",
         "zendframework/zend-captcha": "^2.6",
         "zendframework/zend-json": "^3.0",
-        "firephp/firephp-core": "^0.4",
-        "ccampbell/chromephp": "^4.1",
+        "ramsey/uuid": "^3.5",
         "doctrine/doctrine-orm-module": "^1.1",
-        "doctrine/migrations": "^1.4"
+        "doctrine/migrations": "^1.4",
+        "firephp/firephp-core": "^0.4",
+        "ccampbell/chromephp": "^4.1"
     },
     "autoload": {
         "psr-4": {

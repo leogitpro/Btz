@@ -91,8 +91,33 @@ class MessageController extends BaseController
 
     public function indexAction()
     {
-        //todo
+        $currentMember = $this->memberManager->getCurrentMember();
+        $memberId = (null == $currentMember) ? 0 : $currentMember->getMemberId();
+
+        // Page configuration
+        $size = 1;
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) { $page = 1; }
+        $count = $this->messageManager->getInBoxMessagesCount($memberId);
+
+        // Get pagination helper
+        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        // Configuration pagination
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'index', 'key' => '%d']));
+
+        $rows = $this->messageManager->getInBoxMessagesByLimitPage($memberId, $page, $size);
+
+        return new ViewModel([
+            'rows' => $rows,
+            'activeId' => __METHOD__,
+        ]);
     }
+
 
     public function personalAction()
     {
@@ -134,7 +159,6 @@ class MessageController extends BaseController
                 );
             }
         }
-
 
         return new ViewModel([
             'form' => $form,
