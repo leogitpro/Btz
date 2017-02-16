@@ -25,7 +25,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
                     <td><?php echo $row->getCreated()->format('Y-m-d H:i:s'); ?></td>
                 </tr>
                 <pre>
-                    <?php var_dump($row->getContent()); ?>
+                    <?php var_dump($row->getContent()->getTopic()); ?>
                 </pre>
             <?php } } ?>
 

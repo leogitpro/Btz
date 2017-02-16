@@ -39,14 +39,6 @@ class MessageBox
      */
     private $id;
 
-
-    /**
-     * @var string
-     * @ORM\Column(name="message_id", type="string", length=36, nullable=false)
-     */
-    private $messageId = '';
-
-
     /**
      * @var integer
      * @ORM\Column(name="sender", type="integer")
@@ -91,8 +83,8 @@ class MessageBox
     /**
      * @var MessageContent
      *
-     * @ORM\OneToOne(targetEntity="Admin\Entity\MessageContent")
-     * @ORM\JoinColumn(name="id", referencedColumnName="messageId")
+     * @ORM\ManyToOne(targetEntity="Admin\Entity\MessageContent")
+     * @ORM\JoinColumn(name="message_id", referencedColumnName="id")
      */
     private $content;
 
@@ -164,21 +156,6 @@ class MessageBox
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getMessageId()
-    {
-        return $this->messageId;
-    }
-
-    /**
-     * @param string $messageId
-     */
-    public function setMessageId($messageId)
-    {
-        $this->messageId = $messageId;
-    }
 
     /**
      * @return int

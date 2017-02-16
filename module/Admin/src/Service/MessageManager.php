@@ -119,7 +119,7 @@ class MessageManager extends BaseEntityManager
         $dt = new \DateTime();
 
         $message = new MessageContent();
-        $message->setId(Uuid::uuid1());
+        $message->setId(Uuid::uuid1()->toString());
         $message->setTopic($topic);
         $message->setContent($content);
         $message->setStatus(MessageContent::STATUS_VALIDITY);
@@ -129,10 +129,12 @@ class MessageManager extends BaseEntityManager
         $total = 0;
         $i = 0;
 
+        $this->logger->debug('content uuid:' . $message->getId());
+
         foreach ($receiver as $target) {
             $entity = new MessageBox();
-            $entity->setId(Uuid::uuid1());
-            $entity->setMessageId($message->getId());
+            $entity->setId(Uuid::uuid1()->toString());
+            $entity->setContent($message);
             $entity->setSender($sender);
             $entity->setReceiver($target);
             $entity->setType($type);
