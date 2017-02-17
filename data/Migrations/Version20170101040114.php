@@ -23,16 +23,10 @@ class Version20170101040114 extends AbstractMigration
     {
         $table = $schema->createTable('sys_department_member');
 
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('dept_id', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('member_id', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('status', 'smallint', ['default' => 0]);
-        $table->addColumn('created', 'datetime');
+        $table->addColumn('dept', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('member', 'string', ['fixed' => true, 'length' => 36]);
 
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['dept_id', 'member_id'], 'index_dept_member');
-        $table->addIndex(['dept_id', 'status'], 'index_dept_status');
-        $table->addIndex(['member_id', 'status'], 'index_member_status');
+        $table->setPrimaryKey(['dept', 'member']);
     }
 
     /**

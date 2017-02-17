@@ -10,7 +10,6 @@ namespace Admin\Service\Factory;
 
 
 use Admin\Service\AuthService;
-use Admin\Service\DMRelationManager;
 use Admin\Service\MemberManager;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -21,9 +20,8 @@ class MemberManagerFactory implements FactoryInterface
     {
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $logger = $container->get('Logger');
-        $dmrManager = $container->get(DMRelationManager::class);
         $authService = $container->get(AuthService::class);
 
-        return new MemberManager($authService, $dmrManager, $entityManager, $logger);
+        return new MemberManager($authService, $entityManager, $logger);
     }
 }

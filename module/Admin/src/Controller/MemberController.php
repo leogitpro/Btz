@@ -10,10 +10,14 @@
 namespace Admin\Controller;
 
 
+use Admin\Entity\Department;
 use Admin\Entity\Member;
 use Admin\Form\MemberForm;
+use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
+use Ramsey\Uuid\Uuid;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
@@ -25,12 +29,18 @@ class MemberController extends BaseController
      */
     private $memberManager;
 
+    /**
+     * @var DepartmentManager
+     */
+    private $deptManager;
+
 
     public function onDispatch(MvcEvent $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $this->memberManager = $serviceManager->get(MemberManager::class);
+        $this->deptManager = $serviceManager->get(DepartmentManager::class);
 
         return parent::onDispatch($e);
     }
@@ -76,6 +86,14 @@ class MemberController extends BaseController
                     'action' => 'password',
                     'name' => '修改成员密码'
                 ],
+                [
+                    'action' => 'departments',
+                    'name' => '查看成员部门'
+                ],
+                [
+                    'action' => 'updateDepartments',
+                    'name' => '分配成员部门'
+                ],
             ],
         ];
     }
@@ -115,7 +133,7 @@ class MemberController extends BaseController
 
 
     /**
-     * Create new administrator
+     * Create new member
      *
      * @return ViewModel
      */
@@ -132,13 +150,25 @@ class MemberController extends BaseController
                 $data = $form->getData();
                 $data['password'] = md5($data['password']);
 
-                $this->memberManager->createMember($data);
+                $member = new Member();
+                $member->setMemberId(Uuid::uuid1()->toString());
+                $member->setMemberEmail($data['email']);
+                $member->setMemberPassword($data['password']);
+                $member->setMemberName($data['name']);
+                $member->setMemberStatus(Member::STATUS_ACTIVATED);
+                $member->setMemberLevel(Member::LEVEL_INTERIOR);
+                $member->setMemberCreated(new \DateTime());
+
+                $defaultDept = $this->deptManager->getDefaultDepartment(); // Add member to default group
+                $member->getDepts()->add($defaultDept);
+
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Administrator added',
-                    'The new administrator: ' . $data['name'] . ' has been created success!',
+                    '成员已添加',
+                    '新成员: ' . $data['name'] . ' 已经添加到系统中!',
                     $this->url()->fromRoute('admin/member'),
-                    'Members',
+                    '查看成员列表',
                     3
                 );
             }
@@ -146,28 +176,68 @@ class MemberController extends BaseController
 
         return new ViewModel([
             'form' => $form,
+            'activeId' => __METHOD__,
         ]);
     }
 
 
     /**
-     * Edit administrator page
-     *
-     * @return ViewModel
+     * Edit status
      */
-    public function editAction()
+    public function statusAction()
     {
-        $member_id = (int)$this->params()->fromRoute('key', 0);
+        $member_id = $this->params()->fromRoute('key', 0);
         if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员账号!');
             return ;
         }
 
         $member = $this->memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid member id: ' . $member_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
+            return ;
+        }
+
+        if ($member->getMemberStatus() == Member::STATUS_ACTIVATED) { // to be retried
+            $member->setMemberStatus(Member::STATUS_RETRIED);
+            $member->getDepts()->clear();
+        } else { // to be activated, only restore with default department relation
+            $member->getDepts()->add($this->deptManager->getDefaultDepartment());
+            $member->setMemberStatus(Member::STATUS_ACTIVATED);
+        }
+
+        $this->memberManager->saveModifiedEntity($member);
+
+        return $this->getMessagePlugin()->show(
+            '成员状态已更新',
+            '成员: ' . $member->getMemberName() . ' 的账号状态已经被更新!',
+            $this->url()->fromRoute('admin/member'),
+            '返回',
+            3
+        );
+    }
+
+
+    /**
+     * Edit information
+     *
+     * @return ViewModel
+     */
+    public function editAction()
+    {
+        $member_id = $this->params()->fromRoute('key');
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
+            return ;
+        }
+
+        $member = $this->memberManager->getMember($member_id);
+        if (null == $member) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
@@ -184,13 +254,13 @@ class MemberController extends BaseController
                 $member->setMemberEmail($data['email']);
                 $member->setMemberName($data['name']);
 
-                $this->memberManager->saveModifiedMember($member);
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Administrator updated',
-                    'The administrator: ' . $data['name'] . ' has been updated success!',
+                    '成员信息已经更新',
+                    '成员: ' . $data['name'] . ' 的账号信息已经被更新!',
                     $this->url()->fromRoute('admin/member'),
-                    'Members',
+                    '返回',
                     3
                 );
             }
@@ -202,56 +272,6 @@ class MemberController extends BaseController
             'activeId' => __CLASS__,
         ]);
 
-    }
-
-
-    /**
-     * Edit administrator status page
-     *
-     * @return ViewModel
-     */
-    public function statusAction()
-    {
-        $member_id = (int)$this->params()->fromRoute('key', 0);
-        if($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
-            return ;
-        }
-
-        $member = $this->memberManager->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid member id: ' . $member_id);
-            return ;
-        }
-
-        $form = new MemberForm($this->memberManager, $member, ['status']);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-                $this->memberManager->updateMemberStatus($member, $data['status']);
-
-                return $this->getMessagePlugin()->show(
-                    'Administrator status updated',
-                    'The administrator: ' . $member->getMemberName() . ' status has been updated success!',
-                    $this->url()->fromRoute('admin/member'),
-                    'Members',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'member' => $member,
-            'activeId' => __CLASS__,
-        ]);
     }
 
 
@@ -262,17 +282,17 @@ class MemberController extends BaseController
      */
     public function levelAction()
     {
-        $member_id = (int)$this->params()->fromRoute('key', 0);
+        $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
             return ;
         }
 
         $member = $this->memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid member id: ' . $member_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
@@ -288,14 +308,14 @@ class MemberController extends BaseController
 
                 $member->setMemberLevel($data['level']);
 
-                $this->memberManager->saveModifiedMember($member);
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Administrator level updated',
-                    'The administrator: ' . $member->getMemberName() . ' level has been updated success!',
+                    '成员等级已更新',
+                    '成员: ' . $member->getMemberName() . ' 的等级信息已经被更新!',
                     $this->url()->fromRoute('admin/member'),
-                    'Members',
-                    300
+                    '返回',
+                    3
                 );
             }
         }
@@ -310,23 +330,23 @@ class MemberController extends BaseController
 
 
     /**
-     * Edit administrator password.
+     * Edit password.
      *
      * @return ViewModel
      */
     public function passwordAction()
     {
-        $member_id = (int)$this->params()->fromRoute('key', 0);
+        $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit root administrator');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
             return ;
         }
 
         $member = $this->memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid member id: ' . $member_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
@@ -341,13 +361,13 @@ class MemberController extends BaseController
                 $data = $form->getData();
                 $member->setMemberPassword(md5($data['password']));
 
-                $this->memberManager->saveModifiedMember($member);
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Administrator password updated',
-                    'The administrator: ' . $member->getMemberName() . ' password has been updated success!',
+                    '密码已更改',
+                    '成员: ' . $member->getMemberName() . ' 的登入密码已经更新, 需要使用新密码登入!',
                     $this->url()->fromRoute('admin/member'),
-                    'Members',
+                    '返回',
                     3
                 );
             }
@@ -360,5 +380,100 @@ class MemberController extends BaseController
         ]);
 
     }
+
+
+
+    /**
+     * View a member with all departments relationship
+     *
+     * @return void|ViewModel
+     */
+    public function departmentsAction()
+    {
+        $member_id = $this->params()->fromRoute('key');
+        $member = $this->memberManager->getMember($member_id);
+        if (null == $member) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
+            return ;
+        }
+
+        $data = [
+            'inner' => [],
+            'outer' => [],
+            'member' => $member,
+        ];
+
+        $ownedDepts = $member->getDepts();
+        $departments = $this->deptManager->getDepartments();
+        foreach ($departments as $department) {
+            if ($department instanceof Department) {
+
+                if (Department::DEFAULT_DEPT_ID == $department->getDeptId()) {
+                    continue;
+                }
+
+                if ($ownedDepts->contains($department)) {
+                    array_push($data['inner'], $department);
+                } else {
+                    array_push($data['outer'], $department);
+                }
+            }
+        }
+
+        $viewModel = new ViewModel();
+        $viewModel->setVariables(['data' => $data]);
+        $viewModel->setTerminal(true);
+        return $viewModel;
+
+    }
+
+
+    /**
+     * AJAX save member departments
+     *
+     * @return JsonModel
+     */
+    public function updateDepartmentsAction()
+    {
+        $json = ['success' => false];
+
+        $member_id = $this->params()->fromRoute('key');
+        if ($member_id == Member::DEFAULT_MEMBER_ID) {
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新超级管理员信息');
+            return new JsonModel($json);
+        }
+
+        if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
+
+            $member = $this->memberManager->getMember($member_id);
+            if (null == $member) {
+                $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
+                return new JsonModel($json);
+            }
+
+            $selected = (array)$this->params()->fromPost('selected');
+
+            $member->getDepts()->clear();
+            foreach($selected as $id) {
+                if ($id == Department::DEFAULT_DEPT_ID) {
+                    continue;
+                }
+                $member->getDepts()->add($this->deptManager->getDepartment($id));
+            }
+            $member->getDepts()->add($this->deptManager->getDefaultDepartment());
+
+            $this->memberManager->saveModifiedEntity($member);
+
+            $json['success'] = true;
+        } else {
+
+        }
+
+        return new JsonModel($json);
+    }
+
+
+
 
 }

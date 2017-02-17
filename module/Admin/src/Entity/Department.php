@@ -10,13 +10,16 @@
 namespace Admin\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 
 /**
  * Class Department
+ *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_department")
  */
 class Department
@@ -25,107 +28,53 @@ class Department
     const STATUS_VALID = 1;
     const STATUS_INVALID = 0;
 
-    const DEFAULT_DEPT_ID = 1;
+    const DEFAULT_DEPT_ID = 'ad739904-f423-11e6-b154-acbc32bf6185';
 
     /**
-     * Primary key, auto increment
+     * Primary key, UUID
      *
-     * @var integer
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="dept_id", type="integer")
+     * @ORM\Column(name="dept_id", type="string", length=36, nullable=false)
      */
-    private $dept_id;
+    private $deptId;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="dept_name", type="string", length=45, unique=true)
      */
-    private $dept_name = '';
+    private $deptName = '';
 
     /**
      * @var integer
-     * @ORM\Column(name="dept_members", type="integer")
-     */
-    private $dept_members = 0;
-
-    /**
-     * @var integer
+     *
      * @ORM\Column(name="dept_status", type="smallint")
      */
-    private $dept_status = self::STATUS_INVALID;
+    private $deptStatus = self::STATUS_INVALID;
 
     /**
      * @var \DateTime
+     *
      * @ORM\Column(name="dept_created", type="datetime")
      */
-    private $dept_created = null;
-
+    private $deptCreated = null;
 
 
     /**
-     * @return int
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Admin\Entity\Member", mappedBy="depts")
      */
-    public function getDeptId()
+    private $members;
+
+
+    public function __construct()
     {
-        return $this->dept_id;
+        $this->members = new ArrayCollection();
     }
 
-    /**
-     * @param int $dept_id
-     */
-    public function setDeptId($dept_id)
-    {
-        $this->dept_id = $dept_id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeptName()
-    {
-        return $this->dept_name;
-    }
-
-    /**
-     * @param string $dept_name
-     */
-    public function setDeptName($dept_name)
-    {
-        $this->dept_name = $dept_name;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDeptMembers()
-    {
-        return $this->dept_members;
-    }
-
-    /**
-     * @param int $dept_members
-     */
-    public function setDeptMembers($dept_members)
-    {
-        $this->dept_members = $dept_members;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDeptStatus()
-    {
-        return $this->dept_status;
-    }
-
-    /**
-     * @param int $dept_status
-     */
-    public function setDeptStatus($dept_status)
-    {
-        $this->dept_status = $dept_status;
-    }
 
     /**
      * @return array
@@ -133,8 +82,8 @@ class Department
     public static function getStatusList()
     {
         return [
-            self::STATUS_VALID => 'Valid',
-            self::STATUS_INVALID => 'Invalid',
+            self::STATUS_VALID => '已激活',
+            self::STATUS_INVALID => '未激活',
         ];
     }
 
@@ -144,10 +93,58 @@ class Department
     public function getDeptStatusAsString()
     {
         $list = self::getStatusList();
-        if(isset($list[$this->getDeptStatus()])) {
-            return $list[$this->getDeptStatus()];
+        if(isset($list[$this->deptStatus])) {
+            return $list[$this->deptStatus];
         }
-        return 'Unknown';
+        return '未知';
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeptId()
+    {
+        return $this->deptId;
+    }
+
+    /**
+     * @param string $deptId
+     */
+    public function setDeptId($deptId)
+    {
+        $this->deptId = $deptId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeptName()
+    {
+        return $this->deptName;
+    }
+
+    /**
+     * @param string $deptName
+     */
+    public function setDeptName($deptName)
+    {
+        $this->deptName = $deptName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeptStatus()
+    {
+        return $this->deptStatus;
+    }
+
+    /**
+     * @param int $deptStatus
+     */
+    public function setDeptStatus($deptStatus)
+    {
+        $this->deptStatus = $deptStatus;
     }
 
     /**
@@ -155,17 +152,31 @@ class Department
      */
     public function getDeptCreated()
     {
-        return $this->dept_created;
+        return $this->deptCreated;
     }
 
     /**
-     * @param \DateTime $dept_created
+     * @param \DateTime $deptCreated
      */
-    public function setDeptCreated($dept_created)
+    public function setDeptCreated($deptCreated)
     {
-        $this->dept_created = $dept_created;
+        $this->deptCreated = $deptCreated;
     }
 
+    /**
+     * @return ArrayCollection
+     */
+    public function getMembers()
+    {
+        return $this->members;
+    }
 
+    /**
+     * @param ArrayCollection $members
+     */
+    public function setMembers($members)
+    {
+        $this->members = $members;
+    }
 
 }

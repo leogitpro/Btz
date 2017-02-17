@@ -119,7 +119,7 @@ class MemberForm extends Form
                     'value' => (null == $this->member) ? Member::STATUS_RETRIED : $this->member->getMemberStatus(),
                 ],
                 'options' => [
-                    'label' => 'Administrator status',
+                    'label' => 'Member status',
                     'value_options' => [
                         Member::STATUS_ACTIVATED => Member::getMemberStatusList()[Member::STATUS_ACTIVATED],
                         Member::STATUS_RETRIED => Member::getMemberStatusList()[Member::STATUS_RETRIED],
@@ -138,7 +138,7 @@ class MemberForm extends Form
                     'value' => (null == $this->member) ? Member::LEVEL_INTERIOR: $this->member->getMemberLevel(),
                 ],
                 'options' => [
-                    'label' => 'Administrator level',
+                    'label' => 'Member level',
                     'value_options' => [
                         Member::LEVEL_INTERIOR => Member::getMemberLevelList()[Member::LEVEL_INTERIOR],
                         Member::LEVEL_JUNIOR => Member::getMemberLevelList()[Member::LEVEL_JUNIOR],

@@ -33,6 +33,12 @@ return [
         ], //End orm_default
     ], // End Connection
 
+    'configuration' => [
+        'orm_default' => [
+            'sqlLogger' => \Application\Service\DoctrineSqlLogger::class,
+        ],
+    ],
+
     'migrations_configuration' => [ //Migrations section
         'orm_default' => [
             'directory' => 'data/Migrations', // Default is data/DoctrineORMModule/Migrations

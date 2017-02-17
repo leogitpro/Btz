@@ -21,11 +21,6 @@ class MemberManager extends BaseEntityManager
 {
 
     /**
-     * @var DMRelationManager
-     */
-    private $dmrManager;
-
-    /**
      * @var AuthService
      */
     private $authService;
@@ -34,16 +29,69 @@ class MemberManager extends BaseEntityManager
     /**
      * @var Member
      */
-    private $__member = null;
+    private $currentMember = null;
 
 
-    public function __construct(AuthService $authService,  DMRelationManager $dmrManager, EntityManager $entityManager, Logger $logger)
+    public function __construct(AuthService $authService, EntityManager $entityManager, Logger $logger)
     {
         parent::__construct($entityManager, $logger);
 
         $this->authService = $authService;
-        $this->dmrManager = $dmrManager;
-        $this->__member = null;
+
+        $this->currentMember = null;
+    }
+
+
+    /**
+     * Get all members count
+     *
+     * @return integer
+     */
+    public function getAllMembersCount()
+    {
+        $this->resetQb();
+
+        $this->getQb()->select($this->getQb()->expr()->count('t.memberId'));
+        $this->getQb()->from(Member::class, 't');
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * Get activated members count
+     *
+     * @return int
+     */
+    public function getMembersCount()
+    {
+        $this->resetQb();
+
+        $this->getQb()->select($this->getQb()->expr()->count('t.memberId'));
+        $this->getQb()->from(Member::class, 't');
+
+        $this->getQb()->where($this->getQb()->expr()->eq('t.memberStatus', '?1'));
+        $this->getQb()->setParameter(1, Member::STATUS_ACTIVATED);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * Get administrator information
+     *
+     * @param string $member_id
+     * @return Member
+     */
+    public function getMember($member_id)
+    {
+        $this->resetQb();
+
+        $this->getQb()->from(Member::class, 't')->select('t');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.memberId', '?1'));
+        $this->getQb()->setParameter(1, $member_id);
+
+        return $this->getEntityFromPersistence();
     }
 
 
@@ -58,114 +106,12 @@ class MemberManager extends BaseEntityManager
             return null;
         }
 
-        if (null === $this->__member) {
+        if (null === $this->currentMember) {
             $identity = $this->authService->getIdentity();
-            $this->__member = $this->getMember($identity);
+            $this->currentMember = $this->getMember($identity);
         }
 
-        return $this->__member;
-    }
-
-
-    /**
-     * Get all members count
-     *
-     * @return integer
-     */
-    public function getAllMembersCount()
-    {
-        return $this->getEntitiesCount(Member::class, 'member_id');
-    }
-
-
-    /**
-     * Get all members, max records: 200
-     *
-     * @return array
-     */
-    public function getAllMembers()
-    {
-        return $this->getUniverseMembers([], null, 200);
-    }
-
-
-    /**
-     * Get all members by limit page
-     *
-     * @param int $page
-     * @param int $size
-     * @return array
-     */
-    public function getAllMembersByLimitPage($page = 1, $size = 10)
-    {
-        return $this->getUniverseMembers([], null, $size, ($page - 1) * $size);
-    }
-
-
-    /**
-     * Get activated members count
-     */
-    public function getMembersCount()
-    {
-        return $this->getEntitiesCount(Member::class, 'member_id', ['member_status = :status'], ['status' => Member::STATUS_ACTIVATED]);
-    }
-
-
-    /**
-     * Get activated members, mas records: 200
-     *
-     * @return array
-     */
-    public function getMembers()
-    {
-        return $this->getUniverseMembers(['member_status' => Member::STATUS_ACTIVATED], null, 200);
-    }
-
-
-    /**
-     * Get activated members by page
-     *
-     * @param int $page
-     * @param int $size
-     * @return array
-     */
-    public function getMembersByLimitPage($page = 1, $size = 10)
-    {
-        return $this->getUniverseMembers(['member_status' => Member::STATUS_ACTIVATED], null, $size, ($page - 1) * $size);
-    }
-
-
-    /**
-     * Get members from repository
-     *
-     * @param array $criteria
-     * @param null|array $order
-     * @param int $limit
-     * @param int $offset
-     * @return array
-     */
-    private function getUniverseMembers($criteria, $order = null, $limit = 10, $offset = 0)
-    {
-        if (null == $order) {
-            $order = [
-                'member_status' => 'ASC',
-                'member_level' => 'DESC',
-                'member_name' => 'ASC',
-            ];
-        }
-        return $this->entityManager->getRepository(Member::class)->findBy($criteria, $order, $limit, $offset);
-    }
-
-
-    /**
-     * Get administrator information
-     *
-     * @param integer $member_id
-     * @return Member
-     */
-    public function getMember($member_id)
-    {
-        return $this->getUniverseMember(['member_id' => $member_id]);
+        return $this->currentMember;
     }
 
 
@@ -177,113 +123,79 @@ class MemberManager extends BaseEntityManager
      */
     public function getMemberByEmail($email)
     {
-        return $this->getUniverseMember(['member_email' => $email]);
+        $this->resetQb();
+
+        $this->getQb()->from(Member::class, 't')->select('t');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.memberEmail', '?1'));
+        $this->getQb()->setParameter(1, $email);
+
+        return $this->getEntityFromPersistence();
     }
 
 
     /**
-     * Get a member from repository
+     * Get activated members by page
      *
-     * @param array $criteria
-     * @param null|array $order
-     * @return null|object
+     * @param int $page
+     * @param int $size
+     * @return array
      */
-    private function getUniverseMember($criteria, $order = null)
+    public function getMembersByLimitPage($page = 1, $size = 100)
     {
-        return $this->entityManager->getRepository(Member::class)->findOneBy($criteria, $order);
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(Member::class, 't');
+
+        $this->getQb()->where($this->getQb()->expr()->eq('t.memberStatus', '?1'));
+        $this->getQb()->setParameter(1, Member::STATUS_ACTIVATED);
+
+        $this->getQb()->setMaxResults($size)->setFirstResult(($page -1) * $size);
+
+        $this->getQb()->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
     /**
-     * Save modified Member instance
+     * Get activated members, mas records: 200
      *
-     * @param Member $member
-     * @return Member
+     * @return array
      */
-    public function saveModifiedMember(Member $member)
+    public function getMembers()
     {
-        return $this->saveModifiedEntity($member);
+        return $this->getMembersByLimitPage(1, 200);
     }
 
 
     /**
-     * Update member status
+     * Get all members by limit page
      *
-     * @param Member $member
-     * @param integer $status
-     * @return Member
+     * @param int $page
+     * @param int $size
+     * @return array
      */
-    public function updateMemberStatus(Member $member, $status)
+    public function getAllMembersByLimitPage($page = 1, $size = 100)
     {
-        $oldStatus = $member->getMemberStatus();
-        if ($oldStatus == $status) {
-            return $member;
-        }
+        $this->resetQb();
 
-        if ($oldStatus == Member::STATUS_ACTIVATED) { // to be retried
+        $this->getQb()->select('t')->from(Member::class, 't');
 
-            $this->dmrManager->memberToBeInvalid($member->getMemberId());
+        $this->getQb()->setMaxResults($size)->setFirstResult(($page -1) * $size);
 
-            $member->setMemberStatus(Member::STATUS_RETRIED);
-            $member = $this->saveModifiedEntity($member);
+        $this->getQb()->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
 
-        } else { // to be activated, only restore with default department relation
-
-            $member->setMemberStatus(Member::STATUS_ACTIVATED);
-            $member = $this->saveModifiedEntity($member);
-
-            $this->dmrManager->memberBeActivated($member->getMemberId());
-
-        }
-
-        return $member;
+        return $this->getEntitiesFromPersistence();
     }
 
 
     /**
-     * Update member password
+     * Get all members, max records: 200
      *
-     * @param integer $member_id
-     * @param string $password MD5 value
-     * @return Member
+     * @return array
      */
-    public function updateMemberPassword($member_id, $password)
+    public function getAllMembers()
     {
-        $member = $this->getMember($member_id);
-        if (null == $member) {
-            $this->logger->err(__METHOD__ . PHP_EOL . 'Get member by id(' . $member_id . ') failure');
-            return false;
-        }
-
-        $member->setMemberPassword($password);
-
-        return $this->saveModifiedMember($member);
+        return $this->getAllMembersByLimitPage(1, 200);
     }
-
-
-
-    /**
-     * Create new member
-     *
-     * @param array $data
-     * @return Member
-     */
-    public function createMember($data)
-    {
-        $member = new Member();
-
-        $member->setMemberEmail($data['email']);
-        $member->setMemberPassword($data['password']);
-        $member->setMemberName($data['name']);
-        $member->setMemberStatus(Member::STATUS_RETRIED);
-        $member->setMemberLevel(Member::LEVEL_INTERIOR);
-        $member->setMemberCreated(new \DateTime());
-
-        $member = $this->saveModifiedEntity($member);
-
-        $this->dmrManager->initNewMemberCreated($member->getMemberId());
-
-        return $member;
-    }
-
 }

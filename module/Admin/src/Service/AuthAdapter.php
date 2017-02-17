@@ -66,7 +66,7 @@ class AuthAdapter extends BaseEntityManager implements AdapterInterface
      */
     public function getMemberByEmail($email)
     {
-        return $this->entityManager->getRepository(Member::class)->findOneBy(['member_email' => $email]);
+        return $this->entityManager->getRepository(Member::class)->findOneBy(['memberEmail' => $email]);
     }
 
 

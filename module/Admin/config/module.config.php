@@ -95,7 +95,7 @@ return [
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
 
             Service\MemberManager::class => Service\Factory\MemberManagerFactory::class,
-            Service\DepartmentManager::class => Service\Factory\DmManagerFactory::class,
+            Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\DMRelationManager::class => Service\Factory\EntityManagerFactory::class,

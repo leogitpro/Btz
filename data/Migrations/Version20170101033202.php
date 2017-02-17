@@ -31,8 +31,8 @@ class Version20170101033202 extends AbstractMigration
         $table->addOption('collate', 'utf8mb4_unicode_ci');
         //*/
 
-        // Column: member_id, integer, unsigned, autoincrement
-        $table->addColumn('member_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+        // Column: member_id, string, uuid
+        $table->addColumn('member_id', 'string', ['fixed' => true, 'length' => 36]);
 
         // Column: member_email, varchar(45)
         $table->addColumn('member_email', 'string', ['length' => 45, 'default' => '']);
@@ -56,7 +56,7 @@ class Version20170101033202 extends AbstractMigration
         $table->setPrimaryKey(['member_id']);
 
         // Add Unique index
-        $table->addUniqueIndex(['member_email'], 'unique_index_member_email');
+        $table->addUniqueIndex(['member_email']);
 
         // Index for default query order
         $table->addIndex(['member_status', 'member_level', 'member_name']);

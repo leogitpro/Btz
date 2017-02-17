@@ -1,15 +1,15 @@
 <?php
-$this->pageTitleBar('Edit administrator');
+$this->pageTitleBar('修改成员信息');
 $this->sideTreeMenu()->setActiveId($activeId);
 
 $form->get('email')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the administrator email'
+    'placeholder' => 'Enter the email'
 ]);
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the administrator name'
+    'placeholder' => 'Enter the name'
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);

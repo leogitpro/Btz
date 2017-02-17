@@ -26,6 +26,12 @@ class BaseEntityManager
 
 
     /**
+     * @var \Doctrine\ORM\QueryBuilder
+     */
+    private $qb = null;
+
+
+    /**
      * BaseEntityManager constructor.
      *
      * @param EntityManager $entityManager
@@ -35,38 +41,58 @@ class BaseEntityManager
     {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
+
+        $this->qb = $this->entityManager->createQueryBuilder();
     }
 
 
     /**
-     * Simple count entities
-     *
-     * $where = ['status => ?', 'age = ?'];
-     * $params = [0 => 1, 1 => 38];
-     *
-     * @param string $entity
-     * @param string $countedField
-     * @param array $where
-     * @param array $params
-     * @param string $alias
-     * @return integer
+     * @return \Doctrine\ORM\QueryBuilder
      */
-    protected function getEntitiesCount($entity, $countedField, $where = [], $params = [], $alias = 't')
+    protected function getQb()
     {
-        $qb = $this->entityManager->getRepository($entity)->createQueryBuilder($alias);
-        $qb->select('count(' . $alias . '.' . $countedField . ')');
-        if (!empty($where)) {
-            foreach ($where as $p) {
-                $qb->where($alias . '.' . $p);
-            }
-            if (!empty($params)) {
-                foreach ($params as $k => $v) {
-                    $qb->setParameter($k, $v);
-                }
-            }
+        if (null === $this->qb) {
+            $this->qb = $this->entityManager->createQueryBuilder();
         }
-        //var_dump($qb->getDQL());
-        return $qb->getQuery()->getSingleScalarResult();
+        return $this->qb;
+    }
+
+
+    /**
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    protected function resetQb()
+    {
+        $this->getQb()->getParameters()->clear();
+        $this->getQb()->resetDQLParts();
+        return $this->getQb();
+    }
+
+
+    /**
+     * @return int
+     */
+    protected function getEntitiesCount()
+    {
+        return $this->getQb()->getQuery()->getSingleScalarResult();
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function getEntitiesFromPersistence()
+    {
+        return $this->getQb()->getQuery()->getResult();
+    }
+
+
+    /**
+     * @return mixed
+     */
+    protected function getEntityFromPersistence()
+    {
+        return $this->getQb()->getQuery()->getOneOrNullResult();
     }
 
 
@@ -74,7 +100,7 @@ class BaseEntityManager
      * @param mixed $entity
      * @return mixed
      */
-    protected function saveModifiedEntity($entity)
+    public function saveModifiedEntity($entity)
     {
         $this->entityManager->persist($entity);
         $this->entityManager->flush();

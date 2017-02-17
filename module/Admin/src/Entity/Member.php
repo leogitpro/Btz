@@ -12,6 +12,7 @@
 namespace Admin\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -19,7 +20,8 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Member
  *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_member")
  */
 class Member
@@ -36,72 +38,97 @@ class Member
     const LEVEL_JUNIOR = 1; // Junior
     const LEVEL_INTERIOR = 0; //Interior
 
-    const DEFAULT_MEMBER_ID = 1;
+    const DEFAULT_MEMBER_ID = 'be152a3e-f423-11e6-a4a4-acbc32bf6185';
 
 
     /**
-     * Primary key, auto increment
+     * Primary key, UUID
      *
-     * @var integer
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="member_id", type="integer")
+     * @ORM\Column(name="member_id", type="string", length=36, nullable=false)
      */
-    private $member_id;
+    private $memberId;
 
 
     /**
      * Administrator email, unique
      *
      * @var string
+     *
      * @ORM\Column(name="member_email", type="string", length=45, unique=true)
      */
-    private $member_email = '';
+    private $memberEmail = '';
 
 
     /**
      * Administrator password, md5 value
      *
      * @var string
+     *
      * @ORM\Column(name="member_password", type="string", length=32)
      */
-    private $member_password = '';
+    private $memberPassword = '';
 
 
     /**
      * Administrator name.
      *
      * @var string
+     *
      * @ORM\Column(name="member_name", type="string", length=45)
      */
-    private $member_name = '';
+    private $memberName = '';
 
 
     /**
      * Administrator status, activated, retried, etc ...
      *
      * @var integer
+     *
      * @ORM\Column(name="member_status", type="smallint")
      */
-    private $member_status = self::STATUS_RETRIED;
+    private $memberStatus = self::STATUS_RETRIED;
 
 
     /**
      * Administrator level.
      *
      * @var integer
+     *
      * @ORM\Column(name="member_level", type="smallint")
      */
-    private $member_level = self::LEVEL_INTERIOR;
+    private $memberLevel = self::LEVEL_INTERIOR;
 
 
     /**
      * Administrator created. datetime
      *
      * @var \DateTime
+     *
      * @ORM\Column(name="member_created", type="datetime")
      */
-    private $member_created = null;
+    private $memberCreated = null;
+
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Admin\Entity\Department", inversedBy="members")
+     * @ORM\JoinTable(
+     *     name="sys_department_member",
+     *     joinColumns={@ORM\JoinColumn(name="member", referencedColumnName="member_id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="dept", referencedColumnName="dept_id")}
+     * )
+     */
+    private $depts;
+
+
+    public function __construct()
+    {
+        $this->depts = new ArrayCollection();
+    }
 
 
     /**
@@ -112,11 +139,10 @@ class Member
     public static function getMemberStatusList()
     {
         return [
-            self::STATUS_ACTIVATED => 'Activated',
-            self::STATUS_RETRIED => 'Retried',
+            self::STATUS_ACTIVATED => '已激活',
+            self::STATUS_RETRIED => '被锁定',
         ];
     }
-
 
     /**
      * Get the administrator level list
@@ -126,124 +152,11 @@ class Member
     public static function getMemberLevelList()
     {
         return [
-            self::LEVEL_INTERIOR => 'Interior',
-            self::LEVEL_JUNIOR => 'Junior',
-            self::LEVEL_SENIOR => 'Senior',
-            self::LEVEL_SUPERIOR => 'Superior',
+            self::LEVEL_INTERIOR => '初级',
+            self::LEVEL_JUNIOR => '中级',
+            self::LEVEL_SENIOR => '高级',
+            self::LEVEL_SUPERIOR => '超级',
         ];
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getMemberId()
-    {
-        return $this->member_id;
-    }
-
-    /**
-     * @param int $member_id
-     */
-    public function setMemberId($member_id)
-    {
-        $this->member_id = $member_id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMemberEmail()
-    {
-        return $this->member_email;
-    }
-
-    /**
-     * @param string $member_email
-     */
-    public function setMemberEmail($member_email)
-    {
-        $this->member_email = $member_email;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMemberPassword()
-    {
-        return $this->member_password;
-    }
-
-    /**
-     * @param string $member_password
-     */
-    public function setMemberPassword($member_password)
-    {
-        $this->member_password = $member_password;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMemberName()
-    {
-        return $this->member_name;
-    }
-
-    /**
-     * @param string $member_name
-     */
-    public function setMemberName($member_name)
-    {
-        $this->member_name = $member_name;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMemberStatus()
-    {
-        return $this->member_status;
-    }
-
-    /**
-     * @param int $member_status
-     */
-    public function setMemberStatus($member_status)
-    {
-        $this->member_status = $member_status;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMemberLevel()
-    {
-        return $this->member_level;
-    }
-
-    /**
-     * @param int $member_level
-     */
-    public function setMemberLevel($member_level)
-    {
-        $this->member_level = $member_level;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getMemberCreated()
-    {
-        return $this->member_created;
-    }
-
-    /**
-     * @param \DateTime $member_created
-     */
-    public function setMemberCreated($member_created)
-    {
-        $this->member_created = $member_created;
     }
 
     /**
@@ -254,10 +167,10 @@ class Member
     public function getMemberStatusAsString()
     {
         $list = self::getMemberStatusList();
-        if (isset($list[$this->getMemberStatus()])) {
-            return $list[$this->getMemberStatus()];
+        if (isset($list[$this->memberStatus])) {
+            return $list[$this->memberStatus];
         }
-        return 'Unknown';
+        return '未知';
     }
 
 
@@ -269,11 +182,143 @@ class Member
     public function getMemberLevelAsString()
     {
         $list = self::getMemberLevelList();
-        if (isset($list[$this->getMemberLevel()])) {
-            return $list[$this->getMemberLevel()];
+        if (isset($list[$this->memberLevel])) {
+            return $list[$this->memberLevel];
         }
-        return 'Unknown';
+        return '未知';
     }
+
+
+
+    /**
+     * @return string
+     */
+    public function getMemberId()
+    {
+        return $this->memberId;
+    }
+
+    /**
+     * @param string $memberId
+     */
+    public function setMemberId($memberId)
+    {
+        $this->memberId = $memberId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMemberEmail()
+    {
+        return $this->memberEmail;
+    }
+
+    /**
+     * @param string $memberEmail
+     */
+    public function setMemberEmail($memberEmail)
+    {
+        $this->memberEmail = $memberEmail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMemberPassword()
+    {
+        return $this->memberPassword;
+    }
+
+    /**
+     * @param string $memberPassword
+     */
+    public function setMemberPassword($memberPassword)
+    {
+        $this->memberPassword = $memberPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMemberName()
+    {
+        return $this->memberName;
+    }
+
+    /**
+     * @param string $memberName
+     */
+    public function setMemberName($memberName)
+    {
+        $this->memberName = $memberName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemberStatus()
+    {
+        return $this->memberStatus;
+    }
+
+    /**
+     * @param int $memberStatus
+     */
+    public function setMemberStatus($memberStatus)
+    {
+        $this->memberStatus = $memberStatus;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemberLevel()
+    {
+        return $this->memberLevel;
+    }
+
+    /**
+     * @param int $memberLevel
+     */
+    public function setMemberLevel($memberLevel)
+    {
+        $this->memberLevel = $memberLevel;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getMemberCreated()
+    {
+        return $this->memberCreated;
+    }
+
+    /**
+     * @param \DateTime $memberCreated
+     */
+    public function setMemberCreated($memberCreated)
+    {
+        $this->memberCreated = $memberCreated;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getDepts()
+    {
+        return $this->depts;
+    }
+
+    /**
+     * @param ArrayCollection $depts
+     */
+    public function setDepts($depts)
+    {
+        $this->depts = $depts;
+    }
+
+
 
 
 }

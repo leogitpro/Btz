@@ -11,9 +11,13 @@ namespace Admin\Controller;
 
 
 use Admin\Entity\Department;
+use Admin\Entity\Member;
 use Admin\Form\DepartmentForm;
 use Admin\Service\DepartmentManager;
+use Admin\Service\MemberManager;
+use Ramsey\Uuid\Uuid;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
@@ -25,12 +29,18 @@ class DepartmentController extends BaseController
      */
     private $deptManager;
 
+    /**
+     * @var MemberManager
+     */
+    private $memberManager;
+
 
     public function onDispatch(MvcEvent $e)
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
         $this->deptManager = $serviceManager->get(DepartmentManager::class);
+        $this->memberManager = $serviceManager->get(MemberManager::class);
 
         return parent::onDispatch($e);
     }
@@ -61,12 +71,20 @@ class DepartmentController extends BaseController
                     'rank' => 1,
                 ],
                 [
+                    'action' => 'status',
+                    'name' => '启用/禁用部门',
+                ],
+                [
                     'action' => 'edit',
                     'name' => '修改部门信息',
                 ],
                 [
-                    'action' => 'status',
-                    'name' => '启用/禁用部门',
+                    'action' => 'members',
+                    'name' => '查看部门成员',
+                ],
+                [
+                    'action' => 'updateMembers',
+                    'name' => '分配部门成员',
                 ],
             ],
         ];
@@ -100,100 +118,27 @@ class DepartmentController extends BaseController
 
         $rows = $this->deptManager->getAllDepartmentsByLimitPage($page, $size);
 
+        /**
+        foreach ($rows as $row) {
+            if ($row instanceof Department) {
+                $ms = $row->getMembers();
+                $this->getLoggerPlugin()->debug('name: ' . $row->getDeptName() . ' members: ' . $ms->count());
+                if ($ms->count()) {
+                    foreach ($ms as $m) {
+                        if ($m instanceof Member) {
+                            $this->getLoggerPlugin()->debug('name: ' . $m->getMemberName());
+                        }
+                    }
+                }
+
+            }
+        }
+        //*/
+
         return new ViewModel([
             'rows' => $rows,
             'activeId' => __METHOD__,
         ]);
-    }
-
-
-    /**
-     * Setting department status api
-     */
-    public function statusAction()
-    {
-        $dept_id = (int)$this->params()->fromRoute('key', 0);
-        if($dept_id == Department::DEFAULT_DEPT_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid update Default department status');
-            return ;
-        }
-
-        $department = $this->deptManager->getDepartment($dept_id);
-        if (null == $department) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid department id: ' . $dept_id);
-            return ;
-        }
-
-        if (Department::STATUS_VALID == $department->getDeptStatus()) {
-            $status = Department::STATUS_INVALID;
-        } else {
-            $status = Department::STATUS_VALID;
-        }
-
-        $this->deptManager->updateDepartmentStatus($department, $status);
-
-        return $this->getMessagePlugin()->show(
-            'Department updated',
-            'The department: ' . $department->getDeptName() . ' status has been updated success!',
-            $this->url()->fromRoute('admin/dept'),
-            'Departments',
-            3
-        );
-    }
-
-
-    /**
-     * Edit department information page
-     *
-     * @return ViewModel
-     */
-    public function editAction()
-    {
-        $dept_id = (int)$this->params()->fromRoute('key', 0);
-        if($dept_id == Department::DEFAULT_DEPT_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid edit Default department');
-            return ;
-        }
-
-        $department = $this->deptManager->getDepartment($dept_id);
-        if (null == $department) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid department id: ' . $dept_id);
-            return ;
-        }
-
-        $form = new DepartmentForm($this->deptManager, $department);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-
-                $department->setDeptName($data['name']);
-                $this->deptManager->saveModifiedDepartment($department);
-
-                return $this->getMessagePlugin()->show(
-                    'Department updated',
-                    'The department: ' . $data['name'] . ' has been updated success!',
-                    $this->url()->fromRoute('admin/dept'),
-                    'Departments',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'dept' => $department,
-            'activeId' => __CLASS__,
-        ]);
-
     }
 
 
@@ -215,13 +160,19 @@ class DepartmentController extends BaseController
 
                 $data = $form->getData();
 
-                $this->deptManager->createDepartment($data['name']);
+                $dept = new Department();
+                $dept->setDeptId(Uuid::uuid1()->toString());
+                $dept->setDeptName($data['name']);
+                $dept->setDeptStatus(Department::STATUS_VALID);
+                $dept->setDeptCreated(new \DateTime());
+
+                $this->deptManager->saveModifiedEntity($dept);
 
                 return $this->getMessagePlugin()->show(
-                    'Department created',
-                    'The new department: ' . $data['name'] . ' has been created success!',
+                    '部门已经创建',
+                    '新的部门: ' . $data['name'] . ' 已经创建成功!',
                     $this->url()->fromRoute('admin/dept'),
-                    'Departments',
+                    '查看部门列表',
                     3
                 );
             }
@@ -229,8 +180,213 @@ class DepartmentController extends BaseController
 
         return new ViewModel([
             'form' => $form,
+            'activeId' => __METHOD__,
         ]);
 
     }
 
+
+    /**
+     * Setting department status
+     */
+    public function statusAction()
+    {
+        $dept_id = $this->params()->fromRoute('key');
+        if($dept_id == Department::DEFAULT_DEPT_ID) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新基础部门');
+            return ;
+        }
+
+        $department = $this->deptManager->getDepartment($dept_id);
+        if (null == $department) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
+            return ;
+        }
+
+        if ($department->getDeptStatus() == Department::STATUS_VALID) { // to be invalid
+
+            $department->setDeptStatus(Department::STATUS_INVALID);
+            $members = $department->getMembers();
+            if ($members->count()) {
+                foreach ($members as $member) {
+                    if ($member instanceof Member) {
+                        $member->getDepts()->removeElement($department);
+                    }
+                }
+            }
+
+        } else { // to be valid
+            $department->setDeptStatus(Department::STATUS_VALID);
+        }
+
+        $this->deptManager->saveModifiedEntity($department);
+
+        return $this->getMessagePlugin()->show(
+            '部门已更新',
+            '部门: ' . $department->getDeptName() . ' 状态已经更新!',
+            $this->url()->fromRoute('admin/dept'),
+            '返回',
+            3
+        );
+    }
+
+
+    /**
+     * Edit department information page
+     *
+     * @return ViewModel
+     */
+    public function editAction()
+    {
+        $dept_id = $this->params()->fromRoute('key');
+        if($dept_id == Department::DEFAULT_DEPT_ID) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改默认分组');
+            return ;
+        }
+
+        $department = $this->deptManager->getDepartment($dept_id);
+        if (null == $department) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组ID: ' . $dept_id);
+            return ;
+        }
+
+        $form = new DepartmentForm($this->deptManager, $department);
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                $department->setDeptName($data['name']);
+                $this->deptManager->saveModifiedEntity($department);
+
+                return $this->getMessagePlugin()->show(
+                    '部门已更新',
+                    '部门: ' . $data['name'] . ' 的信息已经更新!',
+                    $this->url()->fromRoute('admin/dept'),
+                    '返回',
+                    3
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'dept' => $department,
+            'activeId' => __CLASS__,
+        ]);
+
+    }
+
+
+    /**
+     * View a department all members
+     *
+     * @return ViewModel
+     */
+    public function membersAction()
+    {
+
+        $dept_id = $this->params()->fromRoute('key');
+        $dept = $this->deptManager->getDepartment($dept_id);
+        if (null == $dept) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
+            return ;
+        }
+
+        $data = [
+            'inner' => [],
+            'outer' => [],
+            'dept' => $dept,
+        ];
+
+        $ownedMembers = $dept->getMembers();
+
+        $members = $this->memberManager->getMembers();
+        foreach ($members as $member) {
+            if ($member instanceof Member) {
+
+                if (Member::DEFAULT_MEMBER_ID == $member->getMemberId()) {
+                    continue;
+                }
+
+                if ($ownedMembers->contains($member)) {
+                    array_push($data['inner'], $member);
+                } else {
+                    array_push($data['outer'], $member);
+                }
+            }
+        }
+
+        $viewModel = new ViewModel();
+        $viewModel->setVariables(['data' => $data]);
+        $viewModel->setTerminal(true);
+
+        return $viewModel;
+    }
+
+
+    /**
+     * Ajax save department members
+     *
+     * @return JsonModel
+     */
+    public function updateMembersAction()
+    {
+
+        $json = ['success' => false];
+
+        $dept_id = $this->params()->fromRoute('key');
+        if ($dept_id == Department::DEFAULT_DEPT_ID) {
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新基础分组信息');
+            return new JsonModel($json);
+        }
+
+        if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
+
+            $dept = $this->deptManager->getDepartment($dept_id);
+            if (null == $dept) {
+                $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组编号:' . $dept_id);
+                return new JsonModel($json);
+            }
+
+            $selected = (array)$this->params()->fromPost('selected');
+
+            $members = $dept->getMembers();
+            if ($members->count()) {
+                foreach ($members as $member) {
+                    if ($member instanceof Member) {
+                        $member->getDepts()->removeElement($dept);
+                    }
+                }
+            }
+
+            foreach($selected as $id) {
+                if ($id == Department::DEFAULT_DEPT_ID) {
+                    continue;
+                }
+
+                $member = $this->memberManager->getMember($id);
+                if (null != $member) {
+                    $member->getDepts()->add($dept);
+                }
+            }
+
+            $this->deptManager->saveModifiedEntity($dept);
+
+            $json['success'] = true;
+        } else {
+
+        }
+
+        return new JsonModel($json);
+    }
 }

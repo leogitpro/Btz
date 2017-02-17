@@ -25,28 +25,26 @@ class Version20170101041510 extends AbstractMigration
         // Init department table
         $this->addSql(
             'INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_members`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?, ?)',
-            [1, 'Default', 0, 1, date('Y-m-d H:i:s')],
-            ['integer', 'string', 'smallint', 'string']
+            ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 0, 1, date('Y-m-d H:i:s')],
+            ['string', 'string', 'smallint', 'string']
         );
 
         // Init member table
         $this->addSql(
             'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?)', //Sql
-            [1, 'admin@example.com', md5('admin'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
-            ['integer', 'string', 'string', 'string', 'smallint', 'smallint', 'string'] // Types
+            ['be152a3e-f423-11e6-a4a4-acbc32bf6185', 'admin@example.com', md5('admin'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
+            ['string', 'string', 'string', 'string', 'smallint', 'smallint', 'string'] // Types
         );
 
         // Init department with member table
         $this->addSql(
-            'INSERT INTO `sys_department_member` (`id`, `dept_id`, `member_id`, `status`, `created`) VALUES (?, ?, ?, ?, ?)',
-            [1, 1, 1, 1, date('Y-m-d H:i:s')],
-            ['integer', 'integer', 'integer', 'smallint', 'string']
+            'INSERT INTO `sys_department_member` (`dept`, `member`) VALUES (?, ?)',
+            ['ad739904-f423-11e6-b154-acbc32bf6185', 'be152a3e-f423-11e6-a4a4-acbc32bf6185'],
+            ['string', 'string']
         );
 
         // Update default department members
-        $this->addSql(
-            'UPDATE `sys_department` SET `dept_members` = `dept_members` + 1 WHERE `dept_id` = 1'
-        );
+        $this->addSql('UPDATE `sys_department` SET `dept_members` = `dept_members` + 1');
 
 
         /**
@@ -95,24 +93,12 @@ class Version20170101041510 extends AbstractMigration
     public function down(Schema $schema)
     {
         // Delete dept with member relation
-        $this->addSql(
-            'DELETE FROM `sys_department_member` WHERE `id` = ?',
-            [1],
-            ['integer']
-        );
+        $this->addSql('DELETE FROM `sys_department_member`');
 
         // Delete department init data
-        $this->addSql(
-            'DELETE FROM `sys_department` WHERE `dept_id` = ?',
-            [1],
-            ['integer']
-        );
+        $this->addSql('DELETE FROM `sys_department`');
 
         // Delete member init data
-        $this->addSql(
-            'DELETE FROM `sys_member` WHERE `member_id` = ?',
-            [1],
-            ['integer']
-        );
+        $this->addSql('DELETE FROM `sys_member`');
     }
 }

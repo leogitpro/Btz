@@ -1,0 +1,47 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">
+        <span aria-hidden="true">&times;</span>
+        <span class="sr-only">Close</span>
+    </button>
+    <h4 class="modal-title" id="pageModalLabel"><?php echo $data['dept']->getDeptName() . "的成员信息"; ?></h4>
+</div>
+
+<div class="modal-body" id="member-department-container">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">已归属部门</h3>
+        </div>
+        <div class="panel-body">
+            <?php foreach($data['inner'] as $member) { ?>
+                <label class="btn btn-default checkbox-container">
+                    <input type="checkbox" value="<?php echo $member->getMemberId(); ?>" checked>
+                    <?php echo $member->getMemberName(); ?>
+                </label>
+            <?php } ?>
+        </div>
+    </div>
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">不属于部门</h3>
+        </div>
+        <div class="panel-body">
+            <?php foreach($data['outer'] as $member) { ?>
+                <label class="btn btn-default checkbox-container">
+                    <input type="checkbox" value="<?php echo $member->getMemberId(); ?>">
+                    <?php echo $member->getMemberName(); ?>
+                </label>
+            <?php } ?>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">不更新</button>
+    <button type="button" class="btn btn-primary" id="save-dept-member" path="<?php echo $this->url('admin/dept', ['action' => 'update-members', 'key' => $data['dept']->getDeptId()]); ?>">重新分配</button>
+</div>

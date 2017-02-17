@@ -20,7 +20,7 @@ return [
             'route' => 'index[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -37,7 +37,7 @@ return [
             'route' => 'dashboard[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -54,7 +54,7 @@ return [
             'route' => 'profile[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -109,7 +109,7 @@ return [
             'route' => 'dmr[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -128,7 +128,7 @@ return [
             'route' => 'component[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -146,7 +146,7 @@ return [
             'route' => 'acl[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9-]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -165,7 +165,7 @@ return [
             'route' => 'message[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9-]+',
+                'key' => '[a-zA-Z0-9_-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [

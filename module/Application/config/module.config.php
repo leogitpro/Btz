@@ -136,6 +136,7 @@ return [
             Service\ContactManager::class => Service\Factory\EntityManagerFactory::class,
             Service\MailManager::class => Service\Factory\MailManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
+            Service\DoctrineSqlLogger::class => Service\Factory\DoctrineSqlLoggerFactory::class,
         ],
         'aliases' => [
             'Logger' => 'AppLogger', // The name: Logger is the key: $config['log']['AppLogger'].

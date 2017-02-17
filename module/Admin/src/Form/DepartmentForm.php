@@ -67,7 +67,7 @@ class DepartmentForm extends Form
                 'value' => (null == $this->dept) ? '' : $this->dept->getDeptName(),
             ],
             'options' => [
-                'label' => 'Department Name',
+                'label' => '部门名称',
             ],
         ]);
 

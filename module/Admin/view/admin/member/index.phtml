@@ -16,7 +16,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
 
         <table class="table table-striped">
             <tr>
-                <th>ID</th>
+                <th>No</th>
                 <th>名字</th>
                 <th>登录账号</th>
                 <th>创建时间</th>
@@ -25,55 +25,59 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                 <th>操作</th>
             </tr>
 
-            <?php foreach ($rows as $member) { ?>
+            <?php $i = 1; foreach ($rows as $member) { ?>
 
                 <tr>
-                    <td><?php echo $member->getMemberId(); ?></td>
+                    <td><?php echo $i++; ?></td>
                     <td><?php echo $member->getMemberName(); ?></td>
                     <td><?php echo $member->getMemberEmail(); ?></td>
                     <td><?php echo $member->getMemberCreated()->format('Y-m-d H:i:s'); ?></td>
                     <td><?php echo $member->getMemberLevelAsString(); ?></td>
-                    <td><?php echo $member->getMemberStatusAsString(); ?></td>
                     <td>
-                        <?php if($member->getMemberId() > 1) { ?>
+                        <span class="label label-<?php echo \Admin\Entity\Member::STATUS_ACTIVATED == $member->getMemberStatus() ? 'success' : 'danger'; ?>">
+                            <?php echo $member->getMemberStatusAsString(); ?>
+                        </span>
+                    </td>
+                    <td>
+                        <?php if($member->getMemberId() != \Admin\Entity\Member::DEFAULT_MEMBER_ID) { ?>
                         <ul class="nav nav-pills actions-list" role="tablist">
                             <li role="presentation" class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    Actions <span class="caret"></span>
+                                    操作选项 <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <?php if(\Admin\Entity\Member::STATUS_ACTIVATED != $member->getMemberStatus()) { ?>
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
-                                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> Activate
+                                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> 激活账户
                                             </a>
                                         </li>
                                     <?php } else { ?>
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'status', 'key' => $member->getMemberId()]); ?>">
-                                                <i class="fa fa-times fa-fw" aria-hidden="true"></i> Retried
+                                                <i class="fa fa-times fa-fw" aria-hidden="true"></i> 锁定账户
                                             </a>
                                         </li>
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'edit', 'key' => $member->getMemberId()]); ?>">
-                                                <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> Edit
+                                                <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> 修改信息
                                             </a>
                                         </li>
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'level', 'key' => $member->getMemberId()]); ?>">
-                                                <i class="fa fa-level-up fa-fw" aria-hidden="true"></i> Level
+                                                <i class="fa fa-level-up fa-fw" aria-hidden="true"></i> 更新等级
                                             </a>
                                         </li>
                                         <li class="divider"></li>
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
-                                                <i class="fa fa-hashtag fa-fw" aria-hidden="true"></i> Password
+                                                <i class="fa fa-hashtag fa-fw" aria-hidden="true"></i> 更新密码
                                             </a>
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-                                            <a href="<?php echo $this->url('admin/dmr', ['action' => 'member-departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
-                                                <i class="fa fa-users fa-fw" aria-hidden="true"></i> Departments
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                <i class="fa fa-users fa-fw" aria-hidden="true"></i> 成员部门管理
                                             </a>
                                         </li>
                                     <?php } ?>
