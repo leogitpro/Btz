@@ -24,10 +24,10 @@ class AclManagerFactory implements FactoryInterface
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $logger = $container->get('Logger');
         $memberManager = $container->get(MemberManager::class);
-        $dmrManager = $container->get(DMRelationManager::class);
+        //$dmrManager = $container->get(DMRelationManager::class);
         $componentManager = $container->get(ComponentManager::class);
 
-        return new AclManager($memberManager, $componentManager, $dmrManager, $entityManager, $logger);
+        return new AclManager($memberManager, $componentManager, $entityManager, $logger);
 
     }
 

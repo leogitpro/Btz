@@ -102,25 +102,6 @@ return [
     // End MemberController router
 
 
-    // DmrController router configuration
-    'dmr' => [
-        'type' => Segment::class,
-        'options' => [
-            'route' => 'dmr[/:action[/:key]][:suffix]',
-            'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
-                'suffix' => '(/|.html)',
-            ],
-            'defaults' => [
-                'controller' => Controller\DmrController::class,
-                'action' => 'index',
-            ],
-        ],
-    ],
-    // End DmrController router
-
-
     // ComponentController router configuration
     'component' => [
         'type' => Segment::class,

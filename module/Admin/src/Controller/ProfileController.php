@@ -10,20 +10,14 @@ namespace Admin\Controller;
 
 use Admin\Form\UpdatePasswordForm;
 use Admin\Form\UpdateProfileForm;
-use Admin\Service\AuthService;
 use Admin\Service\MemberManager;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
+
 class ProfileController extends AbstractActionController
 {
-
-    /**
-     * @var AuthService
-     */
-    private $authService;
-
     /**
      * @var MemberManager
      */
@@ -34,7 +28,6 @@ class ProfileController extends AbstractActionController
     {
         $serviceManager = $e->getApplication()->getServiceManager();
 
-        $this->authService = $serviceManager->get(AuthService::class);
         $this->memberManager = $serviceManager->get(MemberManager::class);
 
         return parent::onDispatch($e);
@@ -48,10 +41,9 @@ class ProfileController extends AbstractActionController
      */
     public function indexAction()
     {
-        $member = $this->memberManager->getMember($this->authService->getIdentity());
+        $member = $this->memberManager->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
             return ;
         }
 
@@ -66,14 +58,13 @@ class ProfileController extends AbstractActionController
      */
     public function passwordAction()
     {
-        $member = $this->memberManager->getMember($this->authService->getIdentity());
+        $member = $this->memberManager->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
             return ;
         }
 
-        $form = new UpdatePasswordForm($this->memberManager, $this->authService);
+        $form = new UpdatePasswordForm($this->memberManager);
 
         if($this->getRequest()->isPost()) {
 
@@ -85,15 +76,14 @@ class ProfileController extends AbstractActionController
 
                 $encryptedPassword = md5($data['new_password']); // Simple MD5 encrypt
 
-                $this->memberManager->updateMemberPassword($this->authService->getIdentity(), $encryptedPassword);
-
-                $this->authService->clearIdentity();
+                $member->setMemberPassword($encryptedPassword);
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Password changed',
-                    'Your password has been changed and need authenticate again. Please use the new password login.',
-                    $this->url()->fromRoute('admin/index', ['suffix' => '.html']),
-                    'Sign In',
+                    '密码已更新',
+                    '您的密码已经更新, 请在下次使用新的密码登入!',
+                    $this->url()->fromRoute('admin/profile', ['suffix' => '.html']),
+                    '返回',
                     3
                 );
             }
@@ -112,10 +102,9 @@ class ProfileController extends AbstractActionController
     public function updateAction()
     {
 
-        $member = $this->memberManager->getMember($this->authService->getIdentity());
+        $member = $this->memberManager->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . ' Invalid administrator identity');
             return ;
         }
 
@@ -130,13 +119,14 @@ class ProfileController extends AbstractActionController
                 $data = $form->getData();
 
                 $member->setMemberName($data['name']);
-                $this->memberManager->saveModifiedMember($member);
+
+                $this->memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
-                    'Profile updated',
-                    'Your profile has been updated success!',
+                    '资料已更新',
+                    '您的个人资料已经更新!',
                     $this->url()->fromRoute('admin/profile'),
-                    'My Profile',
+                    '返回',
                     1
                 );
             }

@@ -120,7 +120,7 @@ class NavManager
     public function initTopRightItem()
     {
         $this->topRightItems = [];
-return;
+
         $member = $this->memberManager->getCurrentMember();
         if (!($member instanceof Member)) {
             return ;

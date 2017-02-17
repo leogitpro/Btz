@@ -32,12 +32,6 @@ class DashboardController extends AbstractActionController
 
     public function indexAction()
     {
-
-        $this->memberManager->getMembersCount();
-
-        $this->memberManager->getAllMembersCount();
-
-
         return new ViewModel();
     }
 

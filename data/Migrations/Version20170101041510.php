@@ -24,8 +24,8 @@ class Version20170101041510 extends AbstractMigration
 
         // Init department table
         $this->addSql(
-            'INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_members`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?, ?)',
-            ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 0, 1, date('Y-m-d H:i:s')],
+            'INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?)',
+            ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 1, date('Y-m-d H:i:s')],
             ['string', 'string', 'smallint', 'string']
         );
 
@@ -42,9 +42,6 @@ class Version20170101041510 extends AbstractMigration
             ['ad739904-f423-11e6-b154-acbc32bf6185', 'be152a3e-f423-11e6-a4a4-acbc32bf6185'],
             ['string', 'string']
         );
-
-        // Update default department members
-        $this->addSql('UPDATE `sys_department` SET `dept_members` = `dept_members` + 1');
 
 
         /**

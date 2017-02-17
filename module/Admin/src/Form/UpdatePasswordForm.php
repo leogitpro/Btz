@@ -4,11 +4,11 @@
 namespace Admin\Form;
 
 
-use Admin\Service\AuthService;
 use Admin\Service\MemberManager;
 use Admin\Validator\OldPasswordValidator;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
+
 
 class UpdatePasswordForm extends Form
 {
@@ -18,19 +18,13 @@ class UpdatePasswordForm extends Form
      */
     private $memberManager;
 
-    /**
-     * @var AuthService
-     */
-    private $authService;
 
-
-    public function __construct(MemberManager $memberManager, AuthService $authService)
+    public function __construct(MemberManager $memberManager)
     {
 
         parent::__construct('update_password_form');
 
         $this->memberManager = $memberManager;
-        $this->authService = $authService;
 
         $this->setAttributes(['method' => 'post', 'role' => 'form']);
 
@@ -125,7 +119,6 @@ class UpdatePasswordForm extends Form
                     'break_chain_on_failure' => true,
                     'options' => [
                         'memberManager' => $this->memberManager,
-                        'authService' => $this->authService,
                     ],
                 ],
             ],

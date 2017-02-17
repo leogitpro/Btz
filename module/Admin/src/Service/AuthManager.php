@@ -72,17 +72,4 @@ class AuthManager
         }
     }
 
-
-    /**
-     * Administrator access control layer
-     *
-     * @param string $controller
-     * @param string $action
-     * @return bool
-     */
-    public function access($controller, $action)
-    {
-        return false;
-    }
-
 }

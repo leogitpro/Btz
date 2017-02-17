@@ -39,7 +39,6 @@ return [
 
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,
-            Controller\DmrController::class => InvokableFactory::class,
             Controller\ComponentController::class => InvokableFactory::class,
             Controller\AclController::class => InvokableFactory::class,
             Controller\MessageController::class => InvokableFactory::class,
@@ -98,7 +97,6 @@ return [
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
-            Service\DMRelationManager::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\MessageManager::class => Service\Factory\EntityManagerFactory::class,
 

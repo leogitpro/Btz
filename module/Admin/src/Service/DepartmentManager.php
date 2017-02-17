@@ -168,27 +168,4 @@ class DepartmentManager extends BaseEntityManager
         return $this->getAllDepartmentsByLimitPage(1, 200);
     }
 
-
-
-    /**
-     * Get the department all member ids
-     *
-     * @param $dept_id
-     * @return array
-     */
-    public function getDepartmentAllMemberIds($dept_id)
-    {
-        return [];
-        $rows = []; //$this->dmrManager->departmentRelations($dept_id);
-        $ids = [];
-        foreach ($rows as $entity) {
-            if ($entity instanceof DepartmentMember) {
-                $ids[$entity->getMemberId()] = $entity->getMemberId();
-            }
-        }
-        return $ids;
-    }
-
-
-
 }

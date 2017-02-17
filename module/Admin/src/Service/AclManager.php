@@ -34,7 +34,7 @@ class AclManager extends BaseEntityManager
 
 
     /**
-     * @var DMRelationManager
+     * @var
      */
     private $dmrManager;
 
@@ -42,7 +42,6 @@ class AclManager extends BaseEntityManager
     public function __construct(
         MemberManager $memberManager,
         ComponentManager $componentManager,
-        DMRelationManager $dmrManager,
         EntityManager $entityManager,
         Logger $logger
     )
@@ -51,7 +50,6 @@ class AclManager extends BaseEntityManager
 
         $this->componentManager = $componentManager;
         $this->memberManager = $memberManager;
-        $this->dmrManager = $dmrManager;
     }
 
 
