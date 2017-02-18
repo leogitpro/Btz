@@ -17,21 +17,14 @@ class Version20170112090228 extends AbstractMigration
     {
         $table = $schema->createTable('sys_acl_member');
 
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('action_id', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('member_id', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('action', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('member', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('status', 'smallint', ['default' => 0]);
-        $table->addColumn('created', 'datetime');
 
-        $table->setPrimaryKey(['id']);
+        $table->setPrimaryKey(['action', 'member']);
 
-        // For query a member owned all actions
-        $table->addIndex(['member_id']);
-        // For query a member owned all valid actions
-        $table->addIndex(['member_id', 'status']);
-
-        // For query member and action relationship
-        $table->addIndex(['action_id', 'member_id']);
+        $table->addIndex(['member']);
+        $table->addIndex(['action']);
     }
 
     /**

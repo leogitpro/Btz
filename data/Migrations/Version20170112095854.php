@@ -10,7 +10,6 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class Version20170112095854 extends AbstractMigration
 {
-
     /**
      * @param Schema $schema
      */
@@ -18,20 +17,15 @@ class Version20170112095854 extends AbstractMigration
     {
         $table = $schema->createTable('sys_acl_department');
 
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('action_id', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('dept_id', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('action', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('dept', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('status', 'smallint', ['default' => 0]);
-        $table->addColumn('created', 'datetime');
 
-        $table->setPrimaryKey(['id']);
+        $table->setPrimaryKey(['action', 'dept']);
 
-        $table->addIndex(['dept_id']);
-        $table->addIndex(['dept_id', 'status']);
-
-        $table->addIndex(['dept_id', 'action_id']);
+        $table->addIndex(['dept']);
+        $table->addIndex(['action']);
     }
-
 
     /**
      * @param Schema $schema
