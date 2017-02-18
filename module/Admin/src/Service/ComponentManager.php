@@ -12,29 +12,62 @@ namespace Admin\Service;
 
 use Admin\Entity\Action;
 use Admin\Entity\Component;
+use Ramsey\Uuid\Uuid;
 
 class ComponentManager extends BaseEntityManager
 {
 
 
     /**
-     * Get one component
+     * Get all components count
      *
-     * @param int $component_id
-     * @return Component
+     * @return integer
      */
-    public function getComponent($component_id)
+    public function getComponentsCount()
     {
-        return $this->entityManager->getRepository(Component::class)->find($component_id);
+        $this->resetQb();
+
+        $this->getQb()->select($this->getQb()->expr()->count('t.comClass'));
+        $this->getQb()->from(Component::class, 't');
+
+        return $this->getEntitiesCount();
     }
 
 
     /**
-     * @return integer
+     * Get one component
+     *
+     * @param string $component_class
+     * @return Component
      */
-    public function getAllComponentsCount()
+    public function getComponent($component_class)
     {
-        return $this->getEntitiesCount(Component::class, 'comId');
+        $this->resetQb();
+
+        $this->getQb()->from(Component::class, 't')->select('t');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.comClass', '?1'));
+        $this->getQb()->setParameter(1, $component_class);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * Get components by limit page
+     *
+     * @param integer $page
+     * @param integer $size
+     * @return array
+     */
+    public function getComponentsByLimitPage($page = 1, $size = 100)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(Component::class, 't');
+        $this->getQb()->setMaxResults($size)->setFirstResult(($page -1) * $size);
+        $this->getQb()->orderBy('t.comRank', 'DESC')->addOrderBy('t.comMenu', 'DESC')->addOrderBy('t.comName');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
@@ -45,43 +78,33 @@ class ComponentManager extends BaseEntityManager
      */
     public function getAllComponents()
     {
-        return $this->getUniverseComponents();
+        return $this->getComponentsByLimitPage(1, 200);
     }
 
 
+
     /**
-     * Get all components by limit page
+     * Get a action by id
      *
-     * @param integer $page
-     * @param integer $size
-     * @return array
+     * @param string $action_id
+     * @return Action
      */
-    public function getAllComponentsByLimitPage($page = 1, $size = 10)
+    public function getAction($action_id)
     {
-        return $this->getUniverseComponents([], null, $size, ($page - 1) * $size );
+        $this->resetQb();
+
+        $this->getQb()->from(Action::class, 't')->select('t');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.actionId', '?1'));
+        $this->getQb()->setParameter(1, $action_id);
+
+        return $this->getEntityFromPersistence();
     }
 
 
-    /**
-     * @return integer
-     */
-    public function getComponentsCount()
-    {
-        return $this->getEntitiesCount(Component::class, 'comId', ['comStatus = :status'], ['status' => Component::STATUS_VALIDITY]);
-    }
 
 
-    /**
-     * Get all valid components
-     *
-     * @return array
-     */
-    public function getComponents()
-    {
-        return $this->getUniverseComponents([
-            'comStatus' => Component::STATUS_VALIDITY,
-        ]);
-    }
+    // Todo
+
 
 
     /**
@@ -105,7 +128,7 @@ class ComponentManager extends BaseEntityManager
      * @param int $size
      * @return array
      */
-    public function getComponentsByLimitPage($page = 1, $size = 10)
+    public function getComponentsByLimitPagex($page = 1, $size = 10)
     {
         return $this->getUniverseComponents([
             'comStatus' => Component::STATUS_VALIDITY,
@@ -259,18 +282,6 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
-     * Get a action by id
-     *
-     * @param integer $action_id
-     * @return Action
-     */
-    public function getAction($action_id)
-    {
-        return $this->getUniverseAction(['actionId' => $action_id]);
-    }
-
-
-    /**
      * Get the action
      *
      * @param string $controller_class
@@ -322,15 +333,147 @@ class ComponentManager extends BaseEntityManager
 
 
     /**
+     * Sync all components to registry
+     *
+     * @param array $items
+     * @return bool
+     */
+    public function syncComponents(array $items)
+    {
+
+        $components = $this->getAllComponents();
+
+        $savedComponents = [];
+        foreach ($components as $component) {
+            if ($component instanceof Component) {
+                $savedComponents[$component->getComClass()] = $component;
+            }
+        }
+
+        $increased = [];
+        $existed = [];
+        foreach ($items as $item) {
+            if (array_key_exists($item['controller'], $savedComponents)) {
+                $existed[$item['controller']] = $item;
+            } else {
+                $increased[$item['controller']] = $item;
+            }
+        }
+
+        // Remove drop component
+        foreach ($savedComponents as $k => $component) {
+            if (!array_key_exists($k, $existed)) {
+                if ($component instanceof Component) {
+                    // Delete there acl
+
+                    // Delete component with all actions
+                    $this->removeEntity($component);
+                }
+            }
+        }
+
+
+        // Sync increased component
+        foreach ($increased as $k => $item) {
+            $component = new Component();
+            $component->setComClass($item['controller']);
+            $component->setComName($item['name']);
+            $component->setComRoute($item['route']);
+            $component->setComMenu($item['menu']);
+            $component->setComIcon($item['icon']);
+            $component->setComRank($item['rank']);
+
+            foreach ($item['actions'] as $sub) {
+                $action = new Action();
+                $action->setActionId(Uuid::uuid1()->toString());
+                $action->setActionKey($sub['action']);
+                $action->setActionName($sub['name']);
+                $action->setActionMenu($sub['menu']);
+                $action->setActionIcon($sub['icon']);
+                $action->setActionRank($sub['rank']);
+
+                $action->setComponent($component);
+                $component->getActions()->add($action);
+            }
+
+            $this->saveModifiedEntity($component);
+        }
+
+
+        // Sync existed component
+        foreach ($existed as $k => $item) {
+            $component = $savedComponents[$k];
+            if ($component instanceof Component) {
+                $savedActions = $component->getActions();
+
+                $existedActions = [];
+                foreach ($savedActions as $action) {
+                    if ($action instanceof Action) {
+                        if (array_key_exists($action->getActionKey(), $item['actions'])) {
+                            $existedActions[$action->getActionKey()] = $action;
+                        } else {
+                            //$this->logger->debug('remove action: ' . $action->getActionName() . ' from component: ' . $component->getComName());
+                            $this->removeEntity($action);
+                        }
+                    }
+                }
+
+                // Increased actions
+                foreach ($item['actions'] as $key => $sub) {
+                    if (!array_key_exists($key, $existedActions)) {
+                        $action = new Action();
+                        $action->setActionId(Uuid::uuid1()->toString());
+                        $action->setActionKey($sub['action']);
+                        $action->setActionName($sub['name']);
+                        $action->setActionMenu($sub['menu']);
+                        $action->setActionIcon($sub['icon']);
+                        $action->setActionRank($sub['rank']);
+
+                        $action->setComponent($component);
+                        $component->getActions()->add($action);
+
+                        //$this->saveModifiedEntity($action);
+                        //$this->logger->debug('increased action: ' . $action->getActionName() . ' for component: ' . $component->getComName());
+                    }
+                }
+
+                // Update the existed actions
+                foreach ($existedActions as $key => $action) {
+                    if ($action instanceof Action) {
+                        $sub = $item['actions'][$key];
+                        $action->setActionName($sub['name']);
+                        $action->setActionMenu($sub['menu']);
+                        $action->setActionIcon($sub['icon']);
+                        $action->setActionRank($sub['rank']);
+                        $this->saveModifiedEntity($action);
+                    }
+                }
+
+                // Update the component
+                $component->setComName($item['name']);
+                $component->setComRoute($item['route']);
+                $component->setComMenu($item['menu']);
+                $component->setComIcon($item['icon']);
+                $component->setComRank($item['rank']);
+
+                $this->saveModifiedEntity($component);
+            }
+        }
+
+
+        return true;
+    }
+
+
+    /**
      * Sync all component information
      *
      * @param array $items
      * @return bool
      */
-    public function syncComponents($items)
+    public function syncComponents1($items)
     {
         if (empty($items)) {
-            $this->logger->info('No component got, stop sync component');
             return false;
         }
 

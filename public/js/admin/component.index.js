@@ -6,11 +6,31 @@ $(function () {
         $(this).removeData("bs.modal");
     });
 
-    $("body").on("change", ".action-status-select", function () {
-        var url = $(this).val();
-        $(this).blur();
-        $.get(url);
+    $("body").on("click", ".remove-action", function () {
+        var tr = $(this).parent().parent();
+        if (confirm("确定要删除么? 操作不可恢复!")) {
+            var url = $(this).attr("href");
+            $(this).blur();
+            $.get(url, function (dt) {
+                tr.hide();
+            });
+            return false;
+        } else {
+            $(this).blur();
+            return false;
+        }
     });
+
+
+    $(".danger-link").click(function () {
+        if (confirm("确定要删除么? 操作不可恢复!")) {
+            return true;
+        } else {
+            $(this).blur();
+            return false;
+        }
+    });
+
 
 
     $("#sync-link").click(function(){

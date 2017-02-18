@@ -10,20 +10,19 @@
 namespace Admin\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Component
+ *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_controller")
  */
 class Component
 {
-
-    const STATUS_VALIDITY = 1; // Validity component
-    const STATUS_INVALID = 0; // Invalid component
-
     const MENU_YES = 1; // Is menu component
     const MENU_NO = 0; // not a menu component
 
@@ -33,102 +32,65 @@ class Component
 
 
     /**
-     * @var integer
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="controller_id", type="integer")
-     */
-    private $comId;
-
-    /**
      * @var string
-     * @ORM\Column(name="controller_class", type="string", length=100)
+     *
+     * @ORM\Id
+     * @ORM\Column(name="controller_class", type="string", length=100, nullable=false)
      */
     private $comClass;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="controller_name", type="string", length=100)
      */
     private $comName = '';
 
     /**
      * @var string
+     *
      * @ORM\Column(name="controller_icon", type="string", length=45)
      */
     private $comIcon = self::ICON_DEFAULT;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="controller_route", type="string", length=45)
      */
     private $comRoute = '';
 
     /**
      * @var integer
+     *
      * @ORM\Column(name="controller_rank", type="smallint")
      */
     private $comRank = self::RANK_DEFAULT;
 
     /**
      * @var integer
+     *
      * @ORM\Column(name="controller_menu", type="smallint")
      */
     private $comMenu = self::MENU_NO;
 
-    /**
-     * @var integer
-     * @ORM\Column(name="controller_status", type="smallint")
-     */
-    private $comStatus = self::STATUS_INVALID;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="controller_created", type="datetime")
+     * cascade: remove => 删除 component, 同步删除其下属的所有 actions
+     *          persist => 添加 component, 同步添加actions中所有的对象到数据库中.
+     *
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Admin\Entity\Action", mappedBy="component", cascade={"remove", "persist"})
      */
-    private $comCreated;
+    private $actions;
 
 
-
-    /**
-     * @return array
-     */
-    public static function getStatusList()
+    public function __construct()
     {
-        return [
-            self::STATUS_INVALID => 'Invalid',
-            self::STATUS_VALIDITY => 'Validity',
-        ];
+        $this->actions = new ArrayCollection();
     }
 
-
-    /**
-     * @return string
-     */
-    public function getComStatusAsString()
-    {
-        $list = self::getStatusList();
-        if (isset($list[$this->getComStatus()])) {
-            return $list[$this->getComStatus()];
-        }
-        return 'Unknown';
-    }
-
-    /**
-     * @return int
-     */
-    public function getComId()
-    {
-        return $this->comId;
-    }
-
-    /**
-     * @param int $comId
-     */
-    public function setComId($comId)
-    {
-        $this->comId = $comId;
-    }
 
     /**
      * @return string
@@ -145,6 +107,7 @@ class Component
     {
         $this->comClass = $comClass;
     }
+
 
     /**
      * @return string
@@ -227,38 +190,19 @@ class Component
     }
 
     /**
-     * @return int
+     * @return ArrayCollection
      */
-    public function getComStatus()
+    public function getActions()
     {
-        return $this->comStatus;
+        return $this->actions;
     }
 
     /**
-     * @param int $comStatus
+     * @param ArrayCollection $actions
      */
-    public function setComStatus($comStatus)
+    public function setActions($actions)
     {
-        $this->comStatus = $comStatus;
+        $this->actions = $actions;
     }
-
-    /**
-     * @return \DateTime
-     */
-    public function getComCreated()
-    {
-        return $this->comCreated;
-    }
-
-    /**
-     * @param \DateTime $comCreated
-     */
-    public function setComCreated($comCreated)
-    {
-        $this->comCreated = $comCreated;
-    }
-
-
-
 
 }

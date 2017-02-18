@@ -12,7 +12,7 @@ namespace Admin\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 
-abstract class BaseController extends AbstractActionController
+class BaseController extends AbstractActionController
 {
 
     /**
@@ -20,7 +20,51 @@ abstract class BaseController extends AbstractActionController
      *
      * @return array
      */
-    abstract public function autoRegisterComponent();
+    //public static function ComponentRegistry() {};
+
+
+
+    /**
+     * @param string $controller
+     * @param string $name
+     * @param string $route
+     * @param int $menu
+     * @param string $icon
+     * @param int $rank
+     * @return array
+     */
+    protected static function CreateControllerRegistry($controller, $name, $route, $menu = 0, $icon = 'list', $rank = 0)
+    {
+        return [
+            'controller' => $controller,
+            'name' => $name,
+            'route' => $route,
+            'menu' => $menu,
+            'icon' => $icon,
+            'rank' => $rank,
+            'actions' => [],
+        ];
+    }
+
+
+    /**
+     * @param string $action
+     * @param string $name
+     * @param int $menu
+     * @param string $icon
+     * @param int $rank
+     * @return array
+     */
+    protected static function CreateActionRegistry($action, $name, $menu = 0, $icon = 'caret-right', $rank = 0)
+    {
+        return [
+            'action' => $action,
+            'name' => $name,
+            'menu' => $menu,
+            'icon' => $icon,
+            'rank' => $rank,
+        ];
+    }
 
 
 }

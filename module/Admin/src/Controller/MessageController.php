@@ -41,8 +41,8 @@ class MessageController extends BaseController
 
 
 
-
-    public function autoRegisterComponent()
+    public static function ComponentRegistryX()
+    //public function autoRegisterComponent()
     {
         return [
             'controller' => __CLASS__,

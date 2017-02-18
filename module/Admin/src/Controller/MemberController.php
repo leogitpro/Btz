@@ -46,6 +46,59 @@ class MemberController extends BaseController
     }
 
 
+    public static function ComponentRegistryX()
+    {
+        return [
+            'controller' => __CLASS__,
+            'name' => '成员管理',
+            'route' => 'admin/member',
+            'menu' => true,
+            'icon' => 'user',
+            'rank' => 10,
+            'actions' => [
+                [
+                    'action' => 'index',
+                    'name' => '查看成员列表',
+                    'icon' => 'bars',
+                    'menu' => true,
+                    'rank' => 9,
+                ],
+                [
+                    'action' => 'add',
+                    'name' => '创建新成员',
+                    'icon' => 'user-plus',
+                    'menu' => true,
+                    'rank' => 1,
+                ],
+                [
+                    'action' => 'edit',
+                    'name' => '修改成员资料',
+                ],
+                [
+                    'action' => 'status',
+                    'name' => '启用/禁用成员'
+                ],
+                [
+                    'action' => 'level',
+                    'name' => '修改成员等级'
+                ],
+                [
+                    'action' => 'password',
+                    'name' => '修改成员密码'
+                ],
+                [
+                    'action' => 'departments',
+                    'name' => '查看成员部门'
+                ],
+                [
+                    'action' => 'updateDepartments',
+                    'name' => '分配成员部门'
+                ],
+            ],
+        ];
+    }
+
+
     public function autoRegisterComponent()
     {
         return [

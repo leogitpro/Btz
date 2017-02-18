@@ -47,9 +47,13 @@ class AclController extends BaseController
     private $componentManager;
 
 
-
-    public function autoRegisterComponent()
+    public static function ComponentRegistryX()
+    //public function autoRegisterComponent()
     {
+
+        $item = self::CreateControllerRegistry(__CLASS__, '权限控制', 'admin/acl', 1, 'cogs', 16);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
+
         return [
             'controller' => __CLASS__,
             'name' => '权限控制',

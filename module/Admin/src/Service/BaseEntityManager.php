@@ -88,7 +88,7 @@ class BaseEntityManager
 
 
     /**
-     * @return mixed
+     * @return object
      */
     protected function getEntityFromPersistence()
     {
@@ -97,8 +97,8 @@ class BaseEntityManager
 
 
     /**
-     * @param mixed $entity
-     * @return mixed
+     * @param object $entity
+     * @return object
      */
     public function saveModifiedEntity($entity)
     {
@@ -106,6 +106,16 @@ class BaseEntityManager
         $this->entityManager->flush();
 
         return $entity;
+    }
+
+
+    /**
+     * @param object $entity
+     */
+    public function removeEntity($entity)
+    {
+        $this->entityManager->remove($entity);
+        $this->entityManager->flush();
     }
 
 

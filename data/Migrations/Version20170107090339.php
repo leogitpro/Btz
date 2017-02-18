@@ -23,27 +23,19 @@ class Version20170107090339 extends AbstractMigration
     {
         $table = $schema->createTable('sys_controller');
 
-        $table->addColumn('controller_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('controller_class', 'string', ['length' => 100, 'default' => '']);
         $table->addColumn('controller_name', 'string', ['length' => 100, 'default' => '']);
         $table->addColumn('controller_icon', 'string', ['length' => 45, 'default' => '']);
         $table->addColumn('controller_route', 'string', ['length' => 45, 'default' => '']);
         $table->addColumn('controller_rank', 'integer', ['unsigned' => true, 'default' => 0]);
         $table->addColumn('controller_menu', 'smallint', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('controller_status', 'smallint', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('controller_created', 'datetime');
 
-        $table->setPrimaryKey(['controller_id']);
-        $table->addUniqueIndex(['controller_class']);
+        $table->setPrimaryKey(['controller_class']);
 
         // Index for: generate menu,
-        $table->addIndex(['controller_status', 'controller_menu']);
         $table->addIndex(['controller_rank', 'controller_name']);
 
-        $table->addIndex(['controller_status']);
-        $table->addIndex(['controller_status', 'controller_rank', 'controller_menu', 'controller_name']);
-        $table->addIndex(['controller_class', 'controller_status']);
-
+        $table->addIndex(['controller_rank', 'controller_menu', 'controller_name']);
     }
 
     /**

@@ -17,6 +17,7 @@ use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+
 class ComponentController extends BaseController
 {
     /**
@@ -36,43 +37,19 @@ class ComponentController extends BaseController
     }
 
 
-
-    public function autoRegisterComponent()
+    /**
+     * @return array
+     */
+    public static function ComponentRegistry()
     {
-        return [
-            'controller' => __CLASS__,
-            'name' => '系统模块',
-            'route' => 'admin/component',
-            'menu' => true,
-            'rank' => 14,
-            'icon' => 'cubes',
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => '查看模块列表',
-                    'menu' => true,
-                    'rank' => 0,
-                    'icon' => 'bars',
-                ],
-                [
-                    'action' => 'status',
-                    'name' => '启用/禁用模块',
-                ],
-                [
-                    'action' => 'actions',
-                    'name' => '查看模块功能列表',
-                ],
-                [
-                    'action' => 'actionstatus',
-                    'name' => '启用/禁用模块功能',
-                ],
-                [
-                    'action' => 'sync',
-                    'name' => '同步系统模块',
-                ],
-            ],
-        ];
+        $item = self::CreateControllerRegistry(__CLASS__, '系统模块', 'admin/component', 1, 'cubes', 14);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
+        $item['actions']['sync'] = self::CreateActionRegistry('sync', '同步系统模块');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除某个模块');
+        $item['actions']['actions'] = self::CreateActionRegistry('actions', '查看模块功能列表');
+        $item['actions']['remove'] = self::CreateActionRegistry('remove', '删除某个功能接口');
 
+        return $item;
     }
 
 
@@ -95,44 +72,86 @@ class ComponentController extends BaseController
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/component', ['action' => 'index', 'key' => '%d']));
-        $paginationHelper->setCount($this->componentManager->getAllComponentsCount());
+        $paginationHelper->setCount($this->componentManager->getComponentsCount());
 
         // Render view data
-        $components = $this->componentManager->getAllComponentsByLimitPage($page, $size);
+        $rows = $this->componentManager->getComponentsByLimitPage($page, $size);
+
+        /**
+        foreach ($rows as $row) {
+            if ($row instanceof Component) {
+                $actions = $row->getActions();
+                foreach ($actions as $action) {
+                    if ($action instanceof Action) {
+                        $this->getLoggerPlugin()->debug('action: ' . $action->getActionName());
+                    }
+                }
+            }
+        }
+        //*/
 
         return new ViewModel([
-            'rows' => $components,
+            'rows' => $rows,
             'activeId' => __METHOD__,
         ]);
     }
 
 
     /**
-     * Change component status
+     * Ajax call sync component data
      */
-    public function statusAction()
+    public function syncAction()
     {
-        $component_id = $this->params()->fromRoute('key', 0);
-        $component = $this->componentManager->getComponent($component_id);
+        ignore_user_abort(true);
+        set_time_limit(0);
+
+        $result = ['success' => false, 'code' => 0, 'message' => ''];
+
+        // if (!$this->getRequest()->isXmlHttpRequest()) { return $this->getResponse(); }
+
+        $controllers = $this->getConfigPlugin()->get('controllers.factories');
+        $items = [];
+        foreach($controllers as $controllerClassName => $factory) {
+            if (0 !== strpos($controllerClassName, __NAMESPACE__)) {
+                continue;
+            }
+
+            if (method_exists($controllerClassName, 'ComponentRegistry')) {
+                $items[] = $controllerClassName::ComponentRegistry();
+            }
+        }
+
+        //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
+
+        //$items = [];
+        $this->componentManager->syncComponents($items);
+
+        $result['success'] = true;
+        return new JsonModel($result);
+    }
+
+
+    /**
+     * Remove component
+     */
+    public function deleteAction()
+    {
+        $component_class = base64_decode($this->params()->fromRoute('key'));
+        $component = $this->componentManager->getComponent($component_class);
         if (!($component instanceof Component)) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid component id:' . $component_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
             return ;
         }
 
-        if ($component->getComStatus() == Component::STATUS_INVALID) {
-            $component->setComStatus(Component::STATUS_VALIDITY);
-        } else {
-            $component->setComStatus(Component::STATUS_INVALID);
-        }
-
-        $component = $this->componentManager->saveModifiedComponent($component);
+        $comName = $component->getComName();
+        $this->componentManager->removeEntity($component);
 
         return $this->getMessagePlugin()->show(
-            'Component updated',
-            'The Component: ' . $component->getComName() . ' status has been updated!',
+            '模块已删除',
+            'The Component: ' . $comName . ' 及所有的功能接口已全部删除!',
             $this->url()->fromRoute('admin/component'),
-            'Components',
+            '返回',
             3
         );
     }
@@ -145,21 +164,18 @@ class ComponentController extends BaseController
      */
     public function actionsAction()
     {
-        $component_id = $this->params()->fromRoute('key', 0);
-
-        $component = $this->componentManager->getComponent($component_id);
+        $component_class = base64_decode($this->params()->fromRoute('key'));
+        $component = $this->componentManager->getComponent($component_class);
         if (!($component instanceof Component)) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid component id:' . $component_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
             return ;
         }
 
-        $actions = $this->componentManager->getComponentAllActions($component);
 
         $viewModel = new ViewModel();
         $viewModel->setVariables([
-            'entity' => $component,
-            'entities' => $actions,
+            'component' => $component,
         ]);
         $viewModel->setTerminal(true);
         return $viewModel;
@@ -167,85 +183,21 @@ class ComponentController extends BaseController
 
 
     /**
-     * Ajax call change action status
-     *
-     * @return JsonModel
+     * Ajax remove a component's one action
      */
-    public function actionstatusAction()
+    public function removeAction()
     {
-        $action_id = $this->params()->fromRoute('key', 0);
+        $action_id = $this->params()->fromRoute('key');
         $action = $this->componentManager->getAction($action_id);
         if (!($action instanceof Action)) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid action id:' . $action_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的接口编号:' . $action_id);
             return ;
         }
 
-        if ($action->getActionStatus() == Action::STATUS_VALIDITY) {
-            $action->setActionStatus(Action::STATUS_INVALID);
-        } else {
-            $action->setActionStatus(Action::STATUS_VALIDITY);
-        }
-
-        $this->componentManager->saveModifiedAction($action);
+        $this->componentManager->removeEntity($action);
 
         return new JsonModel(['success' => true]);
-    }
-
-
-    /**
-     * Ajax call sync component data
-     */
-    public function syncAction()
-    {
-        ignore_user_abort(true);
-        set_time_limit(0);
-
-        $result = [
-            'success' => false,
-            'code' => 0,
-            'message' => '',
-        ];
-
-        // if (!$this->getRequest()->isXmlHttpRequest()) { return $this->getResponse(); }
-
-        $this->getLoggerPlugin()->debug(__METHOD__ . PHP_EOL . 'Start sync component and actions');
-
-        $controllers = $this->getConfigPlugin()->get('controllers.factories');
-        $controllerManager = $this->getEvent()->getApplication()->getServiceManager()->get('ControllerManager');
-
-        $items = [];
-        foreach($controllers as $controllerClassName => $factory) {
-            if (0 !== strpos($controllerClassName, __NAMESPACE__)) {
-                continue;
-            }
-
-            if (!$controllerManager->has($controllerClassName)) {
-                continue;
-            }
-
-            try {
-
-                $controllerInstance = $controllerManager->get($controllerClassName);
-                $method = 'autoRegisterComponent';
-                if (method_exists($controllerInstance, $method)) {
-                    $items[] = $controllerInstance->$method();
-                }
-
-            } catch (\Exception $e) {
-                $this->getLoggerPlugin(__METHOD__ . PHP_EOL . $e->getMessage());
-            }
-        }
-
-        //$items = [$this->autoRegisterComponent()];
-        //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
-
-        $this->componentManager->syncComponents($items);
-
-        $this->getLoggerPlugin()->debug(__METHOD__ . PHP_EOL . 'End synced component and actions');
-
-        $result['success'] = true;
-        return new JsonModel($result);
     }
 
 }

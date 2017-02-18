@@ -4,21 +4,20 @@
         <span aria-hidden="true">&times;</span>
         <span class="sr-only">Close</span>
     </button>
-    <h4 class="modal-title" id="pageModalLabel"><?php echo $entity->getComName(); ?> <small>Actions</small></h4>
+    <h4 class="modal-title" id="pageModalLabel"><?php echo $component->getComName(); ?> <small>功能接口</small></h4>
 </div>
 
 <div class="modal-body">
 
     <table class="table table-striped">
         <tr>
-            <th>Name</th>
-            <th>Actions</th>
+            <th>名称</th>
+            <th>操作</th>
         </tr>
         <?php
-        $statusUrl = urldecode($this->url('admin/component', ['action' => 'actionstatus', 'key' => '%d']));
-        foreach ($entities as $obj) {
+        $actions = $component->getActions();
+        foreach ($actions as $obj) {
             if ($obj instanceof \Admin\Entity\Action) {
-                $list = \Admin\Entity\Action::getActionStatusList();
         ?>
             <tr>
                 <td>
@@ -27,11 +26,9 @@
                     <small><em><?php echo $this->url('admin/component', ['action' => $obj->getActionKey()]); ?></em></small>
                 </td>
                 <td>
-                    <select class="action-status-select">
-                        <?php foreach ($list as $k => $v) { ?>
-                            <option value="<?php echo sprintf($statusUrl, $obj->getActionId()); ?>"<?php echo $k == $obj->getActionStatus() ? ' selected' : ''; ?>><?php echo $v; ?></option>
-                        <?php } ?>
-                    </select>
+                    <a class="remove-action" href="<?php echo $this->url('admin/component', ['action' => 'remove', 'key' => $obj->getActionId()]); ?>">
+                        删除
+                    </a>
                 </td>
             </tr>
         <?php } } ?>
@@ -41,5 +38,5 @@
 
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
 </div>

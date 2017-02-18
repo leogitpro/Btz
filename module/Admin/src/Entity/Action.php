@@ -15,16 +15,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Action
+ *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_action")
  */
 class Action
 {
-
-    const STATUS_INVALID = 0; // Invalid
-    const STATUS_VALIDITY = 1; // Validity
-
     const ICON_DEFAULT = 'caret-right';
 
     const MENU_YES = 1; //
@@ -34,18 +32,12 @@ class Action
 
 
     /**
-     * @var integer
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="action_id", type="integer")
+     * @ORM\Column(name="action_id", type="string", length=36, nullable=false)
      */
     private $actionId;
-
-    /**
-     * @var string
-     * @ORM\Column(name="controller_class", type="string", length=100)
-     */
-    private $controllerClass = '';
 
     /**
      * @var string
@@ -77,29 +69,15 @@ class Action
      */
     private $actionMenu = self::MENU_NO;
 
-    /**
-     * @var int
-     * @ORM\Column(name="action_status", type="integer")
-     */
-    private $actionStatus = self::STATUS_INVALID;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="action_created", type="datetime")
+     * @var Component
+     *
+     * @ORM\ManyToOne(targetEntity="Admin\Entity\Component", inversedBy="actions")
+     * @ORM\JoinColumn(name="controller_key", referencedColumnName="controller_class")
      */
-    private $actionCreated;
+    private $component;
 
-
-    /**
-     * @return array
-     */
-    public static function getActionStatusList()
-    {
-        return [
-            self::STATUS_INVALID => 'Invalid',
-            self::STATUS_VALIDITY => 'Validity',
-        ];
-    }
 
     /**
      * @return int
@@ -117,21 +95,6 @@ class Action
         $this->actionId = $actionId;
     }
 
-    /**
-     * @return string
-     */
-    public function getControllerClass()
-    {
-        return $this->controllerClass;
-    }
-
-    /**
-     * @param string $controllerClass
-     */
-    public function setControllerClass($controllerClass)
-    {
-        $this->controllerClass = $controllerClass;
-    }
 
     /**
      * @return string
@@ -214,49 +177,21 @@ class Action
     }
 
     /**
-     * @return int
+     * @return Component
      */
-    public function getActionStatus()
+    public function getComponent()
     {
-        return $this->actionStatus;
+        return $this->component;
     }
 
     /**
-     * @param int $actionStatus
+     * @param Component $component
      */
-    public function setActionStatus($actionStatus)
+    public function setComponent($component)
     {
-        $this->actionStatus = $actionStatus;
+        $this->component = $component;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getActionCreated()
-    {
-        return $this->actionCreated;
-    }
-
-    /**
-     * @param \DateTime $actionCreated
-     */
-    public function setActionCreated($actionCreated)
-    {
-        $this->actionCreated = $actionCreated;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getActionStatusAsString()
-    {
-        $list = self::getActionStatusList();
-        if (isset($list[$this->getActionStatus()])) {
-            return $list[$this->getActionStatus()];
-        }
-        return 'Unknown';
-    }
 
 
 
