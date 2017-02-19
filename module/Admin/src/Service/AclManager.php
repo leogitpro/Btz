@@ -15,10 +15,10 @@ use Admin\Entity\AclMember;
 use Admin\Entity\Action;
 use Admin\Entity\Component;
 use Admin\Entity\Department;
-use Admin\Entity\DepartmentMember;
 use Admin\Entity\Member;
 use Doctrine\ORM\EntityManager;
 use Zend\Log\Logger;
+
 
 class AclManager extends BaseEntityManager
 {
@@ -32,12 +32,6 @@ class AclManager extends BaseEntityManager
      * @var ComponentManager
      */
     private $componentManager;
-
-
-    /**
-     * @var
-     */
-    private $dmrManager;
 
 
     public function __construct(

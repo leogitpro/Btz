@@ -11,10 +11,6 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
-use Admin\Entity\DepartmentMember;
-use Doctrine\ORM\EntityManager;
-use Ramsey\Uuid\Uuid;
-use Zend\Log\Logger;
 
 
 class DepartmentManager extends BaseEntityManager
