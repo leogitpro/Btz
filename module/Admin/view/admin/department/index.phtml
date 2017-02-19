@@ -22,7 +22,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
                 <th>操作</th>
             </tr>
 
-            <?php $i = 1; foreach ($rows as $dept) { ?>
+            <?php $i = 1; foreach ($rows as $dept) { if($dept->getDeptId() == \Admin\Entity\Department::DEFAULT_DEPT_ID) { continue;} ?>
 
                 <tr>
                     <td><?php echo $i++; ?></td>
@@ -34,44 +34,40 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
                         </span>
                     </td>
                     <td>
-                        <?php if($dept->getDeptId() != \Admin\Entity\Department::DEFAULT_DEPT_ID) { ?>
-                            <ul class="nav nav-pills actions-list" role="tablist">
-                                <li role="presentation" class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                        操作选项 <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <?php if (\Admin\Entity\Department::STATUS_VALID != $dept->getDeptStatus()) { ?>
-                                            <li>
-                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
-                                                    <i class="fa fa-check fa-fw" aria-hidden="true"></i> 启用部门
-                                                </a>
-                                            </li>
+                        <ul class="nav nav-pills actions-list" role="tablist">
+                            <li role="presentation" class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    操作选项 <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <?php if (\Admin\Entity\Department::STATUS_VALID != $dept->getDeptStatus()) { ?>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
+                                                <i class="fa fa-check fa-fw" aria-hidden="true"></i> 启用部门
+                                            </a>
+                                        </li>
 
-                                        <?php } else { ?>
-                                            <li>
-                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
-                                                    <i class="fa fa-times fa-fw" aria-hidden="true"></i> 关闭部门
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
-                                                    <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> 修改信息
-                                                </a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a href="<?php echo $this->url('admin/dept', ['action' => 'members', 'key' => $dept->getDeptId()]); ?>" data-toggle="modal" data-target="#pageModal">
-                                                    <i class="fa fa-users fa-fw" aria-hidden="true"></i> 部门成员管理
-                                                </a>
-                                            </li>
-                                        <?php } ?>
-                                    </ul>
-                                </li>
-                            </ul>
-                        <?php } else { ?>
-                            <ul class="nav nav-pills actions-list" role="tablist"><li><a>&nbsp;</a></li></ul>
-                        <?php } ?>
+                                    <?php } else { ?>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/dept', ['action' => 'status', 'key' => $dept->getDeptId()]); ?>">
+                                                <i class="fa fa-times fa-fw" aria-hidden="true"></i> 关闭部门
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/dept', ['action' => 'edit', 'key' => $dept->getDeptId()]); ?>">
+                                                <i class="fa fa-pencil-square-o fa-fw" aria-hidden="true"></i> 修改信息
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/dept', ['action' => 'members', 'key' => $dept->getDeptId()]); ?>" data-toggle="modal" data-target="#pageModal">
+                                                <i class="fa fa-users fa-fw" aria-hidden="true"></i> 部门成员管理
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+                                </ul>
+                            </li>
+                        </ul>
                     </td>
                 </tr>
 

@@ -116,7 +116,12 @@ class Module
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($controller, $action)) {
-            return $event->getTarget()->redirect()->toRoute('admin/dashboard', ['action' => 'forbidden', 'suffix' => '.html']);
+            $ajaxCall = $event->getTarget()->getRequest()->isXmlHttpRequest();
+            $toAction = 'forbidden';
+            if ($ajaxCall) {
+                $toAction = 'forbiddenajax';
+            }
+            return $event->getTarget()->redirect()->toRoute('admin/dashboard', ['action' => $toAction, 'suffix' => '.html']);
         }
 
     }

@@ -25,7 +25,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                 <th>操作</th>
             </tr>
 
-            <?php $i = 1; foreach ($rows as $member) { ?>
+            <?php $i = 1; foreach ($rows as $member) { if($member->getMemberId() == \Admin\Entity\Member::DEFAULT_MEMBER_ID) {continue;} ?>
 
                 <tr>
                     <td><?php echo $i++; ?></td>
@@ -39,7 +39,6 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                         </span>
                     </td>
                     <td>
-                        <?php if($member->getMemberId() != \Admin\Entity\Member::DEFAULT_MEMBER_ID) { ?>
                         <ul class="nav nav-pills actions-list" role="tablist">
                             <li role="presentation" class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -84,9 +83,6 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                                 </ul>
                             </li>
                         </ul>
-                        <?php } else { ?>
-                            <ul class="nav nav-pills actions-list" role="tablist"><li><a>&nbsp;</a></li></ul>
-                        <?php } ?>
                     </td>
                 </tr>
 

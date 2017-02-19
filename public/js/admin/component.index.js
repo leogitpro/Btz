@@ -46,8 +46,12 @@ $(function () {
 
         //Ajax post
         $.get(url, function (dt) {
-            location.reload();
-        });
+            if (!dt.success) {
+                alert(dt.message);
+            } else {
+                location.reload();
+            }
+        }, 'json');
 
         return false;
     });

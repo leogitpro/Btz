@@ -191,17 +191,7 @@ class NavManager
         $dashboard = $this->createNavItem('dashboard', 'dashboard', 'Dashboard', $url('admin/dashboard'));
         $this->addSideTreeItem($dashboard);
 
-        $member = $this->memberManager->getCurrentMember();
-        if (!($member instanceof Member)) {
-            return ;
-        }
-
-        if (Member::LEVEL_SUPERIOR == $member->getMemberLevel()) {
-            $menus = $this->aclManager->getGlobalMenus();
-        } else {
-            $menus = $this->aclManager->getMemberMenus($member->getMemberId());
-        }
-
+        $menus = $this->aclManager->getMyMenus();
         if (empty($menus)) {
             return;
         }

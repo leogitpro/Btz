@@ -11,6 +11,7 @@ use Admin\Entity\Member;
 use Admin\Service\MemberManager;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class DashboardController extends AbstractActionController
@@ -44,6 +45,16 @@ class DashboardController extends AbstractActionController
     public function forbiddenAction()
     {
         return new ViewModel();
+    }
+
+    /**
+     * Display forbid ajax call
+     *
+     * @return JsonModel
+     */
+    public function forbiddenajaxAction()
+    {
+        return new JsonModel(['success' => false, 'code' => 1001, 'message' => '您当前无权使用这个功能!']);
     }
 
 }

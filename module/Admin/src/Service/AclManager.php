@@ -193,6 +193,25 @@ class AclManager extends BaseEntityManager
     }
 
 
+    /**
+     * Get acl by SQL IN()
+     *
+     * @param array $dept_ids
+     * @return array
+     */
+    public function getDepartmentAndActionAllAclByDepartmentIds($dept_ids)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(AclDepartment::class, 't');
+        $this->getQb()->where($this->getQb()->expr()->in('t.dept', $dept_ids));
+
+        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
 
     /**
      * Get a record for department and action
@@ -270,68 +289,27 @@ class AclManager extends BaseEntityManager
     }
 
 
-
     /**
-     * Get global menu
+     * Get current member menus
      *
      * @return array
      */
-    public function getGlobalMenus()
+    public function getMyMenus()
     {
-        $menu = [];
-        $rows = $this->componentManager->getComponentsForAutoMenu();
-        foreach ($rows as $entity) {
-            if ($entity instanceof Component) {
-                $subMenus = [];
-                $actions = $entity->getActions();
-                foreach ($actions as $action) {
-                    if ($action instanceof Action) {
-                        if (Action::MENU_YES == $action->getActionMenu()) {
-                            $rank = $action->getActionRank();
-                            $subItem = [
-                                'key' => $action->getActionKey(),
-                                'name' => $action->getActionName(),
-                                'icon' => $action->getActionIcon(),
-                            ];
-                            if (!array_key_exists($rank, $subMenus)) {
-                                $subMenus[$rank] = $subItem;
-                            } else {
-                                $subMenus[($rank + rand(1111, 9999))] = $subItem;
-                            }
-                        }
-                    }
-                }
-
-                $item = [
-                    'class' => $entity->getComClass(),
-                    'name' => $entity->getComName(),
-                    'icon' => $entity->getComIcon(),
-                    'route' => $entity->getComRoute(),
-                ];
-                if (!empty($subMenus)) {
-                    krsort($subMenus);
-                    $item['actions'] = $subMenus;
-                }
-
-                $menu[] = $item;
-            }
+        $member = $this->memberManager->getCurrentMember();
+        if (null == $member) {
+            return [];
         }
 
-        return $menu;
-    }
+        $isSupperAdmin = false;
+        $actionIds = [];
+        if (Member::LEVEL_SUPERIOR == $member->getMemberLevel()) {
+            $isSupperAdmin = true;
+        } else {
+            $actionIds = $this->getMemberMergedAcl($member);
+        }
 
-
-    /**
-     * Get a member custom menus
-     *
-     * @param Member $member
-     * @return array
-     */
-    public function getMemberMenus($member)
-    {
-        $actionIds = $this->getMemberMergedAcl($member);
-
-        if (empty($actionIds)) {
+        if (!$isSupperAdmin && empty($actionIds)) {
             return [];
         }
 
@@ -344,7 +322,9 @@ class AclManager extends BaseEntityManager
                 $actions = $entity->getActions();
                 foreach ($actions as $action) {
                     if ($action instanceof Action) {
-                        if (Action::MENU_YES == $action->getActionMenu() && in_array($action->getActionId(), $actionIds)) {
+                        if (Action::MENU_YES == $action->getActionMenu() &&
+                            ($isSupperAdmin || in_array($action->getActionId(), $actionIds))
+                        ) {
                             $rank = $action->getActionRank();
                             $subItem = [
                                 'key' => $action->getActionKey(),
@@ -413,6 +393,14 @@ class AclManager extends BaseEntityManager
         }
 
         // Department acl.
+        $rows = $this->getDepartmentAndActionAllAclByDepartmentIds($departmentIds);
+        foreach ($rows as $acl) {
+            if ($acl instanceof AclDepartment) {
+                $allowedActionIds[$acl->getAction()] = $acl->getAction();
+            }
+        }
+
+        /**
         foreach ($departmentIds as $departmentId) {
             $rows = $this->getDepartmentAndActionAllAclByDepartment($departmentId);
             foreach ($rows as $acl) {
@@ -421,6 +409,7 @@ class AclManager extends BaseEntityManager
                 }
             }
         }
+        //*/
 
         // Merged can access action ids
         $actionIds = [];
