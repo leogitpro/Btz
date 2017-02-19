@@ -12,6 +12,7 @@ namespace Admin\Controller;
 
 use Admin\Entity\Action;
 use Admin\Entity\Component;
+use Admin\Service\AclManager;
 use Admin\Service\ComponentManager;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
@@ -25,6 +26,11 @@ class ComponentController extends BaseController
      */
     private $componentManager;
 
+    /**
+     * @var AclManager
+     */
+    private $aclManager;
+
 
 
     public function onDispatch(MvcEvent $e)
@@ -32,24 +38,9 @@ class ComponentController extends BaseController
         $sm = $e->getApplication()->getServiceManager();
 
         $this->componentManager = $sm->get(ComponentManager::class);
+        $this->aclManager = $sm->get(AclManager::class);
 
         return parent::onDispatch($e);
-    }
-
-
-    /**
-     * @return array
-     */
-    public static function ComponentRegistry()
-    {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统模块', 'admin/component', 1, 'cubes', 14);
-        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
-        $item['actions']['sync'] = self::CreateActionRegistry('sync', '同步系统模块');
-        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除某个模块');
-        $item['actions']['actions'] = self::CreateActionRegistry('actions', '查看模块功能列表');
-        $item['actions']['remove'] = self::CreateActionRegistry('remove', '删除某个功能接口');
-
-        return $item;
     }
 
 
@@ -144,7 +135,17 @@ class ComponentController extends BaseController
             return ;
         }
 
+        // Clean the acl
+        $actions = $component->getActions();
+        foreach ($actions as $action) {
+            if ($action instanceof Action) {
+                $this->aclManager->removeAction($action->getActionId());
+            }
+        }
+
         $comName = $component->getComName();
+
+        // Delete the component and actions
         $this->componentManager->removeEntity($component);
 
         return $this->getMessagePlugin()->show(
@@ -195,9 +196,35 @@ class ComponentController extends BaseController
             return ;
         }
 
+        // Clean the acl
+        $this->aclManager->removeAction($action_id);
+
+        // Delete the action
         $this->componentManager->removeEntity($action);
 
         return new JsonModel(['success' => true]);
     }
+
+
+
+    /**
+     * Controller and actions registry
+     *
+     * @return array
+     */
+    public static function ComponentRegistry()
+    {
+        $item = self::CreateControllerRegistry(__CLASS__, '系统模块', 'admin/component', 1, 'cubes', 14);
+
+        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
+
+        $item['actions']['sync'] = self::CreateActionRegistry('sync', '同步系统模块');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除某个模块');
+        $item['actions']['actions'] = self::CreateActionRegistry('actions', '查看模块功能列表');
+        $item['actions']['remove'] = self::CreateActionRegistry('remove', '删除某个功能接口');
+
+        return $item;
+    }
+
 
 }

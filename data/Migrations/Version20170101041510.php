@@ -32,7 +32,7 @@ class Version20170101041510 extends AbstractMigration
         // Init member table
         $this->addSql(
             'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?)', //Sql
-            ['be152a3e-f423-11e6-a4a4-acbc32bf6185', 'admin@example.com', md5('admin'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
+            ['be152a3e-f423-11e6-a4a4-acbc32bf6185', 'admin@example.com', md5('1212'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
             ['string', 'string', 'string', 'string', 'smallint', 'smallint', 'string'] // Types
         );
 

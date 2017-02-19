@@ -47,56 +47,6 @@ class AclController extends BaseController
     private $componentManager;
 
 
-    public static function ComponentRegistryX()
-    //public function autoRegisterComponent()
-    {
-
-        $item = self::CreateControllerRegistry(__CLASS__, '权限控制', 'admin/acl', 1, 'cogs', 16);
-        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
-
-        return [
-            'controller' => __CLASS__,
-            'name' => '权限控制',
-            'route' => 'admin/acl',
-            'menu' => true,
-            'rank' => 16,
-            'icon' => 'cogs',
-            'actions' => [
-                [
-                    'action' => 'member',
-                    'name' => '个人权限配置',
-                    'menu' => true,
-                    'rank' => 0,
-                    'icon' => 'users',
-                ],
-                [
-                    'action' => 'acl-member',
-                    'name' => '查看个人权限',
-                ],
-                [
-                    'action' => 'acl-member-dispatch',
-                    'name' => '配置个人权限',
-                ],
-                [
-                    'action' => 'department',
-                    'name' => '部门权限配置',
-                    'menu' => true,
-                    'rank' => 0,
-                    'icon' => 'bars',
-                ],
-                [
-                    'action' => 'acl-department',
-                    'name' => '查看部门权限',
-                ],
-                [
-                    'action' => 'acl-department-dispatch',
-                    'name' => '配置部门权限',
-                ],
-            ],
-        ];
-    }
-
-
     public function onDispatch(MvcEvent $e)
     {
         $sm = $e->getApplication()->getServiceManager();
@@ -115,7 +65,7 @@ class AclController extends BaseController
      *
      * @return ViewModel
      */
-    public function memberAction()
+    public function membersAction()
     {
         // Page information
         $page = (int)$this->params()->fromRoute('key', 1);
@@ -128,7 +78,7 @@ class AclController extends BaseController
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
-        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'member', 'key' => '%d']));
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'members', 'key' => '%d']));
         $paginationHelper->setCount($this->memberManager->getMembersCount());
 
         // Render view data
@@ -138,31 +88,30 @@ class AclController extends BaseController
             'entities' => $members,
             'activeId' => __METHOD__,
         ]);
-
     }
 
 
     /**
      * Member acl resources list
      *
-     * @return void|ViewModel
+     * @return ViewModel
      */
-    public function aclMemberAction()
+    public function memberAction()
     {
         $key = $this->params()->fromRoute('key', 0);
-        $params = explode('-', $key);
-        $member_id = (int)array_shift($params);
+        $params = explode('_', $key);
+        $member_id = (string)array_shift($params);
 
         if ($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid control default administrator acl');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止查看超级管理员进行权限配置');
             return ;
         }
 
         $member = $this->memberManager->getMember($member_id);
         if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid administrator id:' . $member_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
             return ;
         }
 
@@ -178,24 +127,23 @@ class AclController extends BaseController
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
-        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'acl-member', 'key' =>  $member_id . '-%d']));
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'member', 'key' =>  $member_id . '_%d']));
         $paginationHelper->setCount($this->componentManager->getComponentsCount());
 
-        $data = $this->componentManager->getComponentsWithActionsByLimitPage($page, $size);
+        $components = $this->componentManager->getComponentsByLimitPage($page, $size);
 
-        $rows = $this->aclManager->getMemberAllAcls($member_id);
-        $acls = [];
+        $rows = $this->aclManager->getMemberAndActionAllAclByMember($member_id);
+        $acl = [];
         foreach ($rows as $row) {
             if ($row instanceof AclMember) {
-                $acls[$row->getActionId()] = $row;
+                $acl[$row->getAction()] = $row;
             }
         }
 
         return new ViewModel([
             'member' => $member,
-            'components' => $data['components'],
-            'actions' => $data['actions'],
-            'acls' => $acls,
+            'components' => $components,
+            'acl' => $acl,
             'activeId' => __CLASS__,
         ]);
     }
@@ -204,38 +152,34 @@ class AclController extends BaseController
     /**
      * Save modified member acl
      *
-     * @return void|JsonModel
+     * @return JsonModel
      */
-    public function aclMemberDispatchAction()
+    public function memberDispatchAction()
     {
-        $result = [
-            'success' => false,
-            'code' => 0,
-            'message' => '',
-        ];
+        $result = ['success' => false, 'code' => 0, 'message' => ''];
 
         $key = $this->params()->fromRoute('key', 0);
-        $params = explode('-', $key);
-        $member_id = (int)array_shift($params);
+        $params = explode('_', $key);
+        $member_id = (string)array_shift($params);
 
         if ($member_id == Member::DEFAULT_MEMBER_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid control default administrator acl');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止对超级管理员进行权限配置');
             return ;
         }
 
         $member = $this->memberManager->getMember($member_id);
         if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid administrator id:' . $member_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
-        $action_id = (int)array_shift($params);
+        $action_id = (string)array_shift($params);
         $action = $this->componentManager->getAction($action_id);
-        if (null == $action || Action::STATUS_VALIDITY != $action->getActionStatus()) {
+        if (null == $action) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid action id:' . $action_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能编号: ' . $action_id);
             return ;
         }
 
@@ -243,15 +187,16 @@ class AclController extends BaseController
         $list = AclMember::getAclStatusList();
         if (!array_key_exists($status, $list)) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid status:' . $status);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '非法的授权类型: ' . $status);
             return ;
         }
 
-        $this->aclManager->saveMemberAcl($member_id, $action_id, $status);
+        $this->aclManager->setMemberAndActionAcl($member_id, $action_id, $status);
 
         $result['success'] = true;
         return new JsonModel($result);
     }
+
 
 
     /**
@@ -259,7 +204,7 @@ class AclController extends BaseController
      *
      * @return ViewModel
      */
-    public function departmentAction()
+    public function departmentsAction()
     {
         // Page information
         $page = (int)$this->params()->fromRoute('key', 1);
@@ -272,7 +217,7 @@ class AclController extends BaseController
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
-        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'department', 'key' => '%d']));
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'departments', 'key' => '%d']));
         $paginationHelper->setCount($this->deptManager->getDepartmentsCount());
 
         // Render view data
@@ -289,24 +234,24 @@ class AclController extends BaseController
     /**
      * Acl department resource list
      *
-     * @return void|ViewModel
+     * @return ViewModel
      */
-    public function aclDepartmentAction()
+    public function departmentAction()
     {
         $key = $this->params()->fromRoute('key', 0);
-        $params = explode('-', $key);
-        $dept_id = (int)array_shift($params);
+        $params = explode('_', $key);
+        $dept_id = array_shift($params);
 
         if ($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid control default department acl');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止操作基础部门');
             return ;
         }
 
         $dept = $this->deptManager->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid department id:' . $dept_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
             return ;
         }
 
@@ -322,28 +267,26 @@ class AclController extends BaseController
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
-        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'acl-department', 'key' =>  $dept_id . '-%d']));
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'department', 'key' =>  $dept_id . '_%d']));
         $paginationHelper->setCount($this->componentManager->getComponentsCount());
 
-        $data = $this->componentManager->getComponentsWithActionsByLimitPage($page, $size);
+        $components = $this->componentManager->getComponentsByLimitPage($page, $size);
 
-        $rows = $this->aclManager->getDepartmentAllAcls($dept_id);
-        $acls = [];
+        $rows = $this->aclManager->getDepartmentAndActionAllAclByDepartment($dept_id);
+        $acl = [];
         foreach ($rows as $row) {
             if ($row instanceof AclDepartment) {
-                $acls[$row->getActionId()] = $row;
+                $acl[$row->getAction()] = $row;
             }
         }
 
         return new ViewModel([
             'dept' => $dept,
-            'components' => $data['components'],
-            'actions' => $data['actions'],
-            'acls' => $acls,
+            'components' => $components,
+            'acl' => $acl,
             'activeId' => __CLASS__,
         ]);
     }
-
 
 
     /**
@@ -351,36 +294,32 @@ class AclController extends BaseController
      *
      * @return void|JsonModel
      */
-    public function aclDepartmentDispatchAction()
+    public function departmentDispatchAction()
     {
-        $result = [
-            'success' => false,
-            'code' => 0,
-            'message' => '',
-        ];
+        $result = ['success' => false, 'code' => 0, 'message' => ''];
 
         $key = $this->params()->fromRoute('key', 0);
-        $params = explode('-', $key);
-        $dept_id = (int)array_shift($params);
+        $params = explode('_', $key);
+        $dept_id = (string)array_shift($params);
 
         if ($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Forbid control default department acl');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止配置基础部门权限');
             return ;
         }
 
         $dept = $this->deptManager->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid department id:' . $dept_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
             return ;
         }
 
-        $action_id = (int)array_shift($params);
+        $action_id = (string)array_shift($params);
         $action = $this->componentManager->getAction($action_id);
-        if (null == $action || Action::STATUS_VALIDITY != $action->getActionStatus()) {
+        if (null == $action) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid action id:' . $action_id);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能:' . $action_id);
             return ;
         }
 
@@ -388,15 +327,36 @@ class AclController extends BaseController
         $list = AclDepartment::getAclStatusList();
         if (!array_key_exists($status, $list)) {
             $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Invalid status:' . $status);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '非法的权限配置信息:' . $status);
             return ;
         }
 
-        $this->aclManager->saveDepartmentAcl($dept_id, $action_id, $status);
+        $this->aclManager->setDepartmentAndActionAcl($dept_id, $action_id, $status);
 
         $result['success'] = true;
         return new JsonModel($result);
     }
 
+
+    /**
+     * Controller and actions registry
+     *
+     * @return array
+     */
+    public static function ComponentRegistry()
+    {
+        $item = self::CreateControllerRegistry(__CLASS__, '权限控制', 'admin/acl', 1, 'cogs', 16);
+
+        $item['actions']['members'] = self::CreateActionRegistry('members', '个人权限配置', 1, 'user', 9);
+        $item['actions']['departments'] = self::CreateActionRegistry('departments', '集体权限配置', 1, 'users', 19);
+
+        $item['actions']['member'] = self::CreateActionRegistry('member', '查看个人权限', 0, null, 8);
+        $item['actions']['member-dispatch'] = self::CreateActionRegistry('member-dispatch', '配置个人权限', 0, null, 7);
+
+        $item['actions']['department'] = self::CreateActionRegistry('department', '查看集体权限', 0, null, 18);
+        $item['actions']['department-dispatch'] = self::CreateActionRegistry('department-dispatch', '配置集体权限', 0, null, 17);
+
+        return $item;
+    }
 
 }

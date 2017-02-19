@@ -17,8 +17,8 @@ class Version20170112095854 extends AbstractMigration
     {
         $table = $schema->createTable('sys_acl_department');
 
-        $table->addColumn('action', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('dept', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('action', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('dept', 'string', ['fixed' => true, 'length' => 36]);
         $table->addColumn('status', 'smallint', ['default' => 0]);
 
         $table->setPrimaryKey(['action', 'dept']);

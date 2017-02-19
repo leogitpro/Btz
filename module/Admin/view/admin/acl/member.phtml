@@ -1,40 +1,59 @@
 <?php
-$this->pageTitleBar('权限配置', '个人权限');
+$this->pageTitleBar('权限配置', '个人权限: ' . $member->getMemberName());
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
+$this->headScript()->appendFile($this->basePath('js/admin/acl.js'));
+
 ?>
 
-    <div class="row">
-        <div class="col-lg-12">
-
-            <table class="table table-striped">
-                <tr>
-                    <th>Administrator</th>
-                    <th>E-mail Address</th>
-                    <th>Level</th>
-                    <th>Actions</th>
-                </tr>
-
-                <?php foreach ($entities as $member) { ?>
-
-                    <tr>
-                        <td><?php echo $member->getMemberName(); ?></td>
-                        <td><?php echo $member->getMemberEmail(); ?></td>
-                        <td><?php echo $member->getMemberLevelAsString(); ?></td>
-                        <td>
-                            <?php if($member->getMemberId() > 1) { ?>
-                                <a href="<?php echo $this->url('admin/acl', ['action' => 'acl-member', 'key' => $member->getMemberId()]); ?>">ACL Setting</a>
-                            <?php } ?>
-                        </td>
-                    </tr>
-
-                <?php } ?>
-
-            </table>
-
-
+<div class="row">
+    <?php
+    foreach ($components as $component) {
+        if ($component instanceof \Admin\Entity\Component) {
+    ?>
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-<?php echo $component->getComIcon(); ?> fa-fw"></i>
+                    <?php echo $component->getComName(); ?>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                    <?php
+                    $url = urldecode($this->url('admin/acl', ['action' => 'member-dispatch', 'key' => $member->getMemberId() . '_%s_%d']));
+                    $actions = $component->getActions();
+                    foreach ($actions as $action) {
+                        if ($action instanceof \Admin\Entity\Action) {
+                            $actionId = $action->getActionId();
+                    ?>
+                        <tr>
+                            <td>
+                                <i class="fa fa-<?php echo $action->getActionIcon(); ?> fa-fw"></i>
+                                <?php echo $action->getActionName(); ?>
+                            </td>
+                            <td class="text-right">
+                                <select class="action-status">
+                                    <?php $list = \Admin\Entity\AclMember::getAclStatusList(); ?>
+                                    <?php if(!array_key_exists($actionId, $acl)) { ?>
+                                        <?php foreach ($list as $k => $v) { ?>
+                                            <option value="<?php echo sprintf($url, $actionId, $k); ?>"<?php echo \Admin\Entity\AclMember::STATUS_DEFAULT == $k ? ' selected' : ''; ?>><?php echo $v; ?></option>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <?php $aclMember = $acl[$actionId]; ?>
+                                        <?php foreach ($list as $k => $v) { ?>
+                                            <option value="<?php echo sprintf($url, $actionId, $k); ?>"<?php echo $aclMember->getStatus() == $k ? ' selected' : ''; ?>><?php echo $v; ?></option>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </select>
+                            </td>
+                        </tr>
+                    <?php } } ?>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
+    <?php } } ?>
 
+</div>
 <?php echo $this->pagination()->render(); ?>

@@ -1,0 +1,29 @@
+<?php
+$this->pageTitleBar('权限配置', '分组权限');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+?>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped">
+                <tr>
+                    <th>部门名称</th>
+                    <th>权限配置</th>
+                </tr>
+                <?php foreach ($entities as $dept) { if($dept->getDeptId() == \Admin\Entity\Department::DEFAULT_DEPT_ID) { continue; } ?>
+
+                    <tr>
+                        <td><?php echo $dept->getDeptName(); ?></td>
+                        <td>
+                            <a href="<?php echo $this->url('admin/acl', ['action' => 'department', 'key' => $dept->getDeptId()]); ?>">进入部门权限配置</a>
+                        </td>
+                    </tr>
+                <?php } ?>
+
+            </table>
+        </div>
+    </div>
+
+<?php echo $this->pagination()->render(); ?>

@@ -46,53 +46,6 @@ class DepartmentController extends BaseController
     }
 
 
-    public static function ComponentRegistryX()
-    //public function autoRegisterComponent()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => '部门管理',
-            'route' => 'admin/dept',
-            'menu' => true,
-            'icon' => 'users',
-            'rank' => 12,
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => '查看部门列表',
-                    'menu' => true,
-                    'icon' => 'bars',
-                    'rank' => 9,
-                ],
-                [
-                    'action' => 'add',
-                    'name' => '创建新部门',
-                    'menu' => true,
-                    'icon' => 'plus',
-                    'rank' => 1,
-                ],
-                [
-                    'action' => 'status',
-                    'name' => '启用/禁用部门',
-                ],
-                [
-                    'action' => 'edit',
-                    'name' => '修改部门信息',
-                ],
-                [
-                    'action' => 'members',
-                    'name' => '查看部门成员',
-                ],
-                [
-                    'action' => 'updateMembers',
-                    'name' => '分配部门成员',
-                ],
-            ],
-        ];
-
-    }
-
-
     /**
      * List departments
      *
@@ -390,4 +343,27 @@ class DepartmentController extends BaseController
 
         return new JsonModel($json);
     }
+
+
+
+    /**
+     * Controller and actions registry
+     *
+     * @return array
+     */
+    public static function ComponentRegistry()
+    {
+        $item = self::CreateControllerRegistry(__CLASS__, '部门管理', 'admin/dept', 1, 'users', 12);
+
+        $item['actions']['index'] = self::CreateActionRegistry('index', '查看部门列表', 1, 'bars', 9);
+        $item['actions']['add'] = self::CreateActionRegistry('add', '创建新部门', 1, 'plus', 1);
+
+        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/禁用部门');
+        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改部门信息');
+        $item['actions']['members'] = self::CreateActionRegistry('members', '查看部门成员');
+        $item['actions']['update-members'] = self::CreateActionRegistry('update-members', '分配部门成员');
+
+        return $item;
+    }
+
 }

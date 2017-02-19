@@ -102,8 +102,6 @@ class Module
         // Set module default template
         $viewModel->setTemplate('layout/admin_layout');
 
-        return ;
-
         $whiteListControllers = [
             ProfileController::class,
             DashboardController::class,
@@ -114,10 +112,10 @@ class Module
 
         // ACL filter
         $action = $event->getRouteMatch()->getParam('action', null);
-        $action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
+        //$action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
 
         $aclManager = $serviceManager->get(AclManager::class);
-        if (!$aclManager->isValid($authService->getIdentity(), $controller, $action)) {
+        if (!$aclManager->isValid($controller, $action)) {
             return $event->getTarget()->redirect()->toRoute('admin/dashboard', ['action' => 'forbidden', 'suffix' => '.html']);
         }
 

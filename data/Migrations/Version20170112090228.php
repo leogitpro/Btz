@@ -17,8 +17,8 @@ class Version20170112090228 extends AbstractMigration
     {
         $table = $schema->createTable('sys_acl_member');
 
-        $table->addColumn('action', 'integer', ['unsigned' => true, 'default' => 0]);
-        $table->addColumn('member', 'integer', ['unsigned' => true, 'default' => 0]);
+        $table->addColumn('action', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('member', 'string', ['fixed' => true, 'length' => 36]);
         $table->addColumn('status', 'smallint', ['default' => 0]);
 
         $table->setPrimaryKey(['action', 'member']);

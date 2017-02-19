@@ -35,6 +35,7 @@ class BaseController extends AbstractActionController
      */
     protected static function CreateControllerRegistry($controller, $name, $route, $menu = 0, $icon = 'list', $rank = 0)
     {
+        if (empty($icon)) { $icon = 'list'; }
         return [
             'controller' => $controller,
             'name' => $name,
@@ -57,6 +58,7 @@ class BaseController extends AbstractActionController
      */
     protected static function CreateActionRegistry($action, $name, $menu = 0, $icon = 'caret-right', $rank = 0)
     {
+        if (empty($icon)) { $icon = 'caret-right'; }
         return [
             'action' => $action,
             'name' => $name,

@@ -190,7 +190,6 @@ class NavManager
 
         $dashboard = $this->createNavItem('dashboard', 'dashboard', 'Dashboard', $url('admin/dashboard'));
         $this->addSideTreeItem($dashboard);
-return;
 
         $member = $this->memberManager->getCurrentMember();
         if (!($member instanceof Member)) {

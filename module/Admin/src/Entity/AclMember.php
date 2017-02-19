@@ -15,8 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class AclMember
+ *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_acl_member")
  */
 class AclMember
@@ -26,37 +28,28 @@ class AclMember
     const STATUS_FORBIDDEN = 2;
     const STATUS_DEFAULT = 0;
 
+
     /**
-     * @var integer
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="action", type="string", length=36, nullable=false)
      */
-    private $id = 0;
+    private $action = '';
 
     /**
-     * @var int
-     * @ORM\Column(name="action_id", type="integer")
+     * @var string
+     *
+     * @ORM\Id
+     * @ORM\Column(name="member", type="string", length=36, nullable=false)
      */
-    private $actionId = 0;
-
-    /**
-     * @var int
-     * @ORM\Column(name="member_id", type="integer")
-     */
-    private $memberId = 0;
+    private $member = '';
 
     /**
      * @var int
      * @ORM\Column(name="status", type="smallint")
      */
     private $status = self::STATUS_DEFAULT;
-
-    /**
-     * @var \DateTime
-     * @ORM\Column(name="created", type="datetime")
-     */
-    private $created;
 
 
     /**
@@ -65,9 +58,9 @@ class AclMember
     public static function getAclStatusList()
     {
         return [
+            self::STATUS_DEFAULT => '暂不设定',
             self::STATUS_ALLOWED => '允许访问',
             self::STATUS_FORBIDDEN => '禁止访问',
-            self::STATUS_DEFAULT => '暂不设定',
         ];
     }
 
@@ -81,55 +74,39 @@ class AclMember
         if (isset($list[$this->status])) {
             return $list[$this->status];
         }
-        return 'Unknown';
+        return '未知设定';
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getAction()
     {
-        return $this->id;
+        return $this->action;
     }
 
     /**
-     * @param int $id
+     * @param string $action
      */
-    public function setId($id)
+    public function setAction($action)
     {
-        $this->id = $id;
+        $this->action = $action;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getActionId()
+    public function getMember()
     {
-        return $this->actionId;
+        return $this->member;
     }
 
     /**
-     * @param int $actionId
+     * @param string $member
      */
-    public function setActionId($actionId)
+    public function setMember($member)
     {
-        $this->actionId = $actionId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMemberId()
-    {
-        return $this->memberId;
-    }
-
-    /**
-     * @param int $memberId
-     */
-    public function setMemberId($memberId)
-    {
-        $this->memberId = $memberId;
+        $this->member = $member;
     }
 
     /**
@@ -148,21 +125,6 @@ class AclMember
         $this->status = $status;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
-
-    /**
-     * @param \DateTime $created
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-    }
 
     
 

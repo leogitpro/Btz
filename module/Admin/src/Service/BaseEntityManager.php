@@ -119,4 +119,16 @@ class BaseEntityManager
     }
 
 
+    /**
+     * @param array $entities
+     */
+    public function removeEntities($entities)
+    {
+        foreach ($entities as $entity) {
+            $this->entityManager->remove($entity);
+        }
+        $this->entityManager->flush();
+    }
+
+
 }

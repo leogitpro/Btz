@@ -46,112 +46,6 @@ class MemberController extends BaseController
     }
 
 
-    public static function ComponentRegistryX()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => '成员管理',
-            'route' => 'admin/member',
-            'menu' => true,
-            'icon' => 'user',
-            'rank' => 10,
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => '查看成员列表',
-                    'icon' => 'bars',
-                    'menu' => true,
-                    'rank' => 9,
-                ],
-                [
-                    'action' => 'add',
-                    'name' => '创建新成员',
-                    'icon' => 'user-plus',
-                    'menu' => true,
-                    'rank' => 1,
-                ],
-                [
-                    'action' => 'edit',
-                    'name' => '修改成员资料',
-                ],
-                [
-                    'action' => 'status',
-                    'name' => '启用/禁用成员'
-                ],
-                [
-                    'action' => 'level',
-                    'name' => '修改成员等级'
-                ],
-                [
-                    'action' => 'password',
-                    'name' => '修改成员密码'
-                ],
-                [
-                    'action' => 'departments',
-                    'name' => '查看成员部门'
-                ],
-                [
-                    'action' => 'updateDepartments',
-                    'name' => '分配成员部门'
-                ],
-            ],
-        ];
-    }
-
-
-    public function autoRegisterComponent()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => '成员管理',
-            'route' => 'admin/member',
-            'menu' => true,
-            'icon' => 'user',
-            'rank' => 10,
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => '查看成员列表',
-                    'icon' => 'bars',
-                    'menu' => true,
-                    'rank' => 9,
-                ],
-                [
-                    'action' => 'add',
-                    'name' => '创建新成员',
-                    'icon' => 'user-plus',
-                    'menu' => true,
-                    'rank' => 1,
-                ],
-                [
-                    'action' => 'edit',
-                    'name' => '修改成员资料',
-                ],
-                [
-                    'action' => 'status',
-                    'name' => '启用/禁用成员'
-                ],
-                [
-                    'action' => 'level',
-                    'name' => '修改成员等级'
-                ],
-                [
-                    'action' => 'password',
-                    'name' => '修改成员密码'
-                ],
-                [
-                    'action' => 'departments',
-                    'name' => '查看成员部门'
-                ],
-                [
-                    'action' => 'updateDepartments',
-                    'name' => '分配成员部门'
-                ],
-            ],
-        ];
-    }
-
-
     /**
      * Show administrator list page
      *
@@ -527,6 +421,27 @@ class MemberController extends BaseController
     }
 
 
+    /**
+     * Controller and actions registry
+     *
+     * @return array
+     */
+    public static function ComponentRegistry()
+    {
+        $item = self::CreateControllerRegistry(__CLASS__, '成员管理', 'admin/member', 1, 'user', 10);
+
+        $item['actions']['index'] = self::CreateActionRegistry('index', '查看成员列表', 1, 'bars', 9);
+        $item['actions']['add'] = self::CreateActionRegistry('add', '创建新成员', 1, 'user-plus', 1);
+
+        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/禁用成员');
+        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改成员资料');
+        $item['actions']['level'] = self::CreateActionRegistry('level', '修改成员等级');
+        $item['actions']['password'] = self::CreateActionRegistry('password', '修改成员密码');
+        $item['actions']['departments'] = self::CreateActionRegistry('departments', '查看成员所属部门');
+        $item['actions']['update-departments'] = self::CreateActionRegistry('update-departments', '分配成员到部门');
+
+        return $item;
+    }
 
 
 }

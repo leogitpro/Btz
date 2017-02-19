@@ -14,8 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class AclDepartment
+ *
  * @package Admin\Entity
- * @ORM\Entity()
+ *
+ * @ORM\Entity
  * @ORM\Table(name="sys_acl_department")
  */
 class AclDepartment
@@ -25,36 +27,26 @@ class AclDepartment
     const STATUS_FORBIDDEN = 0;
 
     /**
-     * @var integer
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="action", type="string", length=36, nullable=false)
      */
-    private $id = 0;
+    private $action = '';
 
     /**
-     * @var int
-     * @ORM\Column(name="action_id", type="integer")
+     * @var string
+     *
+     * @ORM\Id
+     * @ORM\Column(name="dept", type="string", length=36, nullable=false)
      */
-    private $actionId = 0;
-
-    /**
-     * @var int
-     * @ORM\Column(name="dept_id", type="integer")
-     */
-    private $deptId = 0;
+    private $dept = 0;
 
     /**
      * @var int
      * @ORM\Column(name="status", type="smallint")
      */
     private $status = self::STATUS_FORBIDDEN;
-
-    /**
-     * @var \DateTime
-     * @ORM\Column(name="created", type="datetime")
-     */
-    private $created;
 
 
     /**
@@ -77,55 +69,39 @@ class AclDepartment
         if (isset($list[$this->status])) {
             return $list[$this->status];
         }
-        return 'Unknown';
+        return '未知配置';
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getAction()
     {
-        return $this->id;
+        return $this->action;
     }
 
     /**
-     * @param int $id
+     * @param string $action
      */
-    public function setId($id)
+    public function setAction($action)
     {
-        $this->id = $id;
+        $this->action = $action;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getActionId()
+    public function getDept()
     {
-        return $this->actionId;
+        return $this->dept;
     }
 
     /**
-     * @param int $actionId
+     * @param string $dept
      */
-    public function setActionId($actionId)
+    public function setDept($dept)
     {
-        $this->actionId = $actionId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDeptId()
-    {
-        return $this->deptId;
-    }
-
-    /**
-     * @param int $deptId
-     */
-    public function setDeptId($deptId)
-    {
-        $this->deptId = $deptId;
+        $this->dept = $dept;
     }
 
     /**
@@ -144,21 +120,6 @@ class AclDepartment
         $this->status = $status;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
-
-    /**
-     * @param \DateTime $created
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-    }
 
 
 }

@@ -14,6 +14,7 @@ use Admin\Entity\AclDepartment;
 use Admin\Entity\AclMember;
 use Admin\Entity\Action;
 use Admin\Entity\Component;
+use Admin\Entity\Department;
 use Admin\Entity\DepartmentMember;
 use Admin\Entity\Member;
 use Doctrine\ORM\EntityManager;
@@ -54,158 +55,220 @@ class AclManager extends BaseEntityManager
 
 
     /**
-     * @param int $memberId
+     * Get all acl, max records: 200
+     *
+     * @param string $action
      * @return array
      */
-    private function getMemberMergedAcls($memberId)
+    public function getMemberAndActionAllAclByAction($action)
     {
-        $forbiddenActionIds = [];
-        $allowedActionIds = [];
+        $this->resetQb();
 
-        $rows = $this->getMemberAllAcls($memberId);
-        foreach ($rows as $acl) {
-            if ($acl instanceof AclMember) {
-                if (AclMember::STATUS_FORBIDDEN == $acl->getStatus()) {
-                    $forbiddenActionIds[$acl->getActionId()] = $acl->getActionId();
-                }
-                if (AclMember::STATUS_ALLOWED == $acl->getStatus()) {
-                    $allowedActionIds[$acl->getActionId()] = $acl->getActionId();
-                }
-            }
-        }
+        $this->getQb()->select('t')->from(AclMember::class, 't');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.action', '?1'));
+        $this->getQb()->setParameter(1, $action);
 
-        $this->logger->debug('Member personal forbidden access actions:' . implode('-', $forbiddenActionIds));
-        $this->logger->debug('Member personal allowed access actions:' . implode('-', $allowedActionIds));
+        $this->getQb()->setMaxResults(200)->setFirstResult(0);
 
-        // Member departments
-        $deptIds = [];
-        $relations = $this->dmrManager->memberRelations($memberId);
-        foreach ($relations as $relation) {
-            if ($relation instanceof DepartmentMember) {
-                $deptIds[$relation->getDeptId()] = $relation->getDeptId();
-            }
-        }
-        $this->logger->debug('My belong departments:' . implode('-', $deptIds));
+        return $this->getEntitiesFromPersistence();
+    }
 
-        // Department acls
-        foreach ($deptIds as $deptId) {
-            $rows = $this->getDepartmentAcls($deptId);
-            foreach ($rows as $acl) {
-                if ($acl instanceof AclDepartment) {
-                    $allowedActionIds[$acl->getActionId()] = $acl->getActionId();
-                }
-            }
-        }
 
-        $actionIds = [];
-        foreach ($allowedActionIds as $id) {
-            if (!in_array($id, $forbiddenActionIds)) {
-                $actionIds[$id] = $id;
-            }
-        }
-        $this->logger->debug("The final can access actions: " . implode('-', $actionIds));
 
-        return [
-            'allowed' => $actionIds,
-            'forbidden' => $forbiddenActionIds,
-        ];
+    /**
+     * Get a member all actions, max records: 200
+     *
+     * @param string $member_id
+     * @return array
+     */
+    public function getMemberAndActionAllAclByMember($member_id)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(AclMember::class, 't');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.member', '?1'));
+        $this->getQb()->setParameter(1, $member_id);
+
+        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
     /**
-     * @param int $memberId
-     * @param string $controllerClass
-     * @param string $actionKey
+     * Get a record for member and action
+     *
+     * @param string $member
+     * @param string $action
+     * @return AclMember
+     */
+    public function getMemberAndActionAcl($member, $action)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(AclMember::class, 't');
+        $this->getQb()->where(
+            $this->getQb()->expr()->andX(
+                $this->getQb()->expr()->eq('t.member', '?1'),
+                $this->getQb()->expr()->eq('t.action', '?2')
+            )
+        );
+        $this->getQb()->setParameter(1, $member)->setParameter(2, $action);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * Setting member to action ACL
+     *
+     * @param string $member
+     * @param string $action
+     * @param int $status
      * @return bool
      */
-    public function isValid($memberId, $controllerClass, $actionKey)
+    public function setMemberAndActionAcl($member, $action, $status)
     {
-        $member = $this->memberManager->getMember($memberId);
-        if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
-            return false;
-        }
-
-        if (Member::LEVEL_SUPERIOR == $member->getMemberLevel()) { // For supper administrator
+        $acl = $this->getMemberAndActionAcl($member, $action);
+        if (AclMember::STATUS_DEFAULT == $status) {
+            if ($acl instanceof AclMember) {
+                $this->removeEntity($acl);
+            }
             return true;
         }
 
-        $component = $this->componentManager->getComponentByClass($controllerClass);
-        if (null == $component || Component::STATUS_VALIDITY != $component->getComStatus()) {
-            return false;
+        if ($acl instanceof AclMember) {
+            $acl->setStatus($status);
+            $this->saveModifiedEntity($acl);
+        } else {
+            $acl = new AclMember();
+            $acl->setMember($member);
+            $acl->setAction($action);
+            $acl->setStatus($status);
+            $this->saveModifiedEntity($acl);
         }
 
-        $action = $this->componentManager->getComponentAction($controllerClass, $actionKey);
-        if (null == $action || Action::STATUS_VALIDITY != $action->getActionStatus()) {
-            return false;
-        }
-        $actionId = $action->getActionId();
+        return true;
+    }
 
-        $acl = $this->getMemberMergedAcls($memberId);
-        if (in_array($actionId, $acl['forbidden'])) {
-            return false;
-        }
 
-        if (in_array($actionId, $acl['allowed'])) {
-            return true;
-        }
 
-        return false;
+    /**
+     * Get all acl, max records: 200
+     *
+     * @param string $action
+     * @return array
+     */
+    public function getDepartmentAndActionAllAclByAction($action)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(AclDepartment::class, 't');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.action', '?1'));
+        $this->getQb()->setParameter(1, $action);
+
+        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
     /**
-     * Get a member custom menus
+     * Get all acl, max records: 200
      *
-     * @param int $memberId
+     * @param string $dept_id
      * @return array
      */
-    public function getMemberMenus($memberId)
+    public function getDepartmentAndActionAllAclByDepartment($dept_id)
     {
-        $acl = $this->getMemberMergedAcls($memberId);
-        $actionIds = $acl['allowed'];
-        if (empty($actionIds)) {
-            return [];
-        }
+        $this->resetQb();
 
-        $actions = [];
-        $componentClasses = [];
-        $entities = $this->componentManager->getActionsByIds($actionIds);
-        foreach ($entities as $entity) {
-            if ($entity instanceof Action) {
-                if ($entity->getActionStatus() == Action::STATUS_VALIDITY && $entity->getActionMenu() == Action::MENU_YES) {
-                    $componentClasses[$entity->getControllerClass()] = $entity->getControllerClass();
-                    $actions[$entity->getControllerClass()][$entity->getActionId()] = [
-                        'key' => $entity->getActionKey(),
-                        'name' => $entity->getActionName(),
-                        'icon' => $entity->getActionIcon(),
-                    ];
-                }
-            }
-        }
+        $this->getQb()->select('t')->from(AclDepartment::class, 't');
+        $this->getQb()->where($this->getQb()->expr()->eq('t.dept', '?1'));
+        $this->getQb()->setParameter(1, $dept_id);
 
-        if (empty($componentClasses)) {
-            return [];
-        }
+        $this->getQb()->setMaxResults(200)->setFirstResult(0);
 
-        $components = [];
-        $entities = $this->componentManager->getComponentsByClasses($componentClasses);
-        foreach ($entities as $entity) {
-            if ($entity instanceof Component) {
-                if (Component::STATUS_VALIDITY == $entity->getComStatus() && Component::MENU_YES == $entity->getComMenu()) {
-                    $item = [
-                        'class' => $entity->getComClass(),
-                        'name' => $entity->getComName(),
-                        'icon' => $entity->getComIcon(),
-                        'route' => $entity->getComRoute(),
-                        'actions' => $actions[$entity->getComClass()],
-                    ];
-                    $components[] = $item;
-                }
-            }
-        }
-
-        return $components;
+        return $this->getEntitiesFromPersistence();
     }
+
+
+
+    /**
+     * Get a record for department and action
+     *
+     * @param string $dept
+     * @param string $action
+     * @return AclDepartment
+     */
+    public function getDepartmentAndActionAcl($dept, $action)
+    {
+        $this->resetQb();
+
+        $this->getQb()->select('t')->from(AclDepartment::class, 't');
+        $this->getQb()->where(
+            $this->getQb()->expr()->andX(
+                $this->getQb()->expr()->eq('t.dept', '?1'),
+                $this->getQb()->expr()->eq('t.action', '?2')
+            )
+        );
+        $this->getQb()->setParameter(1, $dept)->setParameter(2, $action);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * Setting department to action ACL
+     *
+     * @param string $dept
+     * @param string $action
+     * @param int $status
+     * @return bool
+     */
+    public function setDepartmentAndActionAcl($dept, $action, $status)
+    {
+        $acl = $this->getDepartmentAndActionAcl($dept, $action);
+        if (AclDepartment::STATUS_FORBIDDEN == $status) {
+            if ($acl instanceof AclDepartment) {
+                $this->removeEntity($acl);
+            }
+            return true;
+        }
+
+        if ($acl instanceof AclDepartment) {
+            $acl->setStatus($status);
+            $this->saveModifiedEntity($acl);
+        } else {
+            $acl = new AclDepartment();
+            $acl->setDept($dept);
+            $acl->setAction($action);
+            $acl->setStatus($status);
+            $this->saveModifiedEntity($acl);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Remove a action all acl
+     *
+     * @param string $action
+     */
+    public function removeAction($action)
+    {
+        $rows = $this->getMemberAndActionAllAclByAction($action);
+        if (!empty($rows)) {
+            $this->removeEntities($rows);
+        }
+
+        $rows = $this->getDepartmentAndActionAllAclByAction($action);
+        if (!empty($rows)) {
+            $this->removeEntities($rows);
+        }
+    }
+
 
 
     /**
@@ -219,16 +282,22 @@ class AclManager extends BaseEntityManager
         $rows = $this->componentManager->getComponentsForAutoMenu();
         foreach ($rows as $entity) {
             if ($entity instanceof Component) {
-                $actions = [];
-                $_rows = $this->componentManager->getComponentActions($entity);
-                foreach ($_rows as $_entity) {
-                    if ($_entity instanceof Action) {
-                        if (Action::MENU_YES == $_entity->getActionMenu()) {
-                            $actions[] = [
-                                'key' => $_entity->getActionKey(),
-                                'name' => $_entity->getActionName(),
-                                'icon' => $_entity->getActionIcon(),
+                $subMenus = [];
+                $actions = $entity->getActions();
+                foreach ($actions as $action) {
+                    if ($action instanceof Action) {
+                        if (Action::MENU_YES == $action->getActionMenu()) {
+                            $rank = $action->getActionRank();
+                            $subItem = [
+                                'key' => $action->getActionKey(),
+                                'name' => $action->getActionName(),
+                                'icon' => $action->getActionIcon(),
                             ];
+                            if (!array_key_exists($rank, $subMenus)) {
+                                $subMenus[$rank] = $subItem;
+                            } else {
+                                $subMenus[($rank + rand(1111, 9999))] = $subItem;
+                            }
                         }
                     }
                 }
@@ -239,8 +308,9 @@ class AclManager extends BaseEntityManager
                     'icon' => $entity->getComIcon(),
                     'route' => $entity->getComRoute(),
                 ];
-                if (!empty($actions)) {
-                    $item['actions'] = $actions;
+                if (!empty($subMenus)) {
+                    krsort($subMenus);
+                    $item['actions'] = $subMenus;
                 }
 
                 $menu[] = $item;
@@ -252,204 +322,163 @@ class AclManager extends BaseEntityManager
 
 
     /**
-     * Get a acl for member and action
+     * Get a member custom menus
      *
-     * @param $member_id
-     * @param $action_id
-     * @return AclMember
-     */
-    public function getMemberActionAcl($member_id, $action_id)
-    {
-        return $this->getMemberUniverseAcl([
-            'actionId' => $action_id,
-            'memberId' => $member_id,
-        ]);
-    }
-
-    /**
-     * Get a acl for member with action
-     *
-     * @param array $criteria
-     * @param null|array $order
-     * @return AclMember
-     */
-    private function getMemberUniverseAcl($criteria = [], $order = null)
-    {
-        return $this->entityManager->getRepository(AclMember::class)->findOneBy($criteria, $order);
-    }
-
-
-    /**
-     * Get a member all actions, max records: 200
-     *
-     * @param $member_id
+     * @param Member $member
      * @return array
      */
-    public function getMemberAllAcls($member_id)
+    public function getMemberMenus($member)
     {
-        return $this->getMemberUniverseAcls(['memberId' => $member_id], null, 200);
-    }
+        $actionIds = $this->getMemberMergedAcl($member);
 
-
-    /**
-     * Get member all allowed acls
-     *
-     * @param int $member_id
-     * @return array
-     */
-    public function getMemberAllowedAcls($member_id)
-    {
-        return $this->getMemberUniverseAcls([
-            'memberId' => $member_id,
-            'status' => AclMember::STATUS_ALLOWED,
-        ], null, 200);
-    }
-
-
-    /**
-     * Get member all forbidden acls
-     *
-     * @param int $member_id
-     * @return array
-     */
-    public function getMemberForbiddenAcls($member_id)
-    {
-        return $this->getMemberUniverseAcls([
-            'memberId' => $member_id,
-            'status' => AclMember::STATUS_FORBIDDEN,
-        ], null, 200);
-    }
-
-
-
-    /**
-     * Get member acl configurations
-     *
-     * @param array $criteria
-     * @param null $order
-     * @param int $limit
-     * @param int $offset
-     * @return array
-     */
-    private function getMemberUniverseAcls($criteria = [], $order = null, $limit = 10, $offset = 0)
-    {
-        return $this->entityManager->getRepository(AclMember::class)->findBy($criteria, $order, $limit, $offset);
-    }
-
-
-    /**
-     * Get a acl for department with action
-     *
-     * @param $dept_id
-     * @param $action_id
-     * @return AclDepartment
-     */
-    public function getDepartmentActionAcl($dept_id, $action_id)
-    {
-        return $this->getDepartmentUniverseAcl([
-            'deptId' => $dept_id,
-            'actionId' => $action_id,
-        ]);
-    }
-
-
-    /**
-     * Get a acl for department
-     *
-     * @param array $criteria
-     * @param null|array $order
-     * @return AclDepartment
-     */
-    private function getDepartmentUniverseAcl($criteria = [], $order = null)
-    {
-        return $this->entityManager->getRepository(AclDepartment::class)->findOneBy($criteria, $order);
-    }
-
-
-
-    /**
-     * Get a department all valid actions, max records: 200
-     *
-     * @param integer $dept_id
-     * @return array
-     */
-    public function getDepartmentAcls($dept_id)
-    {
-        return $this->getDepartmentUniverseAcls([
-            'deptId' => $dept_id,
-            'status' => AclDepartment::STATUS_ALLOWED,
-        ], null, 200);
-    }
-
-
-    /**
-     * Get a department all actions, max records: 200
-     *
-     * @param integer $dept_id
-     * @return array
-     */
-    public function getDepartmentAllAcls($dept_id)
-    {
-        return $this->getDepartmentUniverseAcls(['deptId' => $dept_id], null, 200);
-    }
-
-
-    /**
-     * Get department acl configurations
-     *
-     * @param array $criteria
-     * @param null $order
-     * @param int $limit
-     * @param int $offset
-     * @return array
-     */
-    private function getDepartmentUniverseAcls($criteria = [], $order = null, $limit = 10, $offset = 0)
-    {
-        return $this->entityManager->getRepository(AclDepartment::class)->findBy($criteria, $order, $limit, $offset);
-    }
-
-
-    /**
-     * Save edited member acl
-     *
-     * @param integer $member_id
-     * @param integer $action_id
-     * @param integer $status
-     * @return AclMember
-     */
-    public function saveMemberAcl($member_id, $action_id, $status)
-    {
-        $acl = $this->getMemberActionAcl($member_id, $action_id);
-        if (null == $acl) {
-            $acl = new AclMember();
-            $acl->setActionId($action_id);
-            $acl->setMemberId($member_id);
-            $acl->setCreated(new \DateTime());
+        if (empty($actionIds)) {
+            return [];
         }
-        $acl->setStatus($status);
-        return $this->saveModifiedEntity($acl);
+
+        // Rebuild menu
+        $menu = [];
+        $rows = $this->componentManager->getComponentsForAutoMenu();
+        foreach ($rows as $entity) {
+            if ($entity instanceof Component) {
+                $subMenus = [];
+                $actions = $entity->getActions();
+                foreach ($actions as $action) {
+                    if ($action instanceof Action) {
+                        if (Action::MENU_YES == $action->getActionMenu() && in_array($action->getActionId(), $actionIds)) {
+                            $rank = $action->getActionRank();
+                            $subItem = [
+                                'key' => $action->getActionKey(),
+                                'name' => $action->getActionName(),
+                                'icon' => $action->getActionIcon(),
+                            ];
+                            if (!array_key_exists($rank, $subMenus)) {
+                                $subMenus[$rank] = $subItem;
+                            } else {
+                                $subMenus[($rank + rand(1111, 9999))] = $subItem;
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($subMenus)) {
+                    $item = [
+                        'class' => $entity->getComClass(),
+                        'name' => $entity->getComName(),
+                        'icon' => $entity->getComIcon(),
+                        'route' => $entity->getComRoute(),
+                    ];
+
+                    krsort($subMenus);
+                    $item['actions'] = $subMenus;
+
+                    $menu[] = $item;
+                }
+            }
+        }
+
+        return $menu;
     }
 
 
     /**
-     * Save edited department acl
-     *
-     * @param integer $dept_id
-     * @param integer $action_id
-     * @param integer $status
-     * @return AclDepartment
+     * @param Member $member
+     * @return array
      */
-    public function saveDepartmentAcl($dept_id, $action_id, $status)
+    private function getMemberMergedAcl($member)
     {
-        $acl = $this->getDepartmentActionAcl($dept_id, $action_id);
-        if (null == $acl) {
-            $acl = new AclDepartment();
-            $acl->setActionId($action_id);
-            $acl->setDeptId($dept_id);
-            $acl->setCreated(new \DateTime());
+        $forbiddenActionIds = [];
+        $allowedActionIds = [];
+
+        $rows = $this->getMemberAndActionAllAclByMember($member->getMemberId());
+        foreach ($rows as $acl) {
+            if ($acl instanceof AclMember) {
+                if (AclMember::STATUS_FORBIDDEN == $acl->getStatus()) {
+                    $forbiddenActionIds[$acl->getAction()] = $acl->getAction();
+                }
+                if (AclMember::STATUS_ALLOWED == $acl->getStatus()) {
+                    $allowedActionIds[$acl->getAction()] = $acl->getAction();
+                }
+            }
         }
-        $acl->setStatus($status);
-        return $this->saveModifiedEntity($acl);
+
+        // Member departments
+        $departmentIds = [];
+        $departments = $member->getDepts();
+        foreach ($departments as $department) {
+            if ($department instanceof Department) {
+                if ($department->getDeptStatus() == Department::STATUS_VALID) {
+                    $departmentIds[$department->getDeptId()] = $department->getDeptId();
+                }
+            }
+        }
+
+        // Department acl.
+        foreach ($departmentIds as $departmentId) {
+            $rows = $this->getDepartmentAndActionAllAclByDepartment($departmentId);
+            foreach ($rows as $acl) {
+                if ($acl instanceof AclDepartment) {
+                    $allowedActionIds[$acl->getAction()] = $acl->getAction();
+                }
+            }
+        }
+
+        // Merged can access action ids
+        $actionIds = [];
+        foreach ($allowedActionIds as $id) {
+            if (!in_array($id, $forbiddenActionIds)) {
+                $actionIds[$id] = $id;
+            }
+        }
+        return $actionIds;
     }
+
+
+    /**
+     * Access validate.
+     *
+     * @param string $controllerClass
+     * @param string $actionKey
+     * @return bool
+     */
+    public function isValid($controllerClass, $actionKey)
+    {
+        $member = $this->memberManager->getCurrentMember();
+
+        if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
+            return false;
+        }
+
+        if (Member::LEVEL_SUPERIOR == $member->getMemberLevel()) { // For supper administrator
+            return true;
+        }
+
+        $allowed = $this->getMemberMergedAcl($member);
+        if (empty($allowed)) {
+            return false;
+        }
+
+        $component = $this->componentManager->getComponent($controllerClass);
+        if (null == $component) {
+            return false;
+        }
+
+        $actionId = null;
+        $actions = $component->getActions();
+        foreach ($actions as $action) {
+            if ($action instanceof Action) {
+                if ($actionKey == $action->getActionKey()) {
+                    $actionId = $action->getActionId();
+                    break;
+                }
+            }
+        }
+
+        if (empty($actionId)) {
+            return false;
+        }
+
+        return in_array($actionId, $allowed);
+    }
+
 
 }
