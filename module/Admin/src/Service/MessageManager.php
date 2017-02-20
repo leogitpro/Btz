@@ -9,148 +9,353 @@
 namespace Admin\Service;
 
 
+use Admin\Entity\Member;
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
+use Doctrine\ORM\EntityManager;
 use Ramsey\Uuid\Uuid;
+use Zend\Log\Logger;
 
 class MessageManager extends BaseEntityManager
 {
 
     /**
-     * @param int $receiver_id
-     * @return int
+     * @var DepartmentManager
      */
-    public function getInBoxMessagesCount($receiver_id)
+    private $deptManager;
+
+    /**
+     * @var MemberManager
+     */
+    private $memberManager;
+
+
+
+    public function __construct(MemberManager $memberManager, DepartmentManager $departmentManager, EntityManager $entityManager, Logger $logger)
     {
-        return $this->getEntitiesCount(MessageBox::class, 'id', [
-            'receiver = :receiverId AND t.receiverStatus != :status'
-        ], ['receiverId' => $receiver_id, 'status' => MessageBox::STATUS_RECEIVER_DELETED]);
+        parent::__construct($entityManager, $logger);
+
+        $this->memberManager = $memberManager;
+        $this->deptManager = $departmentManager;
     }
 
 
     /**
-     * @param int $sender_id
+     * Get my inbox messages count
+     *
      * @return int
      */
-    public function getOutBoxMessagesCount($sender_id)
+    public function getInBoxMessagesCount()
     {
-        return $this->getEntitiesCount(MessageBox::class, 'id', [
-            'sender = :senderId AND t.senderStatus = :status'
-        ], ['senderId' => $sender_id, 'status' => MessageBox::STATUS_SENDER_SENT]);
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return 0;
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(MessageBox::class, 't');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.receiver', '?1'),
+                $qb->expr()->neq('t.receiverStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_RECEIVER_DELETED);
+
+        return $this->getEntitiesCount();
     }
 
 
     /**
-     * @param int $receiver_id
+     * Get my outbox messages count
+     *
+     * @return int
+     */
+    public function getOutBoxMessagesCount()
+    {
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return 0;
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(MessageBox::class, 't');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.sender', '?1'),
+                $qb->expr()->neq('t.senderStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_SENDER_SENT);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * Get my inbox messages
+     *
      * @param int $page
      * @param int $size
      * @return array
      */
-    public function getInBoxMessagesByLimitPage($receiver_id, $page = 1, $size = 10)
+    public function getInBoxMessagesByLimitPage($page = 1, $size = 10)
     {
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('t')->from(MessageBox::class, 't')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('t.receiver', '?1'),
-                    $qb->expr()->neq('t.receiverStatus', '?2')
-                )
-            )
-            ->setParameter(1, $receiver_id)
-            ->setParameter(2, MessageBox::STATUS_RECEIVER_DELETED)
-            ->orderBy('t.id', 'DESC')
-            ->setMaxResults($size)->setFirstResult(($page - 1) * $size);
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return [];
+        }
 
-        return $qb->getQuery()->getResult();
+        $qb = $this->resetQb();
+        $qb->select('t')->from(MessageBox::class, 't');
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.receiver', '?1'),
+                $qb->expr()->neq('t.receiverStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_RECEIVER_DELETED);
+        $qb->setMaxResults($size)->setFirstResult(($page - 1) * $size);
+        $qb->orderBy('t.created', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
     /**
-     * @param array $criteria
-     * @param null $order
-     * @param int $limit
-     * @param int $offset
+     * Get my outbox messages
+     *
+     * @param int $page
+     * @param int $size
      * @return array
      */
-    public function getUniverseMessages($criteria = [], $order = null, $limit = 100, $offset = 0)
+    public function getOutBoxMessagesByLimitPage($page = 1, $size = 10)
     {
-        if (null == $order) {
-            $order = [
-                'created' => 'DESC'
-            ];
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return [];
         }
-        return $this->entityManager->getRepository(MessageBox::class)->findBy($criteria, $order, $limit, $offset);
+
+        $qb = $this->resetQb();
+        $qb->select('t')->from(MessageBox::class, 't');
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.sender', '?1'),
+                $qb->expr()->neq('t.senderStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_SENDER_DELETED);
+        $qb->setMaxResults($size)->setFirstResult(($page - 1) * $size);
+        $qb->orderBy('t.created', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
+
     }
 
 
     /**
-     * Get a message content
+     * Get all messages count
      *
-     * @param string $message_id
-     * @return MessageContent
+     * @return int
      */
-    public function getMessageContent($message_id)
+    public function getMessageContentsCount()
     {
-        $entity = $this->entityManager->getRepository(MessageContent::class)->find($message_id);
-        if (null == $entity) {
-            return null;
-        }
-        if (MessageContent::STATUS_VALIDITY != $entity->getStatus()) {
-            return null;
-        }
+        $qb = $this->resetQb();
 
-        return $entity;
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(MessageContent::class, 't');
+
+        $qb->where($qb->expr()->eq('t.status', '?1'));
+        $qb->setParameter(1, MessageContent::STATUS_VALIDITY);
+
+        return $this->getEntitiesCount();
     }
 
 
     /**
-     * Create a new message content.
+     * Get all messages
+     *
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getMessageContentsByLimitPage($page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+        $qb->select('t')->from(MessageContent::class, 't');
+        $qb->where($qb->expr()->eq('t.status', '?1'));
+        $qb->setParameter(1, MessageContent::STATUS_VALIDITY);
+        $qb->setMaxResults($size)->setFirstResult(($page - 1) * $size);
+        $qb->orderBy('t.created', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
+    /**
+     * Send multi messages
+     *
+     * @param array $receivers
+     * @param string $topic
+     * @param string $content
+     * @return bool
+     */
+    public function sendMultiMessages($receivers = [], $topic = '', $content = '')
+    {
+        if (empty($topic) || empty($content)) {
+            return false;
+        }
+
+        $sender = $this->memberManager->getCurrentMember();
+        if (null == $sender) {
+            return false;
+        }
+
+        if (empty($receivers)) {
+            return false;
+        }
+
+        $dt = new \DateTime();
+
+        $msg = new MessageContent();
+        $msg->setId(Uuid::uuid1()->toString());
+        $msg->setTopic($topic);
+        $msg->setContent($content);
+        $msg->setStatus(MessageContent::STATUS_VALIDITY);
+        $msg->setCreated($dt);
+
+        $entities = [];
+        foreach ($receivers as $member) {
+            if ($member instanceof Member) {
+
+                $entity = new MessageBox();
+                $entity->setId(Uuid::uuid1()->toString());
+                $entity->setContent($msg);
+                $entity->setSender($sender->getMemberId());
+                $entity->setSenderStatus(MessageBox::STATUS_SENDER_SENT);
+                $entity->setSenderName($sender->getMemberName());
+                $entity->setReceiver($member->getMemberId());
+                $entity->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+                $entity->setType(MessageBox::MESSAGE_TYPE_PERSONAL);
+                $entity->setCreated($dt);
+                array_push($entities, $entity);
+            }
+        }
+        array_push($entities, $msg);
+
+        $this->saveModifiedEntities($entities);
+
+        return true;
+
+    }
+
+
+    /**
+     * Send a message
+     *
+     * @param Member $receiver
+     * @param string $topic
+     * @param string $content
+     * @return bool
+     */
+    public function sendOneMessage($receiver = null, $topic = '', $content = '')
+    {
+        if (null == $receiver || !($receiver instanceof Member)) {
+            return false;
+        }
+
+        if (empty($topic) || empty($content)) {
+            return false;
+        }
+
+        $member = $this->memberManager->getCurrentMember();
+        if (null == $member) {
+            return false;
+        }
+
+
+        $dt = new \DateTime();
+
+        $msg = new MessageContent();
+        $msg->setId(Uuid::uuid1()->toString());
+        $msg->setTopic($topic);
+        $msg->setContent($content);
+        $msg->setStatus(MessageContent::STATUS_VALIDITY);
+        $msg->setCreated($dt);
+
+        $box = new MessageBox();
+        $box->setId(Uuid::uuid1()->toString());
+        $box->setContent($msg);
+        $box->setSender($member->getMemberId());
+        $box->setSenderStatus(MessageBox::STATUS_SENDER_SENT);
+        $box->setSenderName($member->getMemberName());
+        $box->setReceiver($receiver->getMemberId());
+        $box->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+        $box->setType(MessageBox::MESSAGE_TYPE_PERSONAL);
+        $box->setCreated($dt);
+
+        $this->saveModifiedEntities([$box, $msg]);
+
+        return true;
+    }
+
+
+
+    /**
+     * Broadcast a message
      *
      * @param string $topic
      * @param string $content
-     * @param integer $sender
-     * @param array $receiver
-     * @param integer $type
-     *
-     * @return MessageContent
+     * @return bool
      */
-    public function createNewMessage($topic, $content, $sender, $receiver, $type)
+    public function broadcastMessage($topic = '', $content = '')
     {
+        if (empty($topic) || empty($content)) {
+            return false;
+        }
+
         $dt = new \DateTime();
 
-        $message = new MessageContent();
-        $message->setId(Uuid::uuid1()->toString());
-        $message->setTopic($topic);
-        $message->setContent($content);
-        $message->setStatus(MessageContent::STATUS_VALIDITY);
-        $message->setCreated($dt);
+        $msg = new MessageContent();
+        $msg->setId(Uuid::uuid1()->toString());
+        $msg->setTopic($topic);
+        $msg->setContent($content);
+        $msg->setStatus(MessageContent::STATUS_VALIDITY);
+        $msg->setCreated($dt);
 
-        $this->saveModifiedEntity($message);
-        $total = 0;
-        $i = 0;
+        $entities = [];
 
-        $this->logger->debug('content uuid:' . $message->getId());
+        $senderId = '';
+        $senderName = '系统消息';
 
-        foreach ($receiver as $target) {
-            $entity = new MessageBox();
-            $entity->setId(Uuid::uuid1()->toString());
-            $entity->setContent($message);
-            $entity->setSender($sender);
-            $entity->setReceiver($target);
-            $entity->setType($type);
-            $entity->setCreated($dt);
+        $defaultDept = $this->deptManager->getDefaultDepartment();
+        $members = $defaultDept->getMembers();
+        foreach ($members as $member) {
+            if ($member instanceof Member) {
 
-            $this->entityManager->persist($entity);
-            $total++;
-            $i++;
-            if (20 == $i) {
-                $this->entityManager->flush();
-                $i = 0;
+                $entity = new MessageBox();
+                $entity->setId(Uuid::uuid1()->toString());
+                $entity->setContent($msg);
+                $entity->setSender($senderId);
+                $entity->setSenderStatus(MessageBox::STATUS_SENDER_SENT);
+                $entity->setSenderName($senderName);
+                $entity->setReceiver($member->getMemberId());
+                $entity->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+                $entity->setType(MessageBox::MESSAGE_TYPE_BROADCAST);
+                $entity->setCreated($dt);
+                array_push($entities, $entity);
             }
         }
-        if ($i) {
-            $this->entityManager->flush();
-        }
-        return $total;
+        array_push($entities, $msg);
+
+        $this->saveModifiedEntities($entities);
+
+        return true;
     }
 }

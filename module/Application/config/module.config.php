@@ -168,7 +168,7 @@ return [
             'writers' => [
                 [
                     'name' => 'stream',
-                    'priority' => \Zend\Log\Logger::DEBUG,
+                    'priority' => DEBUG_LEVEL,
                     'options' => [
                         'stream' => rtrim(sys_get_temp_dir(), "/\\") . DIRECTORY_SEPARATOR . 'php-log-' . date('Ymd') . '.txt',
                         'formatter' => [

@@ -98,7 +98,8 @@ return [
 
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\MessageManager::class => Service\Factory\EntityManagerFactory::class,
+
+            Service\MessageManager::class => Service\Factory\MessageManagerFactory::class,
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
         ],

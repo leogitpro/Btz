@@ -1,5 +1,5 @@
 <?php
-$this->pageTitleBar('收件箱');
+$this->pageTitleBar('消息内容管理');
 $this->sideTreeMenu()->setActiveId($activeId);
 
 ?>
@@ -8,25 +8,22 @@ $this->sideTreeMenu()->setActiveId($activeId);
 <div class="row">
     <div class="col-lg-12">
 
-        <table class="table table-striped">
+        <table class="table table-hover">
             <tr>
-                <th><i class="fa fa-square-o fa-fw"></i></th>
-                <th><i class="fa fa-envelope-o fa-fw"></i></th>
-                <th>发信人</th>
                 <th>主题</th>
                 <th>时间</th>
+                <th>操作</th>
             </tr>
-            <?php foreach($rows as $row) { if ($row instanceof \Admin\Entity\MessageBox) { ?>
+            <?php foreach($rows as $row) { if ($row instanceof \Admin\Entity\MessageContent) { ?>
                 <tr>
-                    <td><i class="fa fa-square-o fa-fw"></i></td>
-                    <td><i class="fa fa-envelope-o fa-fw"></i></td>
-                    <td>发信人</td>
-                    <td>主题</td>
+                    <td><?php echo $row->getTopic(); ?></td>
                     <td><?php echo $row->getCreated()->format('Y-m-d H:i:s'); ?></td>
+                    <td>
+                        <a href="<?php echo $this->url('admin/message', ['action' => 'delete', 'key' => $row->getId()]); ?>">
+                            <i class="fa fa-close fa-fw" aria-hidden="true"></i> 删除
+                        </a>
+                    </td>
                 </tr>
-                <pre>
-                    <?php var_dump($row->getContent()->getTopic()); ?>
-                </pre>
             <?php } } ?>
 
         </table>

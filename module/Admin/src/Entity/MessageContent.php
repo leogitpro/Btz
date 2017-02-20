@@ -27,6 +27,7 @@ class MessageContent
 
     /**
      * @var string
+     *
      * @ORM\Id
      * @ORM\Column(name="id", type="string", length=36, nullable=false)
      */
@@ -34,19 +35,22 @@ class MessageContent
 
     /**
      * @var integer
+     *
      * @ORM\Column(name="status", type="smallint")
      */
     private $status = self::STATUS_VALIDITY;
 
     /**
      * @var string
+     *
      * @ORM\Column(name="topic", type="string", length=128)
      */
     private $topic = '';
 
     /**
      * @var string
-     * @ORM\Column(name="content", type="string", length=4096)
+     *
+     * @ORM\Column(name="content", type="text")
      */
     private $content = '';
 
@@ -55,6 +59,7 @@ class MessageContent
      * @ORM\Column(name="created", type="datetime")
      */
     private $created;
+
 
     /**
      * @return string
@@ -135,8 +140,5 @@ class MessageContent
     {
         $this->created = $created;
     }
-
-
-
 
 }

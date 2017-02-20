@@ -24,13 +24,17 @@ class Version20170119142408 extends AbstractMigration
 
         $content->setPrimaryKey(['id']);
 
+        $content->addIndex(['status']);
+        $content->addIndex(['created']);
+
 
         $box = $schema->createTable('sys_message_box');
         $box->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
         $box->addColumn('message_id', 'string', ['fixed' => true, 'length' => 36]);
-        $box->addColumn('sender', 'integer', ['unsigned' => true, 'default' => 0]);
+        $box->addColumn('sender', 'string', ['fixed' => true, 'length' => 36]);
         $box->addColumn('sender_status', 'smallint', ['default' => 0]);
-        $box->addColumn('receiver', 'integer', ['unsigned' => true, 'default' => 0]);
+        $box->addColumn('sender_name', 'string', ['length' => 45]);
+        $box->addColumn('receiver', 'string', ['fixed' => true, 'length' => 36]);
         $box->addColumn('receiver_status', 'smallint', ['default' => 0]);
         $box->addColumn('type', 'smallint', ['default' => 0]);
         $box->addColumn('created', 'datetime');
@@ -40,6 +44,7 @@ class Version20170119142408 extends AbstractMigration
         $box->addIndex(['message_id']);
         $box->addIndex(['sender', 'sender_status']);
         $box->addIndex(['receiver', 'receiver_status']);
+        $box->addIndex(['created']);
 
     }
 

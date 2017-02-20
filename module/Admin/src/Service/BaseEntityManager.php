@@ -110,6 +110,18 @@ class BaseEntityManager
 
 
     /**
+     * @param array $entities
+     */
+    public function saveModifiedEntities($entities)
+    {
+        foreach ($entities as $entity) {
+            $this->entityManager->persist($entity);
+        }
+        $this->entityManager->flush();
+    }
+
+
+    /**
      * @param object $entity
      */
     public function removeEntity($entity)

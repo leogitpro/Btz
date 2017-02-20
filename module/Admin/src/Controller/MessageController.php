@@ -40,47 +40,10 @@ class MessageController extends BaseController
     private $memberManager;
 
 
-
-    public static function ComponentRegistryX()
-    //public function autoRegisterComponent()
-    {
-        return [
-            'controller' => __CLASS__,
-            'name' => '站内消息',
-            'route' => 'admin/message',
-            'menu' => true,
-            'rank' => 20,
-            'icon' => 'envelope-o',
-            'actions' => [
-                [
-                    'action' => 'index',
-                    'name' => '收件箱',
-                    'menu' => true,
-                    'rank' => 6,
-                    'icon' => 'envelope-o',
-                ],
-                [
-                    'action' => 'outbox',
-                    'name' => '发件箱',
-                    'menu' => true,
-                    'rank' => 4,
-                    'icon' => 'comment-o',
-                ],
-                [
-                    'action' => 'broadcast',
-                    'name' => '站内广播',
-                    'menu' => true,
-                    'rank' => 2,
-                    'icon' => 'bullhorn',
-                ],
-            ],
-        ];
-    }
-
     public function onDispatch(MvcEvent $e)
     {
-
         $serviceManager = $e->getApplication()->getServiceManager();
+
         $this->messageManager = $serviceManager->get(MessageManager::class);
         $this->deptManager = $serviceManager->get(DepartmentManager::class);
         $this->memberManager = $serviceManager->get(MemberManager::class);
@@ -89,16 +52,16 @@ class MessageController extends BaseController
     }
 
 
+    /**
+     * 全部消息清单. For supper administrator check
+     */
     public function indexAction()
     {
-        $currentMember = $this->memberManager->getCurrentMember();
-        $memberId = (null == $currentMember) ? 0 : $currentMember->getMemberId();
-
         // Page configuration
-        $size = 1;
+        $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
-        $count = $this->messageManager->getInBoxMessagesCount($memberId);
+        $count = $this->messageManager->getMessageContentsCount();
 
         // Get pagination helper
         $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
@@ -110,7 +73,7 @@ class MessageController extends BaseController
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'index', 'key' => '%d']));
 
-        $rows = $this->messageManager->getInBoxMessagesByLimitPage($memberId, $page, $size);
+        $rows = $this->messageManager->getMessageContentsByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
@@ -119,12 +82,79 @@ class MessageController extends BaseController
     }
 
 
-    public function personalAction()
+    /**
+     * 收件箱
+     */
+    public function inAction()
+    {
+        // Page configuration
+        $size = 10;
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) { $page = 1; }
+        $count = $this->messageManager->getInBoxMessagesCount();
+
+        // Get pagination helper
+        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        // Configuration pagination
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'in', 'key' => '%d']));
+
+        $rows = $this->messageManager->getInBoxMessagesByLimitPage($page, $size);
+
+        return new ViewModel([
+            'rows' => $rows,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+
+    /**
+     * 发件箱
+     */
+    public function outAction()
+    {
+        // Page configuration
+        $size = 1;
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) { $page = 1; }
+        $count = $this->messageManager->getOutBoxMessagesCount();
+
+        // Get pagination helper
+        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        // Configuration pagination
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'out', 'key' => '%d']));
+
+        $rows = $this->messageManager->getOutBoxMessagesByLimitPage($page, $size);
+
+        return new ViewModel([
+            'rows' => $rows,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+
+    /**
+     * 发消息
+     */
+    public function sendAction()
     {
         //todo
     }
 
 
+
+    /**
+     * 广播消息
+     */
     public function broadcastAction()
     {
 
@@ -138,23 +168,13 @@ class MessageController extends BaseController
 
                 $data = $form->getData();
 
-                $topic = $data['topic'];
-                $content = $data['content'];
-                $receiver = $this->deptManager->getDepartmentAllMemberIds(Department::DEFAULT_DEPT_ID);
-
-                $currentMember = $this->memberManager->getCurrentMember();
-                $sender = 0;
-                if (null !== $currentMember) {
-                    $sender = $currentMember->getMemberId();
-                }
-
-                $this->messageManager->createNewMessage($topic, $content, $sender, $receiver, MessageBox::MESSAGE_TYPE_BROADCAST);
+                $this->messageManager->broadcastMessage($data['topic'], $data['content']);
 
                 return $this->getMessagePlugin()->show(
-                    'Broadcast published',
-                    'The new broadcast has been published success!',
+                    '广播已发送',
+                    '广播消息已经群发!',
                     $this->url()->fromRoute('admin/message'),
-                    'Messages',
+                    '返回',
                     3
                 );
             }
@@ -166,5 +186,23 @@ class MessageController extends BaseController
         ]);
     }
 
+
+    /**
+     * Controller and actions registry
+     *
+     * @return array
+     */
+    public static function ComponentRegistry()
+    {
+        $item = self::CreateControllerRegistry(__CLASS__, '站内消息', 'admin/message', 1, 'envelope-o', 20);
+
+        $item['actions']['index'] = self::CreateActionRegistry('index', '全部消息', 1, 'envelope-o', 0);
+        $item['actions']['in'] = self::CreateActionRegistry('in', '收件箱', 1, 'envelope-o', 8);
+        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 1, 'envelope-o', 6);
+        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息', 1, 'envelope-o', 4);
+        $item['actions']['broadcast'] = self::CreateActionRegistry('broadcast', '发广播', 1, 'bullhorn', 1);
+
+        return $item;
+    }
 
 }

@@ -51,6 +51,13 @@ class MessageBox
      */
     private $senderStatus = self::STATUS_SENDER_SENT;
 
+
+    /**
+     * @var string
+     * @ORM\Column(name="sender_name", type="string", length=45)
+     */
+    private $senderName = '';
+
     /**
      * @var integer
      * @ORM\Column(name="receiver", type="integer")
@@ -124,7 +131,7 @@ class MessageBox
         if (isset($list[$this->receiverStatus])) {
             return $list[$this->receiverStatus];
         }
-        return 'Unknown';
+        return '未知';
     }
 
 
@@ -137,7 +144,7 @@ class MessageBox
         if (isset($list[$this->type])) {
             return $list[$this->type];
         }
-        return 'Unknown';
+        return '未知';
     }
 
     /**
@@ -187,6 +194,22 @@ class MessageBox
     public function setSenderStatus($senderStatus)
     {
         $this->senderStatus = $senderStatus;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSenderName()
+    {
+        return $this->senderName;
+    }
+
+    /**
+     * @param string $senderName
+     */
+    public function setSenderName($senderName)
+    {
+        $this->senderName = $senderName;
     }
 
     /**
@@ -268,11 +291,5 @@ class MessageBox
     {
         $this->content = $content;
     }
-
-
-
-
-
-
 
 }
