@@ -67,9 +67,9 @@ class IndexController extends AbstractActionController
 
         //echo '<pre>'; print_r($_SESSION); echo '</pre>';
 
-        echo '<h1>';
-        echo Uuid::uuid1();
-        echo '</h1>';
+        //echo '<h1>';
+        //echo Uuid::uuid1();
+        //echo '</h1>';
 
         return new ViewModel();
     }
