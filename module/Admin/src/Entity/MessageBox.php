@@ -59,7 +59,7 @@ class MessageBox
     private $senderName = '';
 
     /**
-     * @var integer
+     * @var string
      * @ORM\Column(name="receiver", type="integer")
      */
     private $receiver = 0;
@@ -165,7 +165,7 @@ class MessageBox
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getSender()
     {
@@ -173,7 +173,7 @@ class MessageBox
     }
 
     /**
-     * @param int $sender
+     * @param string $sender
      */
     public function setSender($sender)
     {
@@ -213,7 +213,7 @@ class MessageBox
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getReceiver()
     {
@@ -221,7 +221,7 @@ class MessageBox
     }
 
     /**
-     * @param int $receiver
+     * @param string $receiver
      */
     public function setReceiver($receiver)
     {

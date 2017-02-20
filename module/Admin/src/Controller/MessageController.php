@@ -18,6 +18,7 @@ use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
 use Admin\Service\MessageManager;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class MessageController extends BaseController
@@ -110,6 +111,67 @@ class MessageController extends BaseController
             'activeId' => __METHOD__,
         ]);
     }
+
+
+    /**
+     * 读消息
+     */
+    public function readAction()
+    {
+        $result = ['success' => false, 'code' => 0, 'message' => ''];
+
+        $boxId = $this->params()->fromRoute('key');
+
+        $messageBox = $this->messageManager->getMessageBox($boxId);
+        if (null == $messageBox) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的消息编号:' . $boxId);
+            return ;
+        }
+
+        $messageBox->setReceiverStatus(MessageBox::STATUS_RECEIVER_READ);
+        $this->messageManager->saveModifiedEntity($messageBox);
+
+        $result['success'] = true;
+        $result['message'] = 'Message has read.';
+
+        return new JsonModel($result);
+    }
+
+
+    /**
+     * 删除消息
+     */
+    public function deleteAction()
+    {
+
+        $result = ['success' => false, 'code' => 0, 'message' => ''];
+
+        $boxId = $this->params()->fromRoute('key');
+
+        $messageBox = $this->messageManager->getMessageBox($boxId);
+        if (null == $messageBox) {
+            $this->getResponse()->setStatusCode(404);
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的消息编号:' . $boxId);
+            return ;
+        }
+
+        $member = $this->memberManager->getCurrentMember();
+        if ($member->getMemberId() == $messageBox->getReceiver()) {
+            $messageBox->setReceiverStatus(MessageBox::STATUS_RECEIVER_DELETED);
+        }
+        if ($member->getMemberId() == $messageBox->getSender()) {
+            $messageBox->setSenderStatus(MessageBox::STATUS_SENDER_DELETED);
+        }
+
+        $this->messageManager->saveModifiedEntity($messageBox);
+
+        $result['success'] = true;
+        $result['message'] = 'Message has deleted.';
+
+        return new JsonModel($result);
+    }
+
 
 
     /**

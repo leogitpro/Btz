@@ -2,6 +2,8 @@
 $this->pageTitleBar('收件箱');
 $this->sideTreeMenu()->setActiveId($activeId);
 
+$this->headScript()->appendFile($this->basePath('js/admin/message.in.js'));
+
 ?>
 
 
@@ -16,40 +18,43 @@ $this->sideTreeMenu()->setActiveId($activeId);
                 <th>主题</th>
                 <th>时间</th>
             </tr>
-            <?php foreach($rows as $row) { if ($row instanceof \Admin\Entity\MessageBox) { ?>
-                <tr>
+            <?php
+            foreach($rows as $row) {
+                if ($row instanceof \Admin\Entity\MessageBox) {
+                    $unread = \Admin\Entity\MessageBox::STATUS_RECEIVER_UNREAD == $row->getReceiverStatus();
+                    $systemMsg = \Admin\Entity\MessageBox::MESSAGE_TYPE_BROADCAST == $row->getType();
+                    $topic = $this->escapeHtml($row->getContent()->getTopic());
+                    $content = $this->escapeHtml($row->getContent()->getContent());
+                    $readUrl = !$unread ? '':$this->url('admin/message', ['action' => 'read', 'key' => $row->getId()]);
+                    $deleteUrl = $this->url('admin/message', ['action' => 'delete', 'key' => $row->getId()]);
+            ?>
+                <tr id="box_<?php echo $row->getId(); ?>">
                     <td><i class="fa fa-square-o fa-fw"></i></td>
+                    <td><i class="fa fa-envelope<?php echo $unread ? '' : '-open'; ?>-o fa-fw"></i></td>
+                    <td><?php echo $systemMsg ? '系统' : $row->getSenderName(); ?></td>
                     <td>
-                        <?php if(\Admin\Entity\MessageBox::STATUS_RECEIVER_UNREAD == $row->getReceiverStatus()) { ?>
-                            <i class="fa fa-envelope-o fa-fw"></i>
-                        <?php } else { ?>
-                            <i class="fa fa-envelope-open-o fa-fw"></i>
-                        <?php } ?>
-                    </td>
-                    <td><?php echo \Admin\Entity\MessageBox::MESSAGE_TYPE_BROADCAST == $row->getType() ? '系统' : $row->getSenderName(); ?></td>
-                    <td>
-                        <a href="#" data-toggle="modal" data-target="#<?php echo $row->getId(); ?>">
-                        <?php if(\Admin\Entity\MessageBox::STATUS_RECEIVER_UNREAD == $row->getReceiverStatus()) { ?>
-                            <span class="weight"><?php echo $row->getContent()->getTopic(); ?></span>
-                        <?php } else { ?>
-                            <span><?php echo $row->getContent()->getTopic(); ?></span>
-                        <?php } ?>
+                        <a class="show-message-content" href="#" data-ajaxcall="<?php echo $readUrl; ?>" data-toggle="modal" data-target="#<?php echo $row->getId(); ?>">
+                            <?php echo $unread ? '<strong>' . $topic . '</strong>' : $topic; ?>
                         </a>
                     </td>
                     <td><?php echo $row->getCreated()->format('Y-m-d H:i:s'); ?></td>
-                    <div class="modal" id="<?php echo $row->getId(); ?>" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal message-modal" id="<?php echo $row->getId(); ?>" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    <h4 class="modal-title"><?php echo $row->getContent()->getTopic(); ?></h4>
+                                    <h4 class="modal-title"><?php echo $topic; ?></h4>
                                 </div>
                                 <div class="modal-body">
-                                    <?php echo $row->getContent()->getContent(); ?>
+                                    <?php echo $content; ?>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                    <button type="button" class="btn btn-primary">删除消息</button>
+                                    <button type="button"
+                                            class="btn btn-primary delete-message-dialog"
+                                            data-target="<?php echo $row->getId(); ?>"
+                                            data-ajaxcall="<?php echo $deleteUrl; ?>"
+                                    >删除消息</button>
                                 </div>
                             </div>
                         </div>

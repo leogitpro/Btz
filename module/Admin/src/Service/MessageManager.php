@@ -41,6 +41,24 @@ class MessageManager extends BaseEntityManager
 
 
     /**
+     * @param string $id
+     *
+     * @return MessageBox
+     */
+    public function getMessageBox($id)
+    {
+        $qb = $this->resetQb();
+
+        $qb->from(MessageBox::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $id);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+
+    /**
      * Get my inbox messages count
      *
      * @return int
