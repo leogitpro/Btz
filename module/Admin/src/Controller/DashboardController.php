@@ -14,6 +14,7 @@ use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
+
 class DashboardController extends AbstractActionController
 {
 
@@ -35,6 +36,8 @@ class DashboardController extends AbstractActionController
     {
         return new ViewModel();
     }
+
+
 
 
     /**

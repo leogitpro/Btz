@@ -47,6 +47,10 @@ class MessageManager extends BaseEntityManager
      */
     public function getMessageBox($id)
     {
+        if (empty($id)) {
+            return null;
+        }
+
         $qb = $this->resetQb();
 
         $qb->from(MessageBox::class, 't')->select('t');
@@ -54,6 +58,64 @@ class MessageManager extends BaseEntityManager
         $qb->setParameter(1, $id);
 
         return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * Get current member unread messages count
+     *
+     * @return int
+     */
+    public function getUnreadMessagesCount()
+    {
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return 0;
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(MessageBox::class, 't');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.receiver', '?1'),
+                $qb->expr()->eq('t.receiverStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_RECEIVER_UNREAD);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * Get current member latest messages
+     *
+     * @param int $count
+     * @return array
+     */
+    public function getMyLatestMessages($count = 5)
+    {
+        $member = $this->memberManager->getCurrentMember();
+        if (!($member instanceof Member)) {
+            return [];
+        }
+
+        $qb = $this->resetQb();
+        $qb->select('t')->from(MessageBox::class, 't');
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.receiver', '?1'),
+                $qb->expr()->neq('t.receiverStatus', '?2')
+            )
+        );
+        $qb->setParameter(1, $member->getMemberId())->setParameter(2, MessageBox::STATUS_RECEIVER_DELETED);
+        $qb->setMaxResults($count)->setFirstResult(0);
+        $qb->orderBy('t.created', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 
@@ -178,6 +240,26 @@ class MessageManager extends BaseEntityManager
 
 
     /**
+     * @param string $messageId
+     * @return MessageContent
+     */
+    public function getMessageContent($messageId = null)
+    {
+        if (empty($messageId)) {
+            return null;
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->from(MessageContent::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $messageId);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+    /**
      * Get all messages count
      *
      * @return int
@@ -252,6 +334,10 @@ class MessageManager extends BaseEntityManager
         foreach ($receivers as $member) {
             if ($member instanceof Member) {
 
+                if ($sender->getMemberId() == $member->getMemberId()) {
+                    continue;
+                }
+
                 $entity = new MessageBox();
                 $entity->setId(Uuid::uuid1()->toString());
                 $entity->setContent($msg);
@@ -260,6 +346,7 @@ class MessageManager extends BaseEntityManager
                 $entity->setSenderName($sender->getMemberName());
                 $entity->setReceiver($member->getMemberId());
                 $entity->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+                $entity->setReceiverName($member->getMemberName());
                 $entity->setType(MessageBox::MESSAGE_TYPE_PERSONAL);
                 $entity->setCreated($dt);
                 array_push($entities, $entity);
@@ -297,6 +384,10 @@ class MessageManager extends BaseEntityManager
             return false;
         }
 
+        if ($receiver->getMemberId() == $member->getMemberId()) {
+            return false;
+        }
+
 
         $dt = new \DateTime();
 
@@ -315,6 +406,7 @@ class MessageManager extends BaseEntityManager
         $box->setSenderName($member->getMemberName());
         $box->setReceiver($receiver->getMemberId());
         $box->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+        $box->setReceiverName($receiver->getMemberName());
         $box->setType(MessageBox::MESSAGE_TYPE_PERSONAL);
         $box->setCreated($dt);
 
@@ -330,9 +422,10 @@ class MessageManager extends BaseEntityManager
      *
      * @param string $topic
      * @param string $content
+     * @param string $deptId
      * @return bool
      */
-    public function broadcastMessage($topic = '', $content = '')
+    public function broadcastMessage($topic = '', $content = '', $deptId = null)
     {
         if (empty($topic) || empty($content)) {
             return false;
@@ -349,11 +442,15 @@ class MessageManager extends BaseEntityManager
 
         $entities = [];
 
-        $senderId = '';
-        $senderName = '系统消息';
+        $senderId = '-';
+        $senderName = '系统';
 
-        $defaultDept = $this->deptManager->getDefaultDepartment();
-        $members = $defaultDept->getMembers();
+        if (null === $deptId) {
+            $dept = $this->deptManager->getDefaultDepartment();
+        } else {
+            $dept = $this->deptManager->getDepartment($deptId);
+        }
+        $members = $dept->getMembers();
         foreach ($members as $member) {
             if ($member instanceof Member) {
 
@@ -362,9 +459,10 @@ class MessageManager extends BaseEntityManager
                 $entity->setContent($msg);
                 $entity->setSender($senderId);
                 $entity->setSenderStatus(MessageBox::STATUS_SENDER_SENT);
-                $entity->setSenderName($senderName);
+                $entity->setSenderName($senderName); // Quick display
                 $entity->setReceiver($member->getMemberId());
                 $entity->setReceiverStatus(MessageBox::STATUS_RECEIVER_UNREAD);
+                $entity->setReceiverName($member->getMemberName()); // Quick display
                 $entity->setType(MessageBox::MESSAGE_TYPE_BROADCAST);
                 $entity->setCreated($dt);
                 array_push($entities, $entity);

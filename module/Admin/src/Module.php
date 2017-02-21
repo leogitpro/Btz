@@ -8,7 +8,9 @@ namespace Admin;
 
 use Admin\Controller\DashboardController;
 use Admin\Controller\IndexController;
+use Admin\Controller\MessageController;
 use Admin\Controller\ProfileController;
+use Admin\Controller\SearchController;
 use Admin\Service\AclManager;
 use Admin\Service\AuthService;
 use Zend\Mvc\MvcEvent;
@@ -105,6 +107,7 @@ class Module
         $whiteListControllers = [
             ProfileController::class,
             DashboardController::class,
+            SearchController::class,
         ];
         if (in_array($controller, $whiteListControllers)) {
             return ;
@@ -113,6 +116,11 @@ class Module
         // ACL filter
         $action = $event->getRouteMatch()->getParam('action', null);
         //$action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
+        // Message public methods
+        if (in_array($action, ['in', 'out', 'read', 'delete', 'unread', 'send']) && $controller == MessageController::class) {
+            return ;
+        }
+
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($controller, $action)) {

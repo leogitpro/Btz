@@ -50,7 +50,6 @@ class ProfileController extends AbstractActionController
         return new ViewModel(['member' => $member]);
     }
 
-
     /**
      * Update administrator password.
      *

@@ -36,6 +36,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\DashboardController::class => InvokableFactory::class,
             Controller\ProfileController::class => InvokableFactory::class,
+            Controller\SearchController::class => InvokableFactory::class,
 
             Controller\DepartmentController::class => InvokableFactory::class,
             Controller\MemberController::class => InvokableFactory::class,

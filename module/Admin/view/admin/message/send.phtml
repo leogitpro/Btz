@@ -1,11 +1,30 @@
 <?php
-$this->pageTitleBar('站内广播');
+$this->pageTitleBar('发送消息');
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
+$this->headLink()->appendStylesheet($this->basePath('open-source-assets/bootcomplete/bootcomplete.css'));
+$this->headScript()->appendFile($this->basePath('open-source-assets/bootcomplete/jquery.bootcomplete.js'));
+$this->headScript()->appendFile($this->basePath('js/admin/message.send.js'));
+
+$autoSuggestUrl = $this->url('admin/search', ['action' => 'members']);
+$this->inlineScript()->captureStart();
+echo <<<JS
+    var autoSuggestUrl = "$autoSuggestUrl";
+JS;
+$this->inlineScript()->captureEnd();
+
+
+$form->get('receiver_name')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '接收人名称',
+    'autocomplete' => 'off',
+]);
+
+
 $form->get('topic')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the message topic'
+    'placeholder' => '输入消息标题'
 ]);
 
 $form->get('content')->setAttributes([
@@ -31,6 +50,15 @@ $form->prepare();
 
         <div class="form-group">
             <?php echo $this->formElement($form->get('csrf')); ?>
+
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('receiver_name'), '接收者'); ?>
+            <?php echo $this->formElement($form->get('receiver_name')); ?>
+            <?php echo $this->formElementErrors($form->get('receiver_name')); ?>
+            <?php echo $this->formElement($form->get('receiver_id')); ?>
+            <?php echo $this->formElementErrors($form->get('receiver_id')); ?>
 
         </div>
 

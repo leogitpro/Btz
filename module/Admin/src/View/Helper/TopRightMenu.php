@@ -52,11 +52,10 @@ class TopRightMenu extends AbstractHelper
             return '';
         }
 
-        $html = '<ul class="nav navbar-top-links navbar-right">';
+        $html = '';
         foreach($this->items as $item) {
             $html .= $this->renderItem($item);
         }
-        $html .= '</ul>';
 
         return $html;
     }

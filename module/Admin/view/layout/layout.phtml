@@ -42,7 +42,12 @@
         </div>
 
         <!-- Top nav bar -->
-        <?php echo $this->topRightMenu()->render(); ?>
+        <ul class="nav navbar-top-links navbar-right"
+            id="topMenuContainer"
+            data-message="<?php echo $this->url('admin/message', ['action' => 'unread']); ?>"
+        >
+            <?php echo $this->topRightMenu()->render(); ?>
+        </ul>
 
         <!-- Side nav bar -->
         <?php echo $this->sideTreeMenu()->render(); ?>
@@ -77,7 +82,7 @@
 
 <!-- Scripts -->
 <?php echo $this->headScript()
-    ->prependFile($this->basePath('js/admin/form.js'))
+    ->prependFile($this->basePath('js/admin/common.js'))
     ->prependFile($this->basePath('open-source-assets/sb-admin-2/js/sb-admin-2.js'))
     ->prependFile($this->basePath('open-source-assets/metisMenu/metisMenu.min.js'))
     ->prependFile($this->basePath('open-source-assets/bootstrap-3.3.7-dist/js/bootstrap.min.js'))

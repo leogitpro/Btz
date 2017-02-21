@@ -48,6 +48,23 @@ return [
     ], // End DashboardController router
 
     // DashboardController router configuration
+    'search' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'search[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                'key' => '[a-zA-Z0-9_-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\SearchController::class,
+                'action' => 'index',
+            ],
+        ],
+    ], // End DashboardController router
+
+    // DashboardController router configuration
     'profile' => [
         'type' => Segment::class,
         'options' => [

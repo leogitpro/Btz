@@ -64,13 +64,17 @@ class MessageBox
      */
     private $receiver = 0;
 
-
     /**
      * @var integer
      * @ORM\Column(name="receiver_status", type="integer")
      */
     private $receiverStatus = self::STATUS_RECEIVER_UNREAD;
 
+    /**
+     * @var string
+     * @ORM\Column(name="receiver_name", type="string", length=45)
+     */
+    private $receiverName = '';
 
     /**
      * @var integer
@@ -242,6 +246,22 @@ class MessageBox
     public function setReceiverStatus($receiverStatus)
     {
         $this->receiverStatus = $receiverStatus;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReceiverName()
+    {
+        return $this->receiverName;
+    }
+
+    /**
+     * @param string $receiverName
+     */
+    public function setReceiverName($receiverName)
+    {
+        $this->receiverName = $receiverName;
     }
 
     /**

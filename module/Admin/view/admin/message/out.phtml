@@ -1,0 +1,71 @@
+<?php
+$this->pageTitleBar('发件箱');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$this->headScript()->appendFile($this->basePath('js/admin/message.out.js'));
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <table class="table table-hover">
+            <tr>
+                <th width="40"><i class="fa fa-square-o fa-fw"></i></th>
+                <th width="100">收件人</th>
+                <th>主题</th>
+                <th>时间</th>
+            </tr>
+            <?php
+            foreach($rows as $row) {
+                if ($row instanceof \Admin\Entity\MessageBox) {
+
+                    if (\Admin\Entity\MessageContent::STATUS_VALIDITY == $row->getContent()->getStatus()) {
+                        $topic = $this->escapeHtml($row->getContent()->getTopic());
+                        $content = nl2br($this->escapeHtml($row->getContent()->getContent()));
+                    } else {
+                        $topic = '消息已过期';
+                        $content = '此消息已经过期, 无法再被查阅!';
+                    }
+                    $deleteUrl = $this->url('admin/message', ['action' => 'delete', 'key' => $row->getId()]);
+                    ?>
+                    <tr id="box_<?php echo $row->getId(); ?>">
+                        <td><i class="fa fa-square-o fa-fw"></i></td>
+                        <td><?php echo $row->getReceiverName(); ?></td>
+                        <td>
+                            <a class="show-message-content" href="#" data-ajaxcall="<?php echo $readUrl; ?>" data-toggle="modal" data-target="#<?php echo $row->getId(); ?>">
+                                <?php echo $topic; ?>
+                            </a>
+                        </td>
+                        <td><?php echo $row->getCreated()->format('Y-m-d H:i:s'); ?></td>
+                        <div class="modal message-modal" id="<?php echo $row->getId(); ?>" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title"><?php echo $topic; ?></h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <?php echo $content; ?>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="button"
+                                                class="btn btn-primary delete-message-dialog"
+                                                data-target="<?php echo $row->getId(); ?>"
+                                                data-ajaxcall="<?php echo $deleteUrl; ?>"
+                                        >删除消息</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </tr>
+                <?php } } ?>
+
+        </table>
+
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>

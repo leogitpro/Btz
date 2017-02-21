@@ -57,13 +57,17 @@ class DepartmentManager extends BaseEntityManager
      * @param string $dept_id
      * @return Department
      */
-    public function getDepartment($dept_id)
+    public function getDepartment($dept_id = null)
     {
-        $this->resetQb();
+        if (empty($dept_id)) {
+            return null;
+        }
 
-        $this->getQb()->from(Department::class, 't')->select('t');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.deptId', '?1'));
-        $this->getQb()->setParameter(1, $dept_id);
+        $qb = $this->resetQb();
+
+        $qb->from(Department::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.deptId', '?1'));
+        $qb->setParameter(1, $dept_id);
 
         return $this->getEntityFromPersistence();
     }
@@ -163,5 +167,38 @@ class DepartmentManager extends BaseEntityManager
     {
         return $this->getAllDepartmentsByLimitPage(1, 200);
     }
+
+
+    /**
+     * Search departments
+     *
+     * @param string $key
+     * @return array
+     */
+    public function getDeptsBySearch($key = null)
+    {
+        if (empty($key)) {
+            return [];
+        }
+
+        $qb = $this->resetQb();
+        $qb->select('t')->from(Department::class, 't');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.deptStatus', '?1'),
+                $qb->expr()->like('t.deptName', '?2')
+            )
+        );
+        $qb->setParameter(1, Department::STATUS_VALID);
+        $qb->setParameter(2, '%' . $key . '%');
+
+        $qb->setMaxResults(10)->setFirstResult(0);
+
+        $qb->orderBy('t.deptStatus', 'DESC')->addOrderBy('t.deptName');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
 
 }

@@ -60,6 +60,12 @@ $this->headScript()->appendFile($this->basePath('js/admin/department.index.js'))
                                         </li>
                                         <li class="divider"></li>
                                         <li>
+                                            <a href="<?php echo $this->url('admin/message', ['action' => 'dept', 'key' => $dept->getDeptId()]); ?>">
+                                                <i class="fa fa-envelope-o fa-fw" aria-hidden="true"></i> 群发消息
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
                                             <a href="<?php echo $this->url('admin/dept', ['action' => 'members', 'key' => $dept->getDeptId()]); ?>" data-toggle="modal" data-target="#pageModal">
                                                 <i class="fa fa-users fa-fw" aria-hidden="true"></i> 部门成员管理
                                             </a>

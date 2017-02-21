@@ -83,13 +83,17 @@ class MemberManager extends BaseEntityManager
      * @param string $member_id
      * @return Member
      */
-    public function getMember($member_id)
+    public function getMember($member_id = null)
     {
-        $this->resetQb();
+        if (empty($member_id)) {
+            return null;
+        }
 
-        $this->getQb()->from(Member::class, 't')->select('t');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.memberId', '?1'));
-        $this->getQb()->setParameter(1, $member_id);
+        $qb = $this->resetQb();
+
+        $qb->from(Member::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.memberId', '?1'));
+        $qb->setParameter(1, $member_id);
 
         return $this->getEntityFromPersistence();
     }
@@ -165,6 +169,38 @@ class MemberManager extends BaseEntityManager
     public function getMembers()
     {
         return $this->getMembersByLimitPage(1, 200);
+    }
+
+
+    /**
+     * Search member by name.
+     *
+     * @param string $key
+     * @return array
+     */
+    public function getMembersBySearch($key = null)
+    {
+        if (empty($key)) {
+            return [];
+        }
+
+        $qb = $this->resetQb();
+        $qb->select('t')->from(Member::class, 't');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.memberStatus', '?1'),
+                $qb->expr()->like('t.memberName', '?2')
+            )
+        );
+        $qb->setParameter(1, Member::STATUS_ACTIVATED);
+        $qb->setParameter(2, '%' . $key . '%');
+
+        $qb->setMaxResults(10)->setFirstResult(0);
+
+        $qb->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 

@@ -75,6 +75,12 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                                         </li>
                                         <li class="divider"></li>
                                         <li>
+                                            <a href="<?php echo $this->url('admin/message', ['action' => 'send', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-envelope-o fa-fw" aria-hidden="true"></i> 发送消息
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'departments', 'key' => $member->getMemberId()]); ?>" data-toggle="modal" data-target="#pageModal">
                                                 <i class="fa fa-users fa-fw" aria-hidden="true"></i> 成员部门管理
                                             </a>

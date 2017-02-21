@@ -88,7 +88,7 @@ class BaseEntityManager
 
 
     /**
-     * @return object
+     * @return mixed
      */
     protected function getEntityFromPersistence()
     {

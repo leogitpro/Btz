@@ -36,6 +36,7 @@ class Version20170119142408 extends AbstractMigration
         $box->addColumn('sender_name', 'string', ['length' => 45]);
         $box->addColumn('receiver', 'string', ['fixed' => true, 'length' => 36]);
         $box->addColumn('receiver_status', 'smallint', ['default' => 0]);
+        $box->addColumn('receiver_name', 'string', ['length' => 45]);
         $box->addColumn('type', 'smallint', ['default' => 0]);
         $box->addColumn('created', 'datetime');
 
