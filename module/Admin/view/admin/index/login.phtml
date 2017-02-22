@@ -6,11 +6,10 @@ $form = $this->form;
 $form->get('email')->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com',
-    'value' => 'admin@example.com',
 ]);
 $form->get('password')->setAttributes([
     'class'=>'form-control',
-    'placeholder'=>'Enter your password',
+    'placeholder'=>'在这里输入您的登录密码',
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -26,18 +25,18 @@ $form->prepare();
 
 <div id="centered_container" class="centered">
     <div class="login-container">
-        <h3 class="text-center">Administrator</h3>
+        <h3 class="text-center">登入管理系统</h3>
 
         <?php if(1 != $login_code) { ?>
         <div class="alert alert-warning" role="alert">
             <?php if(-1 == $login_code) { ?>
-            <strong>Warning!</strong> E-mail address invalid.
+            <strong>警告!</strong> 登入账户( E-Mail) 地址无效.
             <?php } ?>
             <?php if(-4 == $login_code) { ?>
-                <strong>Warning!</strong> You has been retried.
+                <strong>警告!</strong> 该账号目前被锁定, 暂不允许登入系统.
             <?php } ?>
             <?php if(-3 == $login_code) { ?>
-                <strong>Warning!</strong> Credential(Password) invalid.
+                <strong>警告!</strong> 登入认证失败! 请使用正确的账号和密码登入.
             <?php } ?>
         </div>
         <?php } ?>

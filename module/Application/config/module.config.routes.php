@@ -64,7 +64,7 @@ return [
                 'options' => [
                     'route'    => 'index[/:action][:suffix]',
                     'constraints' => [
-                        'action'     => '[a-zA-Z][a-zA-Z0-9_-]+',
+                        'action'     => '[a-zA-Z][a-zA-Z0-9_\-]+',
                         'suffix' => '(/|.html)',
                     ],
                     'defaults' => [

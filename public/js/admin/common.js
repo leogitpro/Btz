@@ -15,7 +15,7 @@ function buildMessageMenu(response) {
     var menuHtml = "";
     var itemsCount = response.rows.length;
     if(itemsCount < 1) {
-        return;
+        return "";
     }
     for(var i=0; i < itemsCount; i++) {
         menuHtml += buildMessageMenuItem(response.rows[i].sender, response.rows[i].topic, response.rows[i].time, response.rows[i].unread, response.inboxUrl);

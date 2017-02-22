@@ -188,7 +188,7 @@ class NavManager
         $this->sideTreeItems = [];
         $url = $this->urlHelper;
 
-        $dashboard = $this->createNavItem('dashboard', 'dashboard', 'Dashboard', $url('admin/dashboard'));
+        $dashboard = $this->createNavItem('dashboard', 'dashboard', '管理中心', $url('admin/dashboard'));
         $this->addSideTreeItem($dashboard);
 
         $menus = $this->aclManager->getMyMenus();

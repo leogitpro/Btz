@@ -62,10 +62,10 @@ class IndexController extends AdminBaseController
 
                 if (Result::SUCCESS == $result->getCode()) {
                     return $this->getMessagePlugin()->show(
-                        'Welcome',
-                        'Thanks sign in control panel.',
+                        '欢迎登入',
+                        '欢迎你再次登入管理平台, 祝您发现更多惊喜!',
                         $this->url()->fromRoute('admin'),
-                        'Enter',
+                        '立即进入',
                         3
                     );
                 } else {
@@ -89,8 +89,8 @@ class IndexController extends AdminBaseController
         $this->getAuthManager()->logout();
 
         return $this->getMessagePlugin()->show(
-            'Identity cleaned',
-            'The identity information has been cleaned safely. thanks sign in again!'
+            '安全退出',
+            '您的账号已经安全的退出系统, 下次登入你使用正确的账号和密码登入系统. 再见!'
         );
     }
 

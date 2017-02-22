@@ -28,7 +28,7 @@ return [
                             'route' => 'auth[/:action][:suffix]',
                             'constraints' => [
                                 //'action' => '(index|login|logout|sign-up|activated|active|forgot-password|reset-password)',
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -42,7 +42,7 @@ return [
                         'options' => [
                             'route' => 'auth/:action/:key[:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                                 'key' => '[a-zA-Z0-9]+',
                                 'suffix' => '(/|.html)',
                             ],
@@ -58,7 +58,7 @@ return [
                         'options' => [
                             'route' => 'profile[/:action][:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                                 'suffix' => '(/|.html)',
                             ],
                             'defaults' => [
@@ -72,7 +72,7 @@ return [
                         'options' => [
                             'route' => 'profile/:action/:key[:suffix]',
                             'constraints' => [
-                                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
+                                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                                 'key' => '[a-zA-Z0-9]+',
                                 'suffix' => '(/|.html)',
                             ],

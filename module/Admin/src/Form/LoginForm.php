@@ -51,7 +51,7 @@ class LoginForm extends Form
                 'id' => 'email',
             ],
             'options' => [
-                'label' => 'Account(E-mail)',
+                'label' => '登录账户(E-mail)',
             ],
         ]);
 
@@ -63,7 +63,7 @@ class LoginForm extends Form
                 'id' => 'password',
             ],
             'options' => [
-                'label' => 'Password',
+                'label' => '登录密码',
             ],
         ]);
 
@@ -73,7 +73,7 @@ class LoginForm extends Form
             'name' => 'submit',
             'attributes' => [
                 'id' => 'submit',
-                'value' => 'Sign In',
+                'value' => '现在登入',
             ],
         ]);
     }

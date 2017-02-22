@@ -21,7 +21,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/component.index.js'));
                     <th>操作</th>
                 </tr>
 
-                <?php $i=1; foreach ($rows as $entity) { $pk = base64_encode($entity->getComClass()); ?>
+                <?php $i=1; foreach ($rows as $entity) { $pk = urlencode($entity->getComClass()); ?>
 
                     <tr>
                         <td><?php echo $i++; ?></td>

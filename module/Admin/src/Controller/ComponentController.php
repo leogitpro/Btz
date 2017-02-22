@@ -106,7 +106,7 @@ class ComponentController extends AdminBaseController
     {
         $componentManager = $this->getComponentManager();
 
-        $component_class = base64_decode($this->params()->fromRoute('key'));
+        $component_class = urldecode($this->params()->fromRoute('key'));
 
         $component = $componentManager->getComponent($component_class);
         if (!($component instanceof Component)) {
@@ -145,7 +145,7 @@ class ComponentController extends AdminBaseController
      */
     public function actionsAction()
     {
-        $component_class = base64_decode($this->params()->fromRoute('key'));
+        $component_class = urldecode($this->params()->fromRoute('key'));
 
         $component = $this->getComponentManager()->getComponent($component_class);
         if (!($component instanceof Component)) {

@@ -19,8 +19,8 @@ return [
         'options' => [
             'route' => 'index[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -36,8 +36,8 @@ return [
         'options' => [
             'route' => 'dashboard[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -53,8 +53,8 @@ return [
         'options' => [
             'route' => 'search[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -70,8 +70,8 @@ return [
         'options' => [
             'route' => 'profile[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -87,8 +87,8 @@ return [
         'options' => [
             'route' => 'department[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -106,8 +106,8 @@ return [
         'options' => [
             'route' => 'member[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -125,8 +125,8 @@ return [
         'options' => [
             'route' => 'component[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-\%]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -143,8 +143,8 @@ return [
         'options' => [
             'route' => 'acl[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -162,8 +162,8 @@ return [
         'options' => [
             'route' => 'message[/:action[/:key]][:suffix]',
             'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                'key' => '[a-zA-Z0-9_-]+',
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
