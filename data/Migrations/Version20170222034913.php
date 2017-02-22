@@ -15,8 +15,21 @@ class Version20170222034913 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
-        // this up() migration is auto-generated, please modify it to your needs
+        $table = $schema->createTable('sys_feedback');
 
+        $table->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('sender', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('content', 'text');
+        $table->addColumn('created', 'datetime');
+        $table->addColumn('replier', 'string', ['fixed' => true, 'length' => 36]);
+        $table->addColumn('reply', 'text');
+        $table->addColumn('updated', 'datetime');
+
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['sender']);
+        $table->addIndex(['replier']);
+        $table->addIndex(['created']);
+        $table->addIndex(['updated']);
     }
 
     /**
@@ -24,7 +37,6 @@ class Version20170222034913 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        // this down() migration is auto-generated, please modify it to your needs
-
+        $schema->dropTable('sys_feedback');
     }
 }

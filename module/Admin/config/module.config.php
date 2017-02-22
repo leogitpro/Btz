@@ -43,6 +43,7 @@ return [
             Controller\ComponentController::class => InvokableFactory::class,
             Controller\AclController::class => InvokableFactory::class,
             Controller\MessageController::class => InvokableFactory::class,
+            Controller\FeedbackController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -99,6 +100,7 @@ return [
 
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\MessageManager::class => Service\Factory\MessageManagerFactory::class,
 

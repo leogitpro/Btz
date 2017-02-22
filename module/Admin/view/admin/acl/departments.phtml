@@ -12,7 +12,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
                     <th>部门名称</th>
                     <th>权限配置</th>
                 </tr>
-                <?php foreach ($entities as $dept) { if($dept->getDeptId() == \Admin\Entity\Department::DEFAULT_DEPT_ID) { continue; } ?>
+                <?php foreach ($entities as $dept) { ?>
 
                     <tr>
                         <td><?php echo $dept->getDeptName(); ?></td>

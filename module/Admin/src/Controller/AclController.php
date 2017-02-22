@@ -208,12 +208,13 @@ class AclController extends AdminBaseController
         $params = explode('_', $key);
         $dept_id = array_shift($params);
 
+        /**
         if ($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止操作基础部门');
             return ;
         }
-
+        //*/
 
         $dept = $this->getDeptManager()->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
@@ -269,11 +270,13 @@ class AclController extends AdminBaseController
         $params = explode('_', $key);
         $dept_id = (string)array_shift($params);
 
+        /**
         if ($dept_id == Department::DEFAULT_DEPT_ID) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止配置基础部门权限');
             return ;
         }
+        //*/
 
         $dept = $this->getDeptManager()->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {

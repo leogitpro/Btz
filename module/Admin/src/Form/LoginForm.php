@@ -95,11 +95,23 @@ class LoginForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '登入账号不能为空哦!',
+                        ],
+                    ],
+                ],
+                [
                     'name' => 'EmailAddress',
                     'break_chain_on_failure' => true,
                     'options' => [
                         'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
                         'useMxCheck' => false,
+                        'messages' => [
+                            \Zend\Validator\EmailAddress::INVALID_FORMAT => '您的账号格式是不是输错了哦!',
+                        ],
                     ],
                 ],
             ],
@@ -120,10 +132,23 @@ class LoginForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '登入密码不能为空哦!',
+                        ],
+                    ],
+                ],
+                [
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 4,
-                        'max' => 15
+                        'max' => 20,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '密码太短了, 最少需要4个字符哦!',
+                            \Zend\Validator\StringLength::TOO_LONG => '你输入的密码太长了点. 能记住的都是大神!',
+                        ],
                     ],
                 ],
             ],

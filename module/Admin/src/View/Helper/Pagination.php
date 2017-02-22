@@ -123,7 +123,7 @@ class Pagination extends AbstractHelper
 
         $start = (($this->page - 1) * $this->size + 1);
         $html .= '<ul class="pagination"><li>';
-        $html .= 'Showing <strong>' . $start . '</strong> to <strong>' . ($start + $this->size - 1) . '</strong> of <strong>' . $this->count . '</strong> records';
+        $html .= '当前数据从 <strong>' . $start . '</strong> 条到 <strong>' . ($start + $this->size - 1) . '</strong>条, 总计 <strong>' . $this->count . '</strong> 页';
         $html .= '</li></ul>';
 
         $html .= '</div>';
@@ -132,10 +132,10 @@ class Pagination extends AbstractHelper
 
 
         if (1 == $this->page) {
-            $html .= '<li class="disabled"><span>First</span></li>';
+            $html .= '<li class="disabled"><span>首页</span></li>';
             $html .= '<li class="disabled"><span>&lt;</span></li>';
         } else {
-            $html .= '<li><a href="' . sprintf($this->urlTpl, 1) . '">First</a></li>';
+            $html .= '<li><a href="' . sprintf($this->urlTpl, 1) . '">首页</a></li>';
             $html .= '<li><a href="' . sprintf($this->urlTpl, ($this->page - 1)) . '">&lt;</a></li>';
         }
 
@@ -169,10 +169,10 @@ class Pagination extends AbstractHelper
 
         if ($pages == $this->page) {
             $html .= '<li class="disabled"><span>&gt;</span></li>';
-            $html .= '<li class="disabled"><span>Last</span></li>';
+            $html .= '<li class="disabled"><span>末页</span></li>';
         } else {
             $html .= '<li><a href="' . sprintf($this->urlTpl, ($this->page + 1)) . '">&gt;</a></li>';
-            $html .= '<li><a href="' . sprintf($this->urlTpl, $pages) . '">Last</a></li>';
+            $html .= '<li><a href="' . sprintf($this->urlTpl, $pages) . '">末页</a></li>';
         }
 
 

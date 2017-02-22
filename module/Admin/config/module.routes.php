@@ -174,4 +174,22 @@ return [
     ],
     // End AclController router
 
+    // AclController router configuration
+    'feedback' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'feedback[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\FeedbackController::class,
+                'action' => 'index',
+            ],
+        ],
+    ],
+    // End AclController router
+
 ];
