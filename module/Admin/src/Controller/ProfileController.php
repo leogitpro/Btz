@@ -10,29 +10,11 @@ namespace Admin\Controller;
 
 use Admin\Form\UpdatePasswordForm;
 use Admin\Form\UpdateProfileForm;
-use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
 
-class ProfileController extends AbstractActionController
+class ProfileController extends AdminBaseController
 {
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $serviceManager = $e->getApplication()->getServiceManager();
-
-        $this->memberManager = $serviceManager->get(MemberManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * Show administrator summary information page.
@@ -41,7 +23,7 @@ class ProfileController extends AbstractActionController
      */
     public function indexAction()
     {
-        $member = $this->memberManager->getCurrentMember();
+        $member = $this->getMemberManager()->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             return ;
@@ -57,13 +39,14 @@ class ProfileController extends AbstractActionController
      */
     public function passwordAction()
     {
-        $member = $this->memberManager->getCurrentMember();
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             return ;
         }
 
-        $form = new UpdatePasswordForm($this->memberManager);
+        $form = new UpdatePasswordForm($memberManager);
 
         if($this->getRequest()->isPost()) {
 
@@ -76,7 +59,7 @@ class ProfileController extends AbstractActionController
                 $encryptedPassword = md5($data['new_password']); // Simple MD5 encrypt
 
                 $member->setMemberPassword($encryptedPassword);
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '密码已更新',
@@ -100,8 +83,8 @@ class ProfileController extends AbstractActionController
      */
     public function updateAction()
     {
-
-        $member = $this->memberManager->getCurrentMember();
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getCurrentMember();
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             return ;
@@ -119,7 +102,7 @@ class ProfileController extends AbstractActionController
 
                 $member->setMemberName($data['name']);
 
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '资料已更新',

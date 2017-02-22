@@ -1,87 +1,26 @@
 <?php
 /**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * module.config.php
+ *
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
  */
+
 
 namespace Application;
 
 
-use Zend\Router\Http\Literal;
-use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 
 return [
     'router' => [
-        'routes' => [
-            'home' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-            ],
-
-            'send-mail' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/send-mail.html',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'send-mail',
-                    ],
-                ],
-            ],
-
-            'contact' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route' => '/contact.html',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action' => 'contact',
-                    ],
-                ],
-            ],
-
-            'app' => [
-                'type'    => Segment::class,
-                'options' => [
-                    'route'    => '/application[/]',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'index',
-                    ],
-                ],
-                'may_terminate' => true,
-                'child_routes' => [
-                    'index' => [
-                        'type'    => Segment::class,
-                        'options' => [
-                            'route'    => 'index[/:action][:suffix]',
-                            'constraints' => [
-                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                'suffix' => '(/|.html)',
-                            ],
-                            'defaults' => [
-                                'controller' => Controller\IndexController::class,
-                                'action'     => 'index',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ],
+        'routes' => require __DIR__ . '/module.config.routes.php',
     ],
 
     'controllers' => [
         'factories' => [
-            Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
+            Controller\IndexController::class => InvokableFactory::class,
             Controller\DisplayController::class => InvokableFactory::class,
         ],
     ],
@@ -166,9 +105,9 @@ return [
     'log' => [
         'AppLogger' => [
             'writers' => [
-                [
+                'stream' => [
                     'name' => 'stream',
-                    'priority' => DEBUG_LEVEL,
+                    'priority' => \Zend\Log\Logger::DEBUG,
                     'options' => [
                         'stream' => rtrim(sys_get_temp_dir(), "/\\") . DIRECTORY_SEPARATOR . 'php-log-' . date('Ymd') . '.txt',
                         'formatter' => [
@@ -180,18 +119,18 @@ return [
                         ],
                         'filters' => [
                             /**
-                            [
+                            'priority' => [
                                 'name' => 'priority',
                                 'options' => [
-                                    'priority' => \Zend\Log\Logger::DEBUG,
+                                    'priority' => \Zend\Log\Logger::ERR,
                                 ],
                             ],
                             //*/
                             /**
-                            [
+                            'regex' => [
                                 'name' => 'regex',
                                 'options' => [
-                                    'regex' => '/test/i', // Log message content matched `test` string.
+                                    'regex' => '/Cleaned/i', // Log message content matched `test` string.
                                 ],
                             ],
                             //*/
@@ -216,27 +155,6 @@ return [
             ],
         ],
         'contact' => 'name@example.com',
-        'template' => [
-            'contact' => '
-Hi:
-    Master!
-    
-There is a new contact from the E-mail: %email%.
-
-%message%
-
-Message post time: %datetime%.
-Thanks!
-            ',
-        ],
+        'template' => require __DIR__ . '/module.config.mail_tpl.php',
     ],
-
-    // Public actions access configuration
-    'access_filter' => [
-        'controllers' => [
-            Controller\IndexController::class => ['*'], // All action can ben access for unauthenticated user.
-            Controller\DisplayController::class => ['*'], // Same as the previous.
-        ],
-    ],
-
 ];

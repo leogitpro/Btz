@@ -7,36 +7,16 @@ namespace Admin\Controller;
 
 
 use Admin\Form\LoginForm;
-use Admin\Service\AuthManager;
 use Admin\Service\AuthService;
 use Zend\Authentication\Result;
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
 
-class IndexController extends AbstractActionController
+class IndexController extends AdminBaseController
 {
-
-    /**
-     * @var AuthService
-     */
-    private $authService;
-
-    /**
-     * @var AuthManager
-     */
-    private $authManager;
-
-
-
     public function onDispatch(MvcEvent $e)
     {
-        $serviceManager = $e->getApplication()->getServiceManager();
-
-        $this->authManager = $serviceManager->get(AuthManager::class);
-        $this->authService = $serviceManager->get(AuthService::class);
-
         $response = parent::onDispatch($e);
 
         $viewModel = $e->getViewModel();
@@ -51,7 +31,7 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
-        if ($this->authService->hasIdentity()) {
+        if ($this->getSm(AuthService::class)->hasIdentity()) {
             $this->redirect()->toRoute('admin/dashboard', ['suffix' => '.html']);
         } else {
             $this->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
@@ -78,7 +58,7 @@ class IndexController extends AbstractActionController
 
                 $data = $form->getData();
 
-                $result = $this->authManager->login($data['email'], md5($data['password']));
+                $result = $this->getAuthManager()->login($data['email'], md5($data['password']));
 
                 if (Result::SUCCESS == $result->getCode()) {
                     return $this->getMessagePlugin()->show(
@@ -106,7 +86,7 @@ class IndexController extends AbstractActionController
      */
     public function logoutAction()
     {
-        $this->authManager->logout();
+        $this->getAuthManager()->logout();
 
         return $this->getMessagePlugin()->show(
             'Identity cleaned',

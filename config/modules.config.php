@@ -20,6 +20,6 @@ return [
     'DoctrineORMModule',
     'Zend\Session',
     'Application',
-    'User',
+    //'User',
     'Admin',
 ];

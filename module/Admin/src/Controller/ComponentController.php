@@ -12,37 +12,12 @@ namespace Admin\Controller;
 
 use Admin\Entity\Action;
 use Admin\Entity\Component;
-use Admin\Service\AclManager;
-use Admin\Service\ComponentManager;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
-class ComponentController extends BaseController
+class ComponentController extends AdminBaseController
 {
-    /**
-     * @var ComponentManager
-     */
-    private $componentManager;
-
-    /**
-     * @var AclManager
-     */
-    private $aclManager;
-
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $sm = $e->getApplication()->getServiceManager();
-
-        $this->componentManager = $sm->get(ComponentManager::class);
-        $this->aclManager = $sm->get(AclManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * Showing components list
@@ -56,17 +31,19 @@ class ComponentController extends BaseController
         $size = 10;
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get("ViewHelperManager");
+        $viewHelperManager = $this->getSm("ViewHelperManager");
         $paginationHelper = $viewHelperManager->get('pagination');
+
+        $componentManager = $this->getComponentManager();
 
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/component', ['action' => 'index', 'key' => '%d']));
-        $paginationHelper->setCount($this->componentManager->getComponentsCount());
+        $paginationHelper->setCount($componentManager->getComponentsCount());
 
         // Render view data
-        $rows = $this->componentManager->getComponentsByLimitPage($page, $size);
+        $rows = $componentManager->getComponentsByLimitPage($page, $size);
 
         /**
         foreach ($rows as $row) {
@@ -115,7 +92,7 @@ class ComponentController extends BaseController
         //echo '<p>Origin</p><pre>'; print_r($items); echo '</pre><hr>';
 
         //$items = [];
-        $this->componentManager->syncComponents($items);
+        $this->getComponentManager()->syncComponents($items);
 
         $result['success'] = true;
         return new JsonModel($result);
@@ -127,8 +104,11 @@ class ComponentController extends BaseController
      */
     public function deleteAction()
     {
+        $componentManager = $this->getComponentManager();
+
         $component_class = base64_decode($this->params()->fromRoute('key'));
-        $component = $this->componentManager->getComponent($component_class);
+
+        $component = $componentManager->getComponent($component_class);
         if (!($component instanceof Component)) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
@@ -139,14 +119,14 @@ class ComponentController extends BaseController
         $actions = $component->getActions();
         foreach ($actions as $action) {
             if ($action instanceof Action) {
-                $this->aclManager->removeAction($action->getActionId());
+                $this->getAclManager()->removeAction($action->getActionId());
             }
         }
 
         $comName = $component->getComName();
 
         // Delete the component and actions
-        $this->componentManager->removeEntity($component);
+        $componentManager->removeEntity($component);
 
         return $this->getMessagePlugin()->show(
             '模块已删除',
@@ -166,7 +146,8 @@ class ComponentController extends BaseController
     public function actionsAction()
     {
         $component_class = base64_decode($this->params()->fromRoute('key'));
-        $component = $this->componentManager->getComponent($component_class);
+
+        $component = $this->getComponentManager()->getComponent($component_class);
         if (!($component instanceof Component)) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
@@ -188,8 +169,9 @@ class ComponentController extends BaseController
      */
     public function removeAction()
     {
+        $componentManager = $this->getComponentManager();
         $action_id = $this->params()->fromRoute('key');
-        $action = $this->componentManager->getAction($action_id);
+        $action = $componentManager->getAction($action_id);
         if (!($action instanceof Action)) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的接口编号:' . $action_id);
@@ -197,10 +179,10 @@ class ComponentController extends BaseController
         }
 
         // Clean the acl
-        $this->aclManager->removeAction($action_id);
+        $this->getAclManager()->removeAction($action_id);
 
         // Delete the action
-        $this->componentManager->removeEntity($action);
+        $componentManager->removeEntity($action);
 
         return new JsonModel(['success' => true]);
     }

@@ -54,7 +54,7 @@ class MailManager
         $result = false;
 
         if (!isset($this->config['smtp'])) {
-            $this->logger->err('No E-mail SMTP information configuration, Cann\'t send mail.');
+            $this->logger->err('无 SMTP 配置, 不能实现发送邮件功能.');
             return $result;
         }
 
@@ -74,12 +74,10 @@ class MailManager
 
             $smtp->send($message);
 
-            $this->logger->debug('Sent mail information' . PHP_EOL . 'to:' . $recipient . PHP_EOL . 'subject:' . $subject . PHP_EOL . 'content:' . $content);
-
             $result = true;
 
         } catch (\Exception $e) {
-            $this->logger->err('Send mail failure: ' . $e->getMessage());
+            $this->logger->err('邮件发送失败: ' . PHP_EOL . $e->getMessage());
         }
 
         return $result;

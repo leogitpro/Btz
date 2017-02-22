@@ -11,35 +11,11 @@ namespace Admin\Controller;
 
 use Admin\Entity\Department;
 use Admin\Entity\Member;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 
-class SearchController extends AbstractActionController
+
+class SearchController extends AdminBaseController
 {
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-    /**
-     * @var DepartmentManager
-     */
-    private $deptManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $sm = $e->getApplication()->getServiceManager();
-        $this->memberManager = $sm->get(MemberManager::class);
-        $this->deptManager = $sm->get(DepartmentManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * Department Search
@@ -50,7 +26,7 @@ class SearchController extends AbstractActionController
     {
         $key = $this->params()->fromPost('query');
 
-        $rows = $this->deptManager->getDeptsBySearch($key);
+        $rows = $this->getDeptManager()->getDeptsBySearch($key);
         $list = [];
         foreach ($rows as $row) {
             if ($row instanceof Department) {
@@ -75,11 +51,13 @@ class SearchController extends AbstractActionController
      */
     public function membersAction()
     {
+        $memberManager = $this->getMemberManager();
+
         $key = $this->params()->fromPost('query');
 
-        $member = $this->memberManager->getCurrentMember();
+        $member = $memberManager->getCurrentMember();
 
-        $rows = $this->memberManager->getMembersBySearch($key);
+        $rows = $memberManager->getMembersBySearch($key);
         $list = [];
         foreach ($rows as $row) {
             if ($row instanceof Member) {

@@ -13,38 +13,13 @@ namespace Admin\Controller;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
 use Admin\Form\DepartmentForm;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
 use Ramsey\Uuid\Uuid;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
-class DepartmentController extends BaseController
+class DepartmentController extends AdminBaseController
 {
-
-    /**
-     * @var DepartmentManager
-     */
-    private $deptManager;
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $serviceManager = $e->getApplication()->getServiceManager();
-
-        $this->deptManager = $serviceManager->get(DepartmentManager::class);
-        $this->memberManager = $serviceManager->get(MemberManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * List departments
@@ -54,7 +29,7 @@ class DepartmentController extends BaseController
     public function indexAction()
     {
 
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $viewHelperManager = $this->getSm('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
         $page = (int)$this->params()->fromRoute('key', 1);
@@ -62,15 +37,17 @@ class DepartmentController extends BaseController
             $page = 1;
         }
 
+        $deptManager = $this->getDeptManager();
+
         $size = 10;
-        $count = $this->deptManager->getAllDepartmentsCount();
+        $count = $deptManager->getAllDepartmentsCount();
 
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/dept', ['action' => 'index', 'key' => '%d']));
 
-        $rows = $this->deptManager->getAllDepartmentsByLimitPage($page, $size);
+        $rows = $deptManager->getAllDepartmentsByLimitPage($page, $size);
 
         /**
         foreach ($rows as $row) {
@@ -103,8 +80,9 @@ class DepartmentController extends BaseController
      */
     public function addAction()
     {
+        $deptManager = $this->getDeptManager();
 
-        $form = new DepartmentForm($this->deptManager);
+        $form = new DepartmentForm($deptManager);
 
         if($this->getRequest()->isPost()) {
 
@@ -120,7 +98,7 @@ class DepartmentController extends BaseController
                 $dept->setDeptStatus(Department::STATUS_VALID);
                 $dept->setDeptCreated(new \DateTime());
 
-                $this->deptManager->saveModifiedEntity($dept);
+                $deptManager->saveModifiedEntity($dept);
 
                 return $this->getMessagePlugin()->show(
                     '部门已经创建',
@@ -152,7 +130,8 @@ class DepartmentController extends BaseController
             return ;
         }
 
-        $department = $this->deptManager->getDepartment($dept_id);
+        $deptManager = $this->getDeptManager();
+        $department = $deptManager->getDepartment($dept_id);
         if (null == $department) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
@@ -175,7 +154,7 @@ class DepartmentController extends BaseController
             $department->setDeptStatus(Department::STATUS_VALID);
         }
 
-        $this->deptManager->saveModifiedEntity($department);
+        $deptManager->saveModifiedEntity($department);
 
         return $this->getMessagePlugin()->show(
             '部门已更新',
@@ -201,14 +180,15 @@ class DepartmentController extends BaseController
             return ;
         }
 
-        $department = $this->deptManager->getDepartment($dept_id);
+        $deptManager = $this->getDeptManager();
+        $department = $deptManager->getDepartment($dept_id);
         if (null == $department) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组ID: ' . $dept_id);
             return ;
         }
 
-        $form = new DepartmentForm($this->deptManager, $department);
+        $form = new DepartmentForm($deptManager, $department);
 
         if($this->getRequest()->isPost()) {
 
@@ -219,7 +199,7 @@ class DepartmentController extends BaseController
                 $data = $form->getData();
 
                 $department->setDeptName($data['name']);
-                $this->deptManager->saveModifiedEntity($department);
+                $deptManager->saveModifiedEntity($department);
 
                 return $this->getMessagePlugin()->show(
                     '部门已更新',
@@ -247,9 +227,8 @@ class DepartmentController extends BaseController
      */
     public function membersAction()
     {
-
         $dept_id = $this->params()->fromRoute('key');
-        $dept = $this->deptManager->getDepartment($dept_id);
+        $dept = $this->getDeptManager()->getDepartment($dept_id);
         if (null == $dept) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
@@ -264,7 +243,7 @@ class DepartmentController extends BaseController
 
         $ownedMembers = $dept->getMembers();
 
-        $members = $this->memberManager->getMembers();
+        $members = $this->getMemberManager()->getMembers();
         foreach ($members as $member) {
             if ($member instanceof Member) {
 
@@ -306,7 +285,8 @@ class DepartmentController extends BaseController
 
         if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
 
-            $dept = $this->deptManager->getDepartment($dept_id);
+            $deptManager = $this->getDeptManager();
+            $dept = $deptManager->getDepartment($dept_id);
             if (null == $dept) {
                 $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组编号:' . $dept_id);
                 return new JsonModel($json);
@@ -328,13 +308,13 @@ class DepartmentController extends BaseController
                     continue;
                 }
 
-                $member = $this->memberManager->getMember($id);
+                $member = $this->getMemberManager()->getMember($id);
                 if (null != $member) {
                     $member->getDepts()->add($dept);
                 }
             }
 
-            $this->deptManager->saveModifiedEntity($dept);
+            $deptManager->saveModifiedEntity($dept);
 
             $json['success'] = true;
         } else {

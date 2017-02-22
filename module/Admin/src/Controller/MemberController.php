@@ -13,38 +13,13 @@ namespace Admin\Controller;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
 use Admin\Form\MemberForm;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
 use Ramsey\Uuid\Uuid;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
-class MemberController extends BaseController
+class MemberController extends AdminBaseController
 {
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-    /**
-     * @var DepartmentManager
-     */
-    private $deptManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $serviceManager = $e->getApplication()->getServiceManager();
-
-        $this->memberManager = $serviceManager->get(MemberManager::class);
-        $this->deptManager = $serviceManager->get(DepartmentManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * Show administrator list page
@@ -57,10 +32,12 @@ class MemberController extends BaseController
         $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
-        $count = $this->memberManager->getAllMembersCount();
+
+        $memberManager = $this->getMemberManager();
+        $count = $memberManager->getAllMembersCount();
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $viewHelperManager = $this->getSm('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
         // Configuration pagination
@@ -70,7 +47,7 @@ class MemberController extends BaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/member', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $this->memberManager->getAllMembersByLimitPage($page, $size);
+        $rows = $memberManager->getAllMembersByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
@@ -86,7 +63,9 @@ class MemberController extends BaseController
      */
     public function addAction()
     {
-        $form = new MemberForm($this->memberManager, null, ['email', 'password', 'name']);
+        $memberManager = $this->getMemberManager();
+
+        $form = new MemberForm($memberManager, null, ['email', 'password', 'name']);
 
         if($this->getRequest()->isPost()) {
 
@@ -106,10 +85,10 @@ class MemberController extends BaseController
                 $member->setMemberLevel(Member::LEVEL_INTERIOR);
                 $member->setMemberCreated(new \DateTime());
 
-                $defaultDept = $this->deptManager->getDefaultDepartment(); // Add member to default group
+                $defaultDept = $this->getDeptManager()->getDefaultDepartment(); // Add member to default group
                 $member->getDepts()->add($defaultDept);
 
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '成员已添加',
@@ -140,7 +119,8 @@ class MemberController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
@@ -151,11 +131,11 @@ class MemberController extends BaseController
             $member->setMemberStatus(Member::STATUS_RETRIED);
             $member->getDepts()->clear();
         } else { // to be activated, only restore with default department relation
-            $member->getDepts()->add($this->deptManager->getDefaultDepartment());
+            $member->getDepts()->add($this->getDeptManager()->getDefaultDepartment());
             $member->setMemberStatus(Member::STATUS_ACTIVATED);
         }
 
-        $this->memberManager->saveModifiedEntity($member);
+        $memberManager->saveModifiedEntity($member);
 
         return $this->getMessagePlugin()->show(
             '成员状态已更新',
@@ -181,14 +161,15 @@ class MemberController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
-        $form = new MemberForm($this->memberManager, $member, ['email', 'name']);
+        $form = new MemberForm($memberManager, $member, ['email', 'name']);
 
         if($this->getRequest()->isPost()) {
 
@@ -201,7 +182,7 @@ class MemberController extends BaseController
                 $member->setMemberEmail($data['email']);
                 $member->setMemberName($data['name']);
 
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '成员信息已经更新',
@@ -236,14 +217,15 @@ class MemberController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
-        $form = new MemberForm($this->memberManager, $member, ['level']);
+        $form = new MemberForm($memberManager, $member, ['level']);
 
         if($this->getRequest()->isPost()) {
 
@@ -255,7 +237,7 @@ class MemberController extends BaseController
 
                 $member->setMemberLevel($data['level']);
 
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '成员等级已更新',
@@ -290,14 +272,15 @@ class MemberController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
             return ;
         }
 
-        $form = new MemberForm($this->memberManager, $member, ['password']);
+        $form = new MemberForm($memberManager, $member, ['password']);
 
         if($this->getRequest()->isPost()) {
 
@@ -308,7 +291,7 @@ class MemberController extends BaseController
                 $data = $form->getData();
                 $member->setMemberPassword(md5($data['password']));
 
-                $this->memberManager->saveModifiedEntity($member);
+                $memberManager->saveModifiedEntity($member);
 
                 return $this->getMessagePlugin()->show(
                     '密码已更改',
@@ -333,12 +316,12 @@ class MemberController extends BaseController
     /**
      * View a member with all departments relationship
      *
-     * @return void|ViewModel
+     * @return ViewModel
      */
     public function departmentsAction()
     {
         $member_id = $this->params()->fromRoute('key');
-        $member = $this->memberManager->getMember($member_id);
+        $member = $this->getMemberManager()->getMember($member_id);
         if (null == $member) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
@@ -352,7 +335,7 @@ class MemberController extends BaseController
         ];
 
         $ownedDepts = $member->getDepts();
-        $departments = $this->deptManager->getDepartments();
+        $departments = $this->getDeptManager()->getDepartments();
         foreach ($departments as $department) {
             if ($department instanceof Department) {
 
@@ -393,7 +376,7 @@ class MemberController extends BaseController
 
         if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
 
-            $member = $this->memberManager->getMember($member_id);
+            $member = $this->getMemberManager()->getMember($member_id);
             if (null == $member) {
                 $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
                 return new JsonModel($json);
@@ -406,11 +389,11 @@ class MemberController extends BaseController
                 if ($id == Department::DEFAULT_DEPT_ID) {
                     continue;
                 }
-                $member->getDepts()->add($this->deptManager->getDepartment($id));
+                $member->getDepts()->add($this->getDeptManager()->getDepartment($id));
             }
-            $member->getDepts()->add($this->deptManager->getDefaultDepartment());
+            $member->getDepts()->add($this->getDeptManager()->getDefaultDepartment());
 
-            $this->memberManager->saveModifiedEntity($member);
+            $this->getMemberManager()->saveModifiedEntity($member);
 
             $json['success'] = true;
         } else {

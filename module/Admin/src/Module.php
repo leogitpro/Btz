@@ -104,23 +104,21 @@ class Module
         // Set module default template
         $viewModel->setTemplate('layout/admin_layout');
 
-        $whiteListControllers = [
-            ProfileController::class,
-            DashboardController::class,
-            SearchController::class,
+        $whiteList = [
+            ProfileController::class => ['*'],
+            DashboardController::class => ['*'],
+            SearchController::class => ['*'],
+            MessageController::class => ['in', 'out', 'read', 'delete', 'unread', 'send'],
         ];
-        if (in_array($controller, $whiteListControllers)) {
-            return ;
-        }
 
-        // ACL filter
         $action = $event->getRouteMatch()->getParam('action', null);
-        //$action = str_replace('-', '', lcfirst(ucwords($action, '-'))); // Convert action name to camel-case form dash-style
-        // Message public methods
-        if (in_array($action, ['in', 'out', 'read', 'delete', 'unread', 'send']) && $controller == MessageController::class) {
+        // Convert action name to camel-case form dash-style
+        //$action = str_replace('-', '', lcfirst(ucwords($action, '-')));
+
+        if (array_key_exists($controller, $whiteList) &&
+            (in_array('*', $whiteList[$controller]) || in_array($action, $whiteList[$controller]) )) {
             return ;
         }
-
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($controller, $action)) {

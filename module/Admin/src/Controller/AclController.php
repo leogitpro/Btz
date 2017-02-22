@@ -9,56 +9,16 @@
 
 namespace Admin\Controller;
 
-
 use Admin\Entity\AclDepartment;
 use Admin\Entity\AclMember;
-use Admin\Entity\Action;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
-use Admin\Service\AclManager;
-use Admin\Service\ComponentManager;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-class AclController extends BaseController
+
+class AclController extends AdminBaseController
 {
-
-    /**
-     * @var AclManager
-     */
-    private $aclManager;
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-    /**
-     * @var DepartmentManager
-     */
-    private $deptManager;
-
-    /**
-     * @var ComponentManager
-     */
-    private $componentManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $sm = $e->getApplication()->getServiceManager();
-
-        $this->aclManager = $sm->get(AclManager::class);
-        $this->memberManager = $sm->get(MemberManager::class);
-        $this->deptManager = $sm->get(DepartmentManager::class);
-        $this->componentManager = $sm->get(ComponentManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * List grant members
@@ -72,17 +32,19 @@ class AclController extends BaseController
         $size = 10;
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get("ViewHelperManager");
+        $viewHelperManager = $this->getSm("ViewHelperManager");
         $paginationHelper = $viewHelperManager->get('pagination');
+
+        $memberManager = $this->getMemberManager();
 
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'members', 'key' => '%d']));
-        $paginationHelper->setCount($this->memberManager->getMembersCount());
+        $paginationHelper->setCount($memberManager->getMembersCount());
 
         // Render view data
-        $members = $this->memberManager->getMembersByLimitPage($page, $size);
+        $members = $memberManager->getMembersByLimitPage($page, $size);
 
         return new ViewModel([
             'entities' => $members,
@@ -108,7 +70,7 @@ class AclController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $member = $this->getMemberManager()->getMember($member_id);
         if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
@@ -121,18 +83,20 @@ class AclController extends BaseController
         $size = 4;
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get("ViewHelperManager");
+        $viewHelperManager = $this->getSm("ViewHelperManager");
         $paginationHelper = $viewHelperManager->get('pagination');
+
+        $componentManager = $this->getComponentManager();
 
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'member', 'key' =>  $member_id . '_%d']));
-        $paginationHelper->setCount($this->componentManager->getComponentsCount());
+        $paginationHelper->setCount($componentManager->getComponentsCount());
 
-        $components = $this->componentManager->getComponentsByLimitPage($page, $size);
+        $components = $componentManager->getComponentsByLimitPage($page, $size);
 
-        $rows = $this->aclManager->getMemberAndActionAllAclByMember($member_id);
+        $rows = $this->getAclManager()->getMemberAndActionAllAclByMember($member_id);
         $acl = [];
         foreach ($rows as $row) {
             if ($row instanceof AclMember) {
@@ -168,7 +132,7 @@ class AclController extends BaseController
             return ;
         }
 
-        $member = $this->memberManager->getMember($member_id);
+        $member = $this->getMemberManager()->getMember($member_id);
         if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
@@ -176,7 +140,7 @@ class AclController extends BaseController
         }
 
         $action_id = (string)array_shift($params);
-        $action = $this->componentManager->getAction($action_id);
+        $action = $this->getComponentManager()->getAction($action_id);
         if (null == $action) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能编号: ' . $action_id);
@@ -191,7 +155,7 @@ class AclController extends BaseController
             return ;
         }
 
-        $this->aclManager->setMemberAndActionAcl($member_id, $action_id, $status);
+        $this->getAclManager()->setMemberAndActionAcl($member_id, $action_id, $status);
 
         $result['success'] = true;
         return new JsonModel($result);
@@ -211,17 +175,19 @@ class AclController extends BaseController
         $size = 10;
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get("ViewHelperManager");
+        $viewHelperManager = $this->getSm("ViewHelperManager");
         $paginationHelper = $viewHelperManager->get('pagination');
+
+        $deptManager = $this->getDeptManager();
 
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'departments', 'key' => '%d']));
-        $paginationHelper->setCount($this->deptManager->getDepartmentsCount());
+        $paginationHelper->setCount($deptManager->getDepartmentsCount());
 
         // Render view data
-        $entities = $this->deptManager->getDepartmentsByLimitPage($page, $size);
+        $entities = $deptManager->getDepartmentsByLimitPage($page, $size);
 
         return new ViewModel([
             'entities' => $entities,
@@ -248,7 +214,8 @@ class AclController extends BaseController
             return ;
         }
 
-        $dept = $this->deptManager->getDepartment($dept_id);
+
+        $dept = $this->getDeptManager()->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
@@ -261,18 +228,20 @@ class AclController extends BaseController
         $size = 4;
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get("ViewHelperManager");
+        $viewHelperManager = $this->getSm("ViewHelperManager");
         $paginationHelper = $viewHelperManager->get('pagination');
+
+        $componentManager = $this->getComponentManager();
 
         // Configuration pagination
         $paginationHelper->setPage($page);
         $paginationHelper->setSize($size);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/acl', ['action' => 'department', 'key' =>  $dept_id . '_%d']));
-        $paginationHelper->setCount($this->componentManager->getComponentsCount());
+        $paginationHelper->setCount($componentManager->getComponentsCount());
 
-        $components = $this->componentManager->getComponentsByLimitPage($page, $size);
+        $components = $componentManager->getComponentsByLimitPage($page, $size);
 
-        $rows = $this->aclManager->getDepartmentAndActionAllAclByDepartment($dept_id);
+        $rows = $this->getAclManager()->getDepartmentAndActionAllAclByDepartment($dept_id);
         $acl = [];
         foreach ($rows as $row) {
             if ($row instanceof AclDepartment) {
@@ -291,8 +260,6 @@ class AclController extends BaseController
 
     /**
      * Save modified department acl
-     *
-     * @return void|JsonModel
      */
     public function departmentDispatchAction()
     {
@@ -308,7 +275,7 @@ class AclController extends BaseController
             return ;
         }
 
-        $dept = $this->deptManager->getDepartment($dept_id);
+        $dept = $this->getDeptManager()->getDepartment($dept_id);
         if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
@@ -316,7 +283,7 @@ class AclController extends BaseController
         }
 
         $action_id = (string)array_shift($params);
-        $action = $this->componentManager->getAction($action_id);
+        $action = $this->getComponentManager()->getAction($action_id);
         if (null == $action) {
             $this->getResponse()->setStatusCode(404);
             $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能:' . $action_id);
@@ -331,7 +298,7 @@ class AclController extends BaseController
             return ;
         }
 
-        $this->aclManager->setDepartmentAndActionAcl($dept_id, $action_id, $status);
+        $this->getAclManager()->setDepartmentAndActionAcl($dept_id, $action_id, $status);
 
         $result['success'] = true;
         return new JsonModel($result);

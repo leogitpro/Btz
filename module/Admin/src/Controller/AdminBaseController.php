@@ -10,13 +10,72 @@
 namespace Admin\Controller;
 
 
-use Zend\Mvc\Controller\AbstractActionController;
+use Admin\Service\AclManager;
+use Admin\Service\AuthManager;
+use Admin\Service\ComponentManager;
+use Admin\Service\DepartmentManager;
+use Admin\Service\MemberManager;
+use Admin\Service\MessageManager;
+use Application\Controller\AppBaseController;
 
 
-
-
-class BaseController extends AbstractActionController
+/**
+ * Class AdminBaseController
+ * @package Admin\Controller
+ *
+ * @method \Admin\Controller\Plugin\MessagePlugin getMessagePlugin()
+ */
+class AdminBaseController extends AppBaseController
 {
+
+    /**
+     * @return MessageManager
+     */
+    protected function getMessageManager()
+    {
+        return $this->getSm(MessageManager::class);
+    }
+
+    /**
+     * @return MemberManager
+     */
+    protected function getMemberManager()
+    {
+        return $this->getSm(MemberManager::class);
+    }
+
+    /**
+     * @return DepartmentManager
+     */
+    protected function getDeptManager()
+    {
+        return $this->getSm(DepartmentManager::class);
+    }
+
+    /**
+     * @return ComponentManager
+     */
+    protected function getComponentManager()
+    {
+        return $this->getSm(ComponentManager::class);
+    }
+
+    /**
+     * @return AuthManager
+     */
+    protected function getAuthManager()
+    {
+        return $this->getSm(AuthManager::class);
+    }
+
+    /**
+     * @return AclManager
+     */
+    protected function getAclManager()
+    {
+        return $this->getSm(AclManager::class);
+    }
+
 
     /**
      * Get the controller actions information

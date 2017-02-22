@@ -1,56 +1,19 @@
 <?php
 /**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * IndexController.php
+ *
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
  */
 
 namespace Application\Controller;
 
 use Application\Form\ContactUsForm;
-use Application\Service\ContactManager;
-use Application\Service\MailManager;
-use Application\Service\NavManager;
-use Ramsey\Uuid\Uuid;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 
 
-
-class IndexController extends AbstractActionController
+class IndexController extends AppBaseController
 {
-
-    /**
-     * @var ContactManager
-     */
-    private $contactManager;
-
-    /**
-     * @var MailManager
-     */
-    private $mailManager;
-
-    /**
-     * @var NavManager
-     */
-    private $navManager;
-
-
-    /**
-     * IndexController constructor.
-     *
-     * @param ContactManager $contactManager
-     * @param MailManager $mailManager
-     * @param NavManager $navManager
-     */
-    public function __construct(ContactManager $contactManager, MailManager $mailManager, NavManager $navManager)
-    {
-        $this->contactManager = $contactManager;
-        $this->mailManager = $mailManager;
-        $this->navManager = $navManager;
-    }
-
 
     /**
      * Home page
@@ -59,18 +22,6 @@ class IndexController extends AbstractActionController
      */
     public function indexAction()
     {
-        //$ip = $this->getServerPlugin()->ipAddress();
-        //$ua = $this->getServerPlugin()->userAgent();
-
-        //echo '<p>ip: ' . $ip . '</p>';
-        //echo '<p>ua: ' . $ua . '</p>';
-
-        //echo '<pre>'; print_r($_SESSION); echo '</pre>';
-
-        //echo '<h1>';
-        //echo Uuid::uuid1();
-        //echo '</h1>';
-
         return new ViewModel();
     }
 
@@ -81,7 +32,6 @@ class IndexController extends AbstractActionController
      */
     public function testAction()
     {
-        //return $this->getResponse();
         return new ViewModel();
     }
 
@@ -110,7 +60,7 @@ class IndexController extends AbstractActionController
                 $message = $data['message'];
                 $ip = $this->getServerPlugin()->ipAddress();
 
-                $this->contactManager->saveNewContact($email, $subject, $message, $ip);
+                $this->getContactManager()->saveNewContact($email, $subject, $message, $ip);
 
                 // Ready send mail
                 $contactMail = $this->getConfigPlugin()->get('mail.contact');
@@ -145,7 +95,7 @@ class IndexController extends AbstractActionController
 
 
     /**
-     * Common service for send mail
+     * 发送邮件
      *
      * @return \Zend\Stdlib\ResponseInterface
      */
@@ -159,13 +109,13 @@ class IndexController extends AbstractActionController
         $recipient = $this->params()->fromPost('mail_recipient');
 
         if (empty($subject) || empty($content) || empty($recipient)) {
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . 'Mail params lost. send cancel.');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '邮件发送参数非法! 取消发送.');
             return $this->getResponse();
         }
 
-        $this->getLoggerPlugin()->debug("Start send mail");
-        $this->mailManager->sendMail($recipient, $subject, $content);
-        $this->getLoggerPlugin()->debug("End send mail");
+        $this->getLoggerPlugin()->debug("开始发送邮件: " . $subject);
+        $this->getMailManager()->sendMail($recipient, $subject, $content);
+        $this->getLoggerPlugin()->debug("邮件发送完毕: " . $subject);
 
         return $this->getResponse();
     }

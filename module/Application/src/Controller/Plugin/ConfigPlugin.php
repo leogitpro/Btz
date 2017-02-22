@@ -10,6 +10,7 @@ namespace Application\Controller\Plugin;
 
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
+
 class ConfigPlugin extends AbstractPlugin
 {
     /**

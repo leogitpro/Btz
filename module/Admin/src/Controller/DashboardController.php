@@ -7,37 +7,19 @@
 
 namespace Admin\Controller;
 
-use Admin\Entity\Member;
-use Admin\Service\MemberManager;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\Mvc\MvcEvent;
+
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
-class DashboardController extends AbstractActionController
+class DashboardController extends AdminBaseController
 {
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $sm = $e->getApplication()->getServiceManager();
-        $this->memberManager = $sm->get(MemberManager::class);
-
-        return parent::onDispatch($e);
-    }
 
 
     public function indexAction()
     {
         return new ViewModel();
     }
-
-
 
 
     /**

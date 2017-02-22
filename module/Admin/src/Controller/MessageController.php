@@ -10,49 +10,15 @@
 namespace Admin\Controller;
 
 
-
-use Admin\Entity\Department;
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
 use Admin\Form\MessageForm;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
-use Admin\Service\MessageManager;
-use Zend\Mvc\MvcEvent;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-class MessageController extends BaseController
+
+class MessageController extends AdminBaseController
 {
-
-    /**
-     * @var MessageManager
-     */
-    private $messageManager;
-
-    /**
-     * @var DepartmentManager
-     */
-    private $deptManager;
-
-
-    /**
-     * @var MemberManager
-     */
-    private $memberManager;
-
-
-    public function onDispatch(MvcEvent $e)
-    {
-        $serviceManager = $e->getApplication()->getServiceManager();
-
-        $this->messageManager = $serviceManager->get(MessageManager::class);
-        $this->deptManager = $serviceManager->get(DepartmentManager::class);
-        $this->memberManager = $serviceManager->get(MemberManager::class);
-
-        return parent::onDispatch($e);
-    }
-
 
     /**
      * 全部消息清单. For supper administrator check
@@ -63,10 +29,12 @@ class MessageController extends BaseController
         $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
-        $count = $this->messageManager->getMessageContentsCount();
+
+        $messageManager = $this->getMessageManager();
+        $count = $messageManager->getMessageContentsCount();
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $viewHelperManager = $this->getSm('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
         // Configuration pagination
@@ -75,7 +43,7 @@ class MessageController extends BaseController
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'index', 'key' => '%d']));
 
-        $rows = $this->messageManager->getMessageContentsByLimitPage($page, $size);
+        $rows = $messageManager->getMessageContentsByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
@@ -93,13 +61,14 @@ class MessageController extends BaseController
 
         $messageId = (string)$this->params()->fromRoute('key');
 
-        $message = $this->messageManager->getMessageContent($messageId);
+        $messageManager = $this->getMessageManager();
+        $message = $messageManager->getMessageContent($messageId);
         if (!($message instanceof MessageContent)) {
             return new JsonModel($result);
         }
 
         $message->setStatus(MessageContent::STATUS_INVALID);
-        $this->messageManager->saveModifiedEntity($message);
+        $messageManager->saveModifiedEntity($message);
 
         $result['success'] = true;
         $result['message'] = 'Closed message: ' . $message->getTopic();
@@ -118,10 +87,12 @@ class MessageController extends BaseController
         $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
-        $count = $this->messageManager->getInBoxMessagesCount();
+
+        $messageManager = $this->getMessageManager();
+        $count = $messageManager->getInBoxMessagesCount();
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $viewHelperManager = $this->getSm('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
         // Configuration pagination
@@ -130,7 +101,7 @@ class MessageController extends BaseController
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'in', 'key' => '%d']));
 
-        $rows = $this->messageManager->getInBoxMessagesByLimitPage($page, $size);
+        $rows = $messageManager->getInBoxMessagesByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
@@ -148,13 +119,14 @@ class MessageController extends BaseController
 
         $boxId = $this->params()->fromRoute('key');
 
-        $messageBox = $this->messageManager->getMessageBox($boxId);
+        $messageManager = $this->getMessageManager();
+        $messageBox = $messageManager->getMessageBox($boxId);
         if (null == $messageBox) {
             return new JsonModel($result);
         }
 
         $messageBox->setReceiverStatus(MessageBox::STATUS_RECEIVER_READ);
-        $this->messageManager->saveModifiedEntity($messageBox);
+        $messageManager->saveModifiedEntity($messageBox);
 
         $result['success'] = true;
         $result['message'] = 'Message has read.';
@@ -173,12 +145,13 @@ class MessageController extends BaseController
 
         $boxId = $this->params()->fromRoute('key');
 
-        $messageBox = $this->messageManager->getMessageBox($boxId);
+        $messageManager = $this->getMessageManager();
+        $messageBox = $messageManager->getMessageBox($boxId);
         if (null == $messageBox) {
             return new JsonModel($result);
         }
 
-        $member = $this->memberManager->getCurrentMember();
+        $member = $this->getMemberManager()->getCurrentMember();
         if ($member->getMemberId() == $messageBox->getReceiver()) {
             $messageBox->setReceiverStatus(MessageBox::STATUS_RECEIVER_DELETED);
         }
@@ -186,7 +159,7 @@ class MessageController extends BaseController
             $messageBox->setSenderStatus(MessageBox::STATUS_SENDER_DELETED);
         }
 
-        $this->messageManager->saveModifiedEntity($messageBox);
+        $messageManager->saveModifiedEntity($messageBox);
 
         $result['success'] = true;
         $result['message'] = 'Message has deleted.';
@@ -202,9 +175,10 @@ class MessageController extends BaseController
     {
         $list = ['count' => 0, 'rows' => []];
 
-        $list['count'] = $this->messageManager->getUnreadMessagesCount();
+        $messageManager = $this->getMessageManager();
+        $list['count'] = $messageManager->getUnreadMessagesCount();
         $list['inboxUrl'] = $this->url()->fromRoute('admin/message', ['action' => 'in']);
-        $rows = $this->messageManager->getMyLatestMessages(5);
+        $rows = $messageManager->getMyLatestMessages(5);
         $messages = [];
         foreach ($rows as $row) {
             if ($row instanceof MessageBox) {
@@ -233,10 +207,12 @@ class MessageController extends BaseController
         $size = 1;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
-        $count = $this->messageManager->getOutBoxMessagesCount();
+
+        $messageManager = $this->getMessageManager();
+        $count = $messageManager->getOutBoxMessagesCount();
 
         // Get pagination helper
-        $viewHelperManager = $this->getEvent()->getApplication()->getServiceManager()->get('ViewHelperManager');
+        $viewHelperManager = $this->getSm('ViewHelperManager');
         $paginationHelper = $viewHelperManager->get('pagination');
 
         // Configuration pagination
@@ -245,7 +221,7 @@ class MessageController extends BaseController
         $paginationHelper->setCount($count);
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/message', ['action' => 'out', 'key' => '%d']));
 
-        $rows = $this->messageManager->getOutBoxMessagesByLimitPage($page, $size);
+        $rows = $messageManager->getOutBoxMessagesByLimitPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,
@@ -260,9 +236,11 @@ class MessageController extends BaseController
     public function sendAction()
     {
         $key = (string)$this->params()->fromRoute('key');
-        $receiver = $this->memberManager->getMember($key);
 
-        $form = new MessageForm($this->memberManager, $receiver);
+        $memberManager = $this->getMemberManager();
+        $receiver = $memberManager->getMember($key);
+
+        $form = new MessageForm($memberManager, $receiver);
 
         if($this->getRequest()->isPost()) {
 
@@ -272,10 +250,10 @@ class MessageController extends BaseController
                 $data = $form->getData();
 
                 if (null == $receiver || $receiver->getMemberId() != $data['receiver_id']) {
-                    $receiver = $this->memberManager->getMember($data['receiver_id']);
+                    $receiver = $memberManager->getMember($data['receiver_id']);
                 }
 
-                $this->messageManager->sendOneMessage($receiver, $data['topic'], $data['content']);
+                $this->getMessageManager()->sendOneMessage($receiver, $data['topic'], $data['content']);
 
                 return $this->getMessagePlugin()->show(
                     '消息已发送',
@@ -300,9 +278,11 @@ class MessageController extends BaseController
     public function deptAction()
     {
         $key = (string)$this->params()->fromRoute('key');
-        $receiver = $this->deptManager->getDepartment($key);
 
-        $form = new MessageForm($this->deptManager, $receiver);
+        $deptManager = $this->getDeptManager();
+        $receiver = $deptManager->getDepartment($key);
+
+        $form = new MessageForm($deptManager, $receiver);
 
         if($this->getRequest()->isPost()) {
 
@@ -311,7 +291,7 @@ class MessageController extends BaseController
             if ($form->isValid()) {
                 $data = $form->getData();
 
-                $this->messageManager->broadcastMessage($data['topic'], $data['content'], (string)$data['receiver_id']);
+                $this->getMessageManager()->broadcastMessage($data['topic'], $data['content'], (string)$data['receiver_id']);
 
                 return $this->getMessagePlugin()->show(
                     '消息已发送',
@@ -346,7 +326,7 @@ class MessageController extends BaseController
 
                 $data = $form->getData();
 
-                $this->messageManager->broadcastMessage($data['topic'], $data['content']);
+                $this->getMessageManager()->broadcastMessage($data['topic'], $data['content']);
 
                 return $this->getMessagePlugin()->show(
                     '广播已发送',
@@ -376,8 +356,8 @@ class MessageController extends BaseController
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '全部消息', 1, 'envelope-o', 0);
         $item['actions']['in'] = self::CreateActionRegistry('in', '收件箱', 1, 'envelope-o', 8);
-        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 1, 'envelope-o', 6);
-        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息', 1, 'envelope-o', 4);
+        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 0, 'envelope-o', 6);
+        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息', 0, 'envelope-o', 4);
         $item['actions']['dept'] = self::CreateActionRegistry('dept', '群发消息', 1, 'envelope-o', 3);
         $item['actions']['broadcast'] = self::CreateActionRegistry('broadcast', '发广播', 1, 'bullhorn', 1);
 

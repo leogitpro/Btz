@@ -1,19 +1,19 @@
 <?php
 /**
- * Display message controller
+ * DisplayController.php
  *
- * User: leo
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
  */
 
 namespace Application\Controller;
 
 
-use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class DisplayController extends AbstractActionController
-{
 
+class DisplayController extends AppBaseController
+{
 
     /**
      * Display notification message
