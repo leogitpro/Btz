@@ -18,7 +18,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
                             </h4>
                         </div>
                         <div class="col-lg-4 text-right">
-                            <small class=""><a href="#">删除反馈</a></small>
+                            <small class=""><a href="<?php echo $this->url('admin/feedback', ['action' => 'cancel', 'key' => $row->getId()]); ?>xxx">删除反馈</a></small>
                         </div>
                     </div>
                 </div>

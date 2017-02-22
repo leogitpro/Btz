@@ -10,8 +10,12 @@ namespace Admin\Controller;
 
 
 use Admin\Entity\Feedback;
+use Admin\Entity\Member;
 use Admin\Form\FeedbackForm;
+use Doctrine\DBAL\Exception\NonUniqueFieldNameException;
+use Doctrine\ORM\NonUniqueResultException;
 use Ramsey\Uuid\Uuid;
+use Zend\Mvc\Exception\RuntimeException;
 use Zend\View\Model\ViewModel;
 
 class FeedbackController extends AdminBaseController
@@ -97,6 +101,36 @@ class FeedbackController extends AdminBaseController
     }
 
 
+    /**
+     * Cancel self feedback
+     */
+    public function cancelAction()
+    {
+        $feedbackId = (string)$this->params()->fromRoute('key');
+
+        $feedbackManager = $this->getFeedbackManager();
+        $feedback = $feedbackManager->getFeedback($feedbackId);
+
+        if (!$feedback instanceof Feedback) {
+            throw new \Exception('反馈的信息编号失效了!');
+        }
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+        if (!($myself instanceof Member) || $myself->getMemberId() != $feedback->getSender()->getMemberId()) {
+            $this->getResponse()->setStatusCode(404);
+            return ;
+        }
+
+        $feedbackManager->removeEntity($feedback);
+
+        return $this->getMessagePlugin()->show(
+            '反馈已删除',
+            '您已经删除您的反馈意见! 如果有任何想法, 请让我们知道. 谢谢!',
+            $this->url()->fromRoute('admin/feedback'),
+            '返回',
+            3
+        );
+    }
 
 
     /**
@@ -110,6 +144,8 @@ class FeedbackController extends AdminBaseController
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '我的反馈', 1, 'comments-o', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '发起反馈', 1, 'comment-o', 1);
+
+        $item['actions']['cancel'] = self::CreateActionRegistry('cancel', '删除反馈');
 
         return $item;
     }

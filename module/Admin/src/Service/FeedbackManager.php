@@ -13,8 +13,31 @@ namespace Admin\Service;
 use Admin\Entity\Feedback;
 use Admin\Entity\Member;
 
+
 class FeedbackManager extends BaseEntityManager
 {
+
+    /**
+     * Get the
+     *
+     * @param string $feedbackId
+     * @return Feedback
+     */
+    public function getFeedback($feedbackId)
+    {
+        if (empty($feedbackId)) {
+            return null;
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->from(Feedback::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $feedbackId);
+
+        return $this->getEntityFromPersistence();
+    }
+
 
     /**
      * Query a member feedback count
