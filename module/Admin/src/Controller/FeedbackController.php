@@ -213,7 +213,6 @@ class FeedbackController extends AdminBaseController
 
 
 
-
     /**
      * Controller and actions registry
      *
@@ -229,7 +228,8 @@ class FeedbackController extends AdminBaseController
         $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除反馈');
 
         $item['actions']['all'] = self::CreateActionRegistry('all', '全部反馈', 1, 'comments-o', 10);
-        $item['actions']['close'] = self::CreateActionRegistry('close', '删除反馈');
+        $item['actions']['close'] = self::CreateActionRegistry('close', '关闭反馈');
+        $item['actions']['reply'] = self::CreateActionRegistry('reply', '回应反馈');
 
         return $item;
     }

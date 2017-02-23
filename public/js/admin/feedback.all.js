@@ -7,4 +7,18 @@ $(function () {
             return false;
         }
     });
+
+    $(".update-reply").click(function () {
+        var text = $("#reply_" + $(this).attr("name")).val();
+        var url = $(this).data("path");
+
+        $(this).blur();
+
+        $.post(url, {content:text}, function (dt) {
+            console.log(dt);
+            if(dt.success) {
+                window.location.reload(true);
+            }
+        }, "json");
+    });
 });
