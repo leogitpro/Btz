@@ -173,7 +173,7 @@ class MessageController extends AdminBaseController
      */
     public function unreadAction()
     {
-        $list = ['count' => 0, 'rows' => []];
+        $list = ['success' => true, 'count' => 0, 'rows' => []];
 
         $messageManager = $this->getMessageManager();
         $list['count'] = $messageManager->getUnreadMessagesCount();

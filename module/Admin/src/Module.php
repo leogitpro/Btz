@@ -74,17 +74,17 @@ class Module
 
 
     /**
-     * Custom dispatch listener
-     * Use custom layout for this module
-     *
      * @param MvcEvent $event
+     * @throws \Exception
      */
     public function onDispatchListener(MvcEvent $event)
     {
         // Application running env flag
         $serviceManager = $event->getApplication()->getServiceManager();
+
         $appConfig = $serviceManager->get('ApplicationConfig');
         $appEnv = isset($appConfig['application']['env']) ? $appConfig['application']['env'] : 'development';
+
         $viewModel = $event->getViewModel();
         $viewModel->setVariable('appEnv', $appEnv);
 
@@ -98,7 +98,17 @@ class Module
         // Login status validate
         $authService = $serviceManager->get(AuthService::class);
         if (!$authService->hasIdentity()) {
-            return $event->getTarget()->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
+            $request = $event->getTarget()->getRequest();
+            if($request->isXmlHttpRequest()) {
+                $viewModel->setTemplate(true);
+                $response = $event->getTarget()->getResponse();
+                $response->getHeaders()->addHeaderLine( 'Content-Type', 'application/json' );
+                $response->setContent(json_encode(['success' => false, 'code' => 1001, 'message' => 'Unauthorized']));
+                $response->send();
+                exit(1);
+            } else {
+                return $event->getTarget()->redirect()->toRoute('admin/index', ['action' => 'login', 'suffix' => '.html']);
+            }
         }
 
         // Set module default template
@@ -122,14 +132,19 @@ class Module
 
         $aclManager = $serviceManager->get(AclManager::class);
         if (!$aclManager->isValid($controller, $action)) {
-            $ajaxCall = $event->getTarget()->getRequest()->isXmlHttpRequest();
-            $toAction = 'forbidden';
-            if ($ajaxCall) {
-                $toAction = 'forbiddenajax';
+            $request = $event->getTarget()->getRequest();
+            if($request->isXmlHttpRequest()) {
+                $viewModel->setTemplate(true);
+                $response = $event->getTarget()->getResponse();
+                //$response->setStatusCode(500);
+                $response->getHeaders()->addHeaderLine( 'Content-Type', 'application/json' );
+                $response->setContent(json_encode(['success' => false, 'code' => 1111, 'message' => 'Unauthorized']));
+                $response->send();
+                exit(1);
+            } else {
+                throw new \Exception('我们找遍了整个宇宙也没发现谁给了你权利使用这个功能哦!');
             }
-            return $event->getTarget()->redirect()->toRoute('admin/dashboard', ['action' => $toAction, 'suffix' => '.html']);
         }
-
     }
 
 }

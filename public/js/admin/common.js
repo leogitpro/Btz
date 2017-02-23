@@ -11,6 +11,10 @@ function buildMessageMenuItem(author, topic, time, unread, url) {
 }
 
 function buildMessageMenu(response) {
+    if(!response.success) {
+        return "";
+    }
+
     var count = response.count;
     var menuHtml = "";
     var itemsCount = response.rows.length;

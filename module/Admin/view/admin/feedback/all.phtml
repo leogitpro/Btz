@@ -1,10 +1,8 @@
 <?php
-$this->pageTitleBar('我的反馈');
+$this->pageTitleBar('成员反馈');
 $this->sideTreeMenu()->setActiveId($activeId);
 $this->headScript()->appendFile($this->basePath('js/admin/feedback.all.js'));
-
 ?>
-
 
 <div class="row">
     <div class="col-lg-12">
@@ -19,27 +17,21 @@ $this->headScript()->appendFile($this->basePath('js/admin/feedback.all.js'));
                             </h4>
                         </div>
                         <div class="col-lg-4 text-right">
-                            <small class=""><a class="remove-link" href="<?php echo $this->url('admin/feedback', ['action' => 'delete', 'key' => $row->getId()]); ?>">删除反馈</a></small>
+                            <small class=""><a class="remove-link" href="<?php echo $this->url('admin/feedback', ['action' => 'close', 'key' => $row->getId()]); ?>">删除反馈</a></small>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
                     <?php echo nl2br($this->escapeHtml($row->getContent())); ?>
+                    <hr>
+                    <div class="form-group">
+                        <textarea class="form-control" cols="80" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-primary" type="submit" id="submit" value="Submit">
+                    </div>
                 </div>
             </div>
-            <?php if(!empty($row->getReply())) { ?>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title text-right">
-                            <small><em><?php echo $row->getUpdated()->format('Y-m-d H:i'); ?></em> By: </small>
-                            <?php echo $row->getReplier()->getMemberName(); ?>
-                        </h4>
-                    </div>
-                    <div class="panel-body">
-                        <?php echo nl2br($this->escapeHtml($row->getReply())); ?>
-                    </div>
-                </div>
-            <?php } ?>
         <?php } ?>
     </div>
 </div>

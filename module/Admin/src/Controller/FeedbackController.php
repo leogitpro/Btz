@@ -16,6 +16,7 @@ use Doctrine\DBAL\Exception\NonUniqueFieldNameException;
 use Doctrine\ORM\NonUniqueResultException;
 use Ramsey\Uuid\Uuid;
 use Zend\Mvc\Exception\RuntimeException;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class FeedbackController extends AdminBaseController
@@ -41,7 +42,7 @@ class FeedbackController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
         $feedbackManager = $this->getFeedbackManager();
 
-        $size = 1;
+        $size = 5;
         $count = $feedbackManager->getMemberFeedbackCount($myself);
 
         $paginationHelper->setPage($page);
@@ -93,7 +94,6 @@ class FeedbackController extends AdminBaseController
             }
         }
 
-
         return new ViewModel([
             'form' => $form,
             'activeId' => __METHOD__,
@@ -102,23 +102,18 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * Cancel self feedback
+     * Delete self feedback
      */
-    public function cancelAction()
+    public function deleteAction()
     {
         $feedbackId = (string)$this->params()->fromRoute('key');
 
         $feedbackManager = $this->getFeedbackManager();
         $feedback = $feedbackManager->getFeedback($feedbackId);
-
-        if (!$feedback instanceof Feedback) {
-            throw new \Exception('反馈的信息编号失效了!');
-        }
-
         $myself = $this->getMemberManager()->getCurrentMember();
-        if (!($myself instanceof Member) || $myself->getMemberId() != $feedback->getSender()->getMemberId()) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
+
+        if ($myself->getMemberId() != $feedback->getSender()->getMemberId()) {
+            throw new \Exception('你不能删除别人的反馈信息!');
         }
 
         $feedbackManager->removeEntity($feedback);
@@ -134,6 +129,92 @@ class FeedbackController extends AdminBaseController
 
 
     /**
+     * @return ViewModel
+     */
+    public function allAction()
+    {
+        $viewHelperManager = $this->getSm('ViewHelperManager');
+        $paginationHelper = $viewHelperManager->get('pagination');
+
+        $page = (int)$this->params()->fromRoute('key', 1);
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $feedbackManager = $this->getFeedbackManager();
+
+        $size = 5;
+        $count = $feedbackManager->getAllFeedbackCount();
+
+        $paginationHelper->setPage($page);
+        $paginationHelper->setSize($size);
+        $paginationHelper->setCount($count);
+        $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/feedback', ['action' => 'index', 'key' => '%d']));
+
+        $rows = $feedbackManager->getFeedbackByLimitPage($page, $size);
+
+        return new ViewModel([
+            'rows' => $rows,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function closeAction()
+    {
+        $feedbackId = (string)$this->params()->fromRoute('key');
+
+        $feedbackManager = $this->getFeedbackManager();
+        $feedback = $feedbackManager->getFeedback($feedbackId);
+
+        $feedbackManager->removeEntity($feedback);
+
+        return $this->getMessagePlugin()->show(
+            '反馈已关闭',
+            '成员的反馈已经关闭!',
+            $this->url()->fromRoute('admin/feedback', ['action' => 'all']),
+            '返回',
+            3
+        );
+    }
+
+
+    /**
+     * Reply feedback
+     */
+    public function replyAction()
+    {
+        $feedbackId = (string)$this->params()->fromRoute('key');
+
+        $feedbackManager = $this->getFeedbackManager();
+
+        $feedback = $feedbackManager->getFeedback($feedbackId);
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $content = strip_tags($this->params()->fromPost('content', ''));
+
+        $feedback->setReplier($myself);
+        $feedback->setReply($content);
+        $feedback->setUpdated(new \DateTime());
+
+        $feedbackManager->saveModifiedEntity($feedback);
+
+        return new JsonModel([
+            'success' => true,
+            'code' => 0,
+            'message' => '',
+        ]);
+    }
+
+
+
+
+    /**
      * Controller and actions registry
      *
      * @return array
@@ -145,7 +226,10 @@ class FeedbackController extends AdminBaseController
         $item['actions']['index'] = self::CreateActionRegistry('index', '我的反馈', 1, 'comments-o', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '发起反馈', 1, 'comment-o', 1);
 
-        $item['actions']['cancel'] = self::CreateActionRegistry('cancel', '删除反馈');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除反馈');
+
+        $item['actions']['all'] = self::CreateActionRegistry('all', '全部反馈', 1, 'comments-o', 10);
+        $item['actions']['close'] = self::CreateActionRegistry('close', '删除反馈');
 
         return $item;
     }

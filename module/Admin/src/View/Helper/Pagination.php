@@ -123,7 +123,7 @@ class Pagination extends AbstractHelper
 
         $start = (($this->page - 1) * $this->size + 1);
         $html .= '<ul class="pagination"><li>';
-        $html .= '当前数据从 <strong>' . $start . '</strong> 条到 <strong>' . ($start + $this->size - 1) . '</strong>条, 总计 <strong>' . $this->count . '</strong> 页';
+        $html .= '当前第 <strong>' . $this->page . '</strong>页, 总计 <strong>' . $this->count . '</strong> 条';
         $html .= '</li></ul>';
 
         $html .= '</div>';

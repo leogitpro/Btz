@@ -22,11 +22,12 @@ class FeedbackManager extends BaseEntityManager
      *
      * @param string $feedbackId
      * @return Feedback
+     * @throws \Exception
      */
     public function getFeedback($feedbackId)
     {
         if (empty($feedbackId)) {
-            return null;
+            throw new \Exception('没有反馈的编号, 我们无法为您查阅信息哦!');
         }
 
         $qb = $this->resetQb();
@@ -35,7 +36,11 @@ class FeedbackManager extends BaseEntityManager
         $qb->where($qb->expr()->eq('t.id', '?1'));
         $qb->setParameter(1, $feedbackId);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Feedback) {
+            throw new \Exception('查询不到相关的反馈信息!');
+        }
+        return $obj;
     }
 
 

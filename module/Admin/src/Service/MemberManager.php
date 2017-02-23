@@ -82,11 +82,12 @@ class MemberManager extends BaseEntityManager
      *
      * @param string $member_id
      * @return Member
+     * @throws \Exception
      */
     public function getMember($member_id = null)
     {
         if (empty($member_id)) {
-            return null;
+            throw new \Exception('没有成员的编号, 我们无法为您查询信息哦!');
         }
 
         $qb = $this->resetQb();
@@ -95,19 +96,22 @@ class MemberManager extends BaseEntityManager
         $qb->where($qb->expr()->eq('t.memberId', '?1'));
         $qb->setParameter(1, $member_id);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Member) {
+            throw new \Exception('这个成员编号失效了哦!');
+        }
+        return $obj;
     }
 
 
     /**
-     * Get current member
-     *
-     * @return Member|null
+     * @return Member
+     * @throws \Exception
      */
     public function getCurrentMember()
     {
         if(!$this->authService->hasIdentity()) {
-            return null;
+            throw new \Exception('您需要重新登录一下更新状态哦!');
         }
 
         if (null === $this->currentMember) {
