@@ -8,8 +8,8 @@
 namespace Admin\Service;
 
 
+use Application\Service\AppLogger;
 use Zend\Authentication\Result;
-use Zend\Log\Logger;
 use Zend\Session\SessionManager;
 
 class AuthManager
@@ -26,12 +26,12 @@ class AuthManager
     private $authService;
 
     /**
-     * @var Logger
+     * @var AppLogger
      */
     private $logger;
 
 
-    public function __construct(AuthService $authService, SessionManager $sessionManager, Logger $logger)
+    public function __construct(AuthService $authService, SessionManager $sessionManager, AppLogger $logger)
     {
         $this->authService = $authService;
         $this->sessionManager = $sessionManager;

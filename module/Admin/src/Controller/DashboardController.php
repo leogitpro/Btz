@@ -18,10 +18,6 @@ class DashboardController extends AdminBaseController
 
     public function indexAction()
     {
-        echo '<pre>';
-        print_r($this->getConfigPlugin()->get('log'));
-        echo '</pre>';
-
         return new ViewModel();
     }
 

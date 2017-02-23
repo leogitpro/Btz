@@ -9,14 +9,15 @@
 namespace Application\Controller\Plugin;
 
 
-use Zend\Log\Logger;
+use Application\Service\AppLogger;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+
 
 class LoggerPlugin extends AbstractPlugin
 {
 
     /**
-     * @var Logger
+     * @var AppLogger
      */
     private $logger;
 
@@ -24,16 +25,16 @@ class LoggerPlugin extends AbstractPlugin
     /**
      * LoggerPlugin constructor.
      *
-     * @param Logger $logger
+     * @param AppLogger $logger
      */
-    public function __construct(Logger $logger)
+    public function __construct(AppLogger $logger)
     {
         $this->logger = $logger;
     }
 
 
     /**
-     * @return Logger
+     * @return AppLogger
      */
     function __invoke()
     {

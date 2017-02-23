@@ -5,6 +5,7 @@
  * User: leo
  */
 
+
 namespace Admin\Service\Factory;
 
 
@@ -13,6 +14,7 @@ use Admin\Service\AuthService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Session\SessionManager;
+
 
 class AuthManagerFactory implements FactoryInterface
 {

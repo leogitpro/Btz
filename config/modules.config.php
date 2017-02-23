@@ -13,7 +13,6 @@
 return [
     'Zend\Router',
     'Zend\Validator',
-    'Zend\Log',
     'Zend\I18n',
     'Zend\Form',
     'DoctrineModule',

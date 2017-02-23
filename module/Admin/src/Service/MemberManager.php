@@ -13,8 +13,8 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Member;
+use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
 
 
 class MemberManager extends BaseEntityManager
@@ -32,7 +32,7 @@ class MemberManager extends BaseEntityManager
     private $currentMember = null;
 
 
-    public function __construct(AuthService $authService, EntityManager $entityManager, Logger $logger)
+    public function __construct(AuthService $authService, EntityManager $entityManager, AppLogger $logger)
     {
         parent::__construct($entityManager, $logger);
 

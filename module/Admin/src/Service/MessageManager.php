@@ -12,9 +12,10 @@ namespace Admin\Service;
 use Admin\Entity\Member;
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
+use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
 use Ramsey\Uuid\Uuid;
-use Zend\Log\Logger;
+
 
 class MessageManager extends BaseEntityManager
 {
@@ -31,7 +32,11 @@ class MessageManager extends BaseEntityManager
 
 
 
-    public function __construct(MemberManager $memberManager, DepartmentManager $departmentManager, EntityManager $entityManager, Logger $logger)
+    public function __construct(
+        MemberManager $memberManager,
+        DepartmentManager $departmentManager,
+        EntityManager $entityManager,
+        AppLogger $logger)
     {
         parent::__construct($entityManager, $logger);
 

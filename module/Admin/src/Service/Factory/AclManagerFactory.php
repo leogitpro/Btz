@@ -12,10 +12,10 @@ namespace Admin\Service\Factory;
 
 use Admin\Service\AclManager;
 use Admin\Service\ComponentManager;
-use Admin\Service\DMRelationManager;
 use Admin\Service\MemberManager;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+
 
 class AclManagerFactory implements FactoryInterface
 {

@@ -8,8 +8,9 @@
 namespace Admin\Service;
 
 
+use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
+
 
 class BaseEntityManager
 {
@@ -20,7 +21,7 @@ class BaseEntityManager
     protected $entityManager;
 
     /**
-     * @var Logger
+     * @var AppLogger
      */
     protected $logger;
 
@@ -35,9 +36,9 @@ class BaseEntityManager
      * BaseEntityManager constructor.
      *
      * @param EntityManager $entityManager
-     * @param Logger $logger
+     * @param AppLogger $logger
      */
-    public function __construct(EntityManager $entityManager, Logger $logger)
+    public function __construct(EntityManager $entityManager, AppLogger $logger)
     {
         $this->entityManager = $entityManager;
         $this->logger = $logger;

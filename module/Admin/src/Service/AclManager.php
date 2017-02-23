@@ -16,8 +16,8 @@ use Admin\Entity\Action;
 use Admin\Entity\Component;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
+use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
 
 
 class AclManager extends BaseEntityManager
@@ -38,7 +38,7 @@ class AclManager extends BaseEntityManager
         MemberManager $memberManager,
         ComponentManager $componentManager,
         EntityManager $entityManager,
-        Logger $logger
+        AppLogger $logger
     )
     {
         parent::__construct($entityManager, $logger);
