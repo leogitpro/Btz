@@ -9,13 +9,24 @@
 namespace Admin\Controller;
 
 
+use Admin\Entity\Wechat;
 use Admin\Form\WechatForm;
+use Admin\Wechat\Service;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
 
 class WechatController extends AdminBaseController
 {
+
+    /**
+     * @return Service
+     */
+    private function getWechatService($wxId)
+    {
+        return $this->buildSm(Service::class, ['wx_id' => $wxId]);
+    }
 
     /**
      * Myself wechat configuration
@@ -26,6 +37,17 @@ class WechatController extends AdminBaseController
 
         $wechatManager = $this->getWechatManager();
         $wechat = $wechatManager->getWechatByMember($myself);
+        if (!$wechat instanceof Wechat) {
+            return new ViewModel([
+                'wechat' => null,
+                'activeId' => __METHOD__,
+            ]);
+        }
+
+        //$wechatService = $this->getWechatService($wechat->getWxId());
+
+        //var_dump($wechatService->getAccessToken());
+
 
 
         return new ViewModel([
@@ -70,6 +92,38 @@ class WechatController extends AdminBaseController
         ]);
     }
 
+
+    public function checkAction()
+    {
+        $result = ['success' => false, 'message' => '', 'hosts' => []];
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $wechatManager = $this->getWechatManager();
+        $wechat = $wechatManager->getWechatByMember($myself);
+
+        if (Wechat::STATUS_CHECKED == $wechat->getWxChecked()) {
+            $result['success'] = true;
+            return new JsonModel($result);
+        }
+
+        if (!$wechat instanceof Wechat) {
+            return new JsonModel($result);
+        }
+
+        $wechatService = $this->getWechatService($wechat->getWxId());
+        $wxHosts = $wechatService->getCallbackHosts();
+        if(!empty($wxHosts)) {
+            $wechat->setWxChecked(Wechat::STATUS_CHECKED);
+            $wechatManager->saveModifiedEntity($wechat);
+        }
+
+        $result['success'] = true;
+        $result['hosts'] = $wxHosts;
+        return new JsonModel($result);
+    }
+
+
     public function clientAction()
     {
         //todo
@@ -87,6 +141,7 @@ class WechatController extends AdminBaseController
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '公众号管理', 1, 'university', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '创建公众号');
+        $item['actions']['check'] = self::CreateActionRegistry('check', '验证 AppId');
 
         return $item;
     }

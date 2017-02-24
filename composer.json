@@ -16,6 +16,7 @@
         "ramsey/uuid": "^3.5",
         "doctrine/doctrine-orm-module": "^1.1",
         "doctrine/migrations": "^1.4",
+        "curl/curl": "^1.5",
         "firephp/firephp-core": "^0.4",
         "ccampbell/chromephp": "^4.1"
     },

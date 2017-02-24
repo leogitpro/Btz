@@ -2,6 +2,7 @@
 $this->pageTitleBar('公众号管理');
 $this->sideTreeMenu()->setActiveId($activeId);
 
+$this->headScript()->appendFile($this->basePath('js/admin/wechat.index.js'));
 ?>
 
 
@@ -14,17 +15,28 @@ $this->sideTreeMenu()->setActiveId($activeId);
         </p>
         <?php } else { ?>
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-7">
                     <p>AppID: <?php echo $wechat->getWxAppId(); ?></p>
                     <p>AppID: <?php echo $wechat->getWxAppSecret(); ?></p>
                 </div>
-                <div class="col-lg-2">
-                    <p>允许状态</p>
-                    <p>正常</p>
+                <div class="col-lg-2 text-center">
+                    <p>运行状态</p>
+                    <?php if(time() < $wechat->getWxExpired()) { ?>
+                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>运行中</strong></p>
+                    <?php } else { ?>
+                        <p class="text-muted"><i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>已过期</strong></p>
+                    <?php } ?>
                 </div>
-                <div class="col-lg-2">
+                <div class="col-lg-3 text-center">
                     <p>验证状态</p>
-                    <p>未验证</p>
+                    <?php if(\Admin\Entity\Wechat::STATUS_CHECKED == $wechat->getWxChecked()) { ?>
+                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong></p>
+                    <?php } else { ?>
+                        <p class="text-muted">
+                            <i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>未验证</strong>
+                            <a class="check-wechat btn btn-default btn-xs" href="<?php echo $this->url('admin/wechat', ['action'=>'check']); ?>">现在验证</a>
+                        </p>
+                    <?php } ?>
                 </div>
             </div>
             <hr>

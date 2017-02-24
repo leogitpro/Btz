@@ -33,7 +33,7 @@ class Version20170224061249 extends AbstractMigration
 
         $table->setPrimaryKey(['wx_id']);
         $table->addUniqueIndex(['wx_appid']);
-        $table->addIndex(['member_id']);
+        $table->addIndex(['member']);
         $table->addIndex(['wx_created']);
     }
 

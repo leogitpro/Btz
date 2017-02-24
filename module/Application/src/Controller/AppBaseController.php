@@ -29,12 +29,23 @@ class AppBaseController extends AbstractActionController
 {
 
     /**
-     * @param $sm
+     * @param string $sm
      * @return mixed
      */
     protected function getSm($sm)
     {
         return $this->getEvent()->getApplication()->getServiceManager()->get($sm);
+    }
+
+    /**
+     * @param string $sm
+     * @param array|null $options
+     * @return mixed
+     */
+    protected function buildSm($sm, array $options = null)
+    {
+        return $this->getEvent()->getApplication()->getServiceManager()->build($sm, $options);
+
     }
 
 

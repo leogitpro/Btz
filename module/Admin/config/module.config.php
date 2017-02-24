@@ -107,6 +107,12 @@ return [
             Service\MessageManager::class => Service\Factory\MessageManagerFactory::class,
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
+
+            Wechat\Service::class => Wechat\Factory\ServiceFactory::class,
+            Wechat\Local::class => Wechat\Factory\LocalFactory::class,
+            Wechat\Remote::class => Wechat\Factory\RemoteFactory::class,
+            Wechat\Http::class => Wechat\Factory\BaseFactory::class,
+
         ],
     ],
 

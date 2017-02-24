@@ -94,6 +94,7 @@ class WechatManager extends BaseEntityManager
         $wechat->setWxAppId($appid);
         $wechat->setWxAppSecret($appsecret);
         $wechat->setWxChecked(Wechat::STATUS_UNCHECK);
+        $wechat->setWxExpired(strtotime("+7 days"));
         $wechat->setWxCreated(new \DateTime());
         $wechat->setMember($member);
 

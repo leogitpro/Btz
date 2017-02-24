@@ -37,7 +37,7 @@ class NavManager
         $this->items = [];
 
         $this->addItem(['id' => 'home', 'label' => 'Home', 'link' => $urlHelper('home')]);
-        $this->addItem(['id' => 'contact', 'label' => 'Contact Us', 'link' => $urlHelper('contact')]);
+        //$this->addItem(['id' => 'contact', 'label' => 'Contact Us', 'link' => $urlHelper('contact')]);
         //$this->addItem(['id' => 'about', 'label' => 'About', 'link' => $this->urlHelper('about')]);
     }
 
