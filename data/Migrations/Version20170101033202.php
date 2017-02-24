@@ -31,25 +31,13 @@ class Version20170101033202 extends AbstractMigration
         $table->addOption('collate', 'utf8mb4_unicode_ci');
         //*/
 
-        // Column: member_id, string, uuid
         $table->addColumn('member_id', 'string', ['fixed' => true, 'length' => 36]);
-
-        // Column: member_email, varchar(45)
         $table->addColumn('member_email', 'string', ['length' => 45, 'default' => '']);
-
-        // Column: member_password, char(32)
         $table->addColumn('member_password', 'string', ['length' => 32, 'fixed' => true, 'default' => '']);
-
-        // Column: member_name, varchar(45)
         $table->addColumn('member_name', 'string', ['length' => 45, 'default' => '']);
-
-        // Column: member_status
         $table->addColumn('member_status', 'smallint', ['default' => 0, 'comment' => 'Account status']);
-
-        // Column: member_level
         $table->addColumn('member_level', 'smallint', ['default' => 0, 'comment' => 'Account level']);
-
-        // Column: member_created
+        $table->addColumn('member_expired', 'datetime');
         $table->addColumn('member_created', 'datetime');
 
         // Set table primary key.

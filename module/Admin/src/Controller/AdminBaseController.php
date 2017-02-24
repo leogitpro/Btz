@@ -17,6 +17,7 @@ use Admin\Service\DepartmentManager;
 use Admin\Service\FeedbackManager;
 use Admin\Service\MemberManager;
 use Admin\Service\MessageManager;
+use Admin\Service\WechatManager;
 use Application\Controller\AppBaseController;
 
 
@@ -28,6 +29,14 @@ use Application\Controller\AppBaseController;
  */
 class AdminBaseController extends AppBaseController
 {
+
+    /**
+     * @return WechatManager
+     */
+    protected function getWechatManager()
+    {
+        return $this->getSm(WechatManager::class);
+    }
 
     /**
      * @return FeedbackManager

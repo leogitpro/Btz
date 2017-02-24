@@ -110,6 +110,21 @@ class MemberForm extends Form
         }
 
 
+        if (in_array('*', $this->fields) || in_array('expired', $this->fields)) {
+            $this->add([
+                'type' => 'date',
+                'name' => 'expired',
+                'attributes' => [
+                    'id' => 'expired',
+                    'value' => (null == $this->member) ? '' : $this->member->getMemberExpired()->format('Y-m-d'),
+                ],
+                'options' => [
+                    'label' => 'Member expired',
+                ],
+            ]);
+        }
+
+
         if (in_array('*', $this->fields) || in_array('status', $this->fields)) {
             $this->add([
                 'type' => 'select',

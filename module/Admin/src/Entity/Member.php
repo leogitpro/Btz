@@ -53,7 +53,7 @@ class Member
 
 
     /**
-     * Administrator email, unique
+     * Member email, unique
      *
      * @var string
      *
@@ -63,7 +63,7 @@ class Member
 
 
     /**
-     * Administrator password, md5 value
+     * Member password, md5 value
      *
      * @var string
      *
@@ -73,7 +73,7 @@ class Member
 
 
     /**
-     * Administrator name.
+     * Member name.
      *
      * @var string
      *
@@ -83,7 +83,7 @@ class Member
 
 
     /**
-     * Administrator status, activated, retried, etc ...
+     * Member status, activated, retried, etc ...
      *
      * @var integer
      *
@@ -93,7 +93,7 @@ class Member
 
 
     /**
-     * Administrator level.
+     * Member level.
      *
      * @var integer
      *
@@ -103,7 +103,16 @@ class Member
 
 
     /**
-     * Administrator created. datetime
+     * member expired. datetime
+     *
+     * @var \DateTime
+     *
+     * @ORM\Column(name="member_expired", type="datetime")
+     */
+    private $memberExpired = null;
+
+    /**
+     * Member created. datetime
      *
      * @var \DateTime
      *
@@ -132,7 +141,7 @@ class Member
 
 
     /**
-     * Get the administrator status list
+     * Get the Member status list
      *
      * @return array
      */
@@ -145,7 +154,7 @@ class Member
     }
 
     /**
-     * Get the administrator level list
+     * Get the Member level list
      *
      * @return array
      */
@@ -160,7 +169,7 @@ class Member
     }
 
     /**
-     * Get administrator status as string
+     * Get Member status as string
      *
      * @return string
      */
@@ -175,7 +184,7 @@ class Member
 
 
     /**
-     * Get administrator level as string
+     * Get Member level as string
      *
      * @return string
      */
@@ -289,6 +298,22 @@ class Member
     /**
      * @return \DateTime
      */
+    public function getMemberExpired()
+    {
+        return $this->memberExpired;
+    }
+
+    /**
+     * @param \DateTime $memberExpired
+     */
+    public function setMemberExpired($memberExpired)
+    {
+        $this->memberExpired = $memberExpired;
+    }
+
+    /**
+     * @return \DateTime
+     */
     public function getMemberCreated()
     {
         return $this->memberCreated;
@@ -317,8 +342,6 @@ class Member
     {
         $this->depts = $depts;
     }
-
-
 
 
 }

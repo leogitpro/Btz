@@ -19,7 +19,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                 <th>No</th>
                 <th>名字</th>
                 <th>登录账号</th>
-                <th>创建时间</th>
+                <th>过期时间</th>
                 <th>等级</th>
                 <th>状态</th>
                 <th>操作</th>
@@ -31,7 +31,7 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                     <td><?php echo $i++; ?></td>
                     <td><?php echo $member->getMemberName(); ?></td>
                     <td><?php echo $member->getMemberEmail(); ?></td>
-                    <td><?php echo $member->getMemberCreated()->format('Y-m-d H:i:s'); ?></td>
+                    <td><?php echo $member->getMemberExpired()->format('Y-m-d'); ?></td>
                     <td><?php echo $member->getMemberLevelAsString(); ?></td>
                     <td>
                         <span class="label label-<?php echo \Admin\Entity\Member::STATUS_ACTIVATED == $member->getMemberStatus() ? 'success' : 'danger'; ?>">
@@ -71,6 +71,12 @@ $this->headScript()->appendFile($this->basePath('js/admin/member.index.js'));
                                         <li>
                                             <a href="<?php echo $this->url('admin/member', ['action' => 'password', 'key' => $member->getMemberId()]); ?>">
                                                 <i class="fa fa-hashtag fa-fw" aria-hidden="true"></i> 更新密码
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="<?php echo $this->url('admin/member', ['action' => 'expired', 'key' => $member->getMemberId()]); ?>">
+                                                <i class="fa fa-calendar-check-o fa-fw" aria-hidden="true"></i> 过期时间
                                             </a>
                                         </li>
                                         <li class="divider"></li>

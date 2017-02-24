@@ -76,19 +76,8 @@ class MemberController extends AdminBaseController
                 $data = $form->getData();
                 $data['password'] = md5($data['password']);
 
-                $member = new Member();
-                $member->setMemberId(Uuid::uuid1()->toString());
-                $member->setMemberEmail($data['email']);
-                $member->setMemberPassword($data['password']);
-                $member->setMemberName($data['name']);
-                $member->setMemberStatus(Member::STATUS_ACTIVATED);
-                $member->setMemberLevel(Member::LEVEL_INTERIOR);
-                $member->setMemberCreated(new \DateTime());
-
                 $defaultDept = $this->getDeptManager()->getDefaultDepartment(); // Add member to default group
-                $member->getDepts()->add($defaultDept);
-
-                $memberManager->saveModifiedEntity($member);
+                $memberManager->createMember($data['email'], $data['password'], $data['name'], [$defaultDept]);
 
                 return $this->getMessagePlugin()->show(
                     '成员已添加',
@@ -312,6 +301,55 @@ class MemberController extends AdminBaseController
     }
 
 
+    /**
+     * Setting member expired date
+     */
+    public function expiredAction()
+    {
+        $member_id = $this->params()->fromRoute('key');
+        if($member_id == Member::DEFAULT_MEMBER_ID) {
+            throw new \Exception("这个账号不是一般人能碰的!");
+        }
+
+        $memberManager = $this->getMemberManager();
+        $member = $memberManager->getMember($member_id);
+        if (null == $member) {
+            throw new \Exception("这个成员信息好像已经没了.");
+        }
+
+        $form = new MemberForm($memberManager, $member, ['expired']);
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                $dt = new \DateTime($data['expired']);
+                $member->setMemberExpired($dt);
+
+                $memberManager->saveModifiedEntity($member);
+
+                return $this->getMessagePlugin()->show(
+                    '日期已更改',
+                    '成员: ' . $member->getMemberName() . ' 的账号过期时间已经更新!',
+                    $this->url()->fromRoute('admin/member'),
+                    '返回',
+                    3
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'member' => $member,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
 
     /**
      * View a member with all departments relationship
@@ -420,6 +458,7 @@ class MemberController extends AdminBaseController
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改成员资料');
         $item['actions']['level'] = self::CreateActionRegistry('level', '修改成员等级');
         $item['actions']['password'] = self::CreateActionRegistry('password', '修改成员密码');
+        $item['actions']['expired'] = self::CreateActionRegistry('expired', '设置成员过期时间');
         $item['actions']['departments'] = self::CreateActionRegistry('departments', '查看成员所属部门');
         $item['actions']['update-departments'] = self::CreateActionRegistry('update-departments', '分配成员到部门');
 

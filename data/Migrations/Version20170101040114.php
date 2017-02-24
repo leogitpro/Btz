@@ -10,12 +10,6 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class Version20170101040114 extends AbstractMigration
 {
-
-    public function getDescription()
-    {
-        return 'Create table for department with member relation';
-    }
-
     /**
      * @param Schema $schema
      */

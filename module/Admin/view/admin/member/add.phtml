@@ -4,7 +4,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
 
 $form->get('email')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the member email'
+    'placeholder' => '成员登入账号(E-mail)'
 ]);
 
 $form->get('password')->setAttributes([
@@ -13,7 +13,7 @@ $form->get('password')->setAttributes([
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
-    'placeholder' => 'Enter the member name'
+    'placeholder' => '成员名称'
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -39,21 +39,21 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('email')); ?>
+            <?php echo $this->formLabel($form->get('email'), '设定登入账号(E-mail)'); ?>
             <?php echo $this->formElement($form->get('email')); ?>
             <?php echo $this->formElementErrors($form->get('email')); ?>
 
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('password')); ?>
+            <?php echo $this->formLabel($form->get('password'), '设定登入密码'); ?>
             <?php echo $this->formElement($form->get('password')); ?>
             <?php echo $this->formElementErrors($form->get('password')); ?>
 
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('name'), '成员名字'); ?>
             <?php echo $this->formElement($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
 

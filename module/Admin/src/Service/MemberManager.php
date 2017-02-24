@@ -15,6 +15,7 @@ namespace Admin\Service;
 use Admin\Entity\Member;
 use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
+use Ramsey\Uuid\Uuid;
 
 
 class MemberManager extends BaseEntityManager
@@ -49,10 +50,10 @@ class MemberManager extends BaseEntityManager
      */
     public function getAllMembersCount()
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select($this->getQb()->expr()->count('t.memberId'));
-        $this->getQb()->from(Member::class, 't');
+        $qb->select($qb->expr()->count('t.memberId'));
+        $qb->from(Member::class, 't');
 
         return $this->getEntitiesCount();
     }
@@ -65,13 +66,13 @@ class MemberManager extends BaseEntityManager
      */
     public function getMembersCount()
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select($this->getQb()->expr()->count('t.memberId'));
-        $this->getQb()->from(Member::class, 't');
+        $qb->select($qb->expr()->count('t.memberId'));
+        $qb->from(Member::class, 't');
 
-        $this->getQb()->where($this->getQb()->expr()->eq('t.memberStatus', '?1'));
-        $this->getQb()->setParameter(1, Member::STATUS_ACTIVATED);
+        $qb->where($qb->expr()->eq('t.memberStatus', '?1'));
+        $qb->setParameter(1, Member::STATUS_ACTIVATED);
 
         return $this->getEntitiesCount();
     }
@@ -131,11 +132,11 @@ class MemberManager extends BaseEntityManager
      */
     public function getMemberByEmail($email)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->from(Member::class, 't')->select('t');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.memberEmail', '?1'));
-        $this->getQb()->setParameter(1, $email);
+        $qb->from(Member::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.memberEmail', '?1'));
+        $qb->setParameter(1, $email);
 
         return $this->getEntityFromPersistence();
     }
@@ -150,16 +151,16 @@ class MemberManager extends BaseEntityManager
      */
     public function getMembersByLimitPage($page = 1, $size = 100)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(Member::class, 't');
+        $qb->select('t')->from(Member::class, 't');
 
-        $this->getQb()->where($this->getQb()->expr()->eq('t.memberStatus', '?1'));
-        $this->getQb()->setParameter(1, Member::STATUS_ACTIVATED);
+        $qb->where($qb->expr()->eq('t.memberStatus', '?1'));
+        $qb->setParameter(1, Member::STATUS_ACTIVATED);
 
-        $this->getQb()->setMaxResults($size)->setFirstResult(($page -1) * $size);
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
 
-        $this->getQb()->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
+        $qb->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
 
         return $this->getEntitiesFromPersistence();
     }
@@ -217,13 +218,13 @@ class MemberManager extends BaseEntityManager
      */
     public function getAllMembersByLimitPage($page = 1, $size = 100)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(Member::class, 't');
+        $qb->select('t')->from(Member::class, 't');
 
-        $this->getQb()->setMaxResults($size)->setFirstResult(($page -1) * $size);
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
 
-        $this->getQb()->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
+        $qb->orderBy('t.memberStatus')->addOrderBy('t.memberLevel', 'DESC')->addOrderBy('t.memberName');
 
         return $this->getEntitiesFromPersistence();
     }
@@ -237,5 +238,36 @@ class MemberManager extends BaseEntityManager
     public function getAllMembers()
     {
         return $this->getAllMembersByLimitPage(1, 200);
+    }
+
+
+    /**
+     * Create a member
+     *
+     * @param string $email
+     * @param string $password
+     * @param string $name
+     * @param array $depts
+     * @return Member
+     */
+    public function createMember($email, $password, $name, $depts = [])
+    {
+        $member = new Member();
+        $member->setMemberId(Uuid::uuid1()->toString());
+        $member->setMemberEmail($email);
+        $member->setMemberPassword($password);
+        $member->setMemberName($name);
+        $member->setMemberStatus(Member::STATUS_ACTIVATED);
+        $member->setMemberLevel(Member::LEVEL_INTERIOR);
+        $member->setMemberExpired(new \DateTime("last day"));
+        $member->setMemberCreated(new \DateTime());
+
+        foreach ($depts as $dept) {
+            $member->getDepts()->add($dept);
+        }
+
+        $this->saveModifiedEntity($member);
+
+        return $member;
     }
 }

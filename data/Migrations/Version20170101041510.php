@@ -21,26 +21,22 @@ class Version20170101041510 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
-
         // Init department table
         $this->addSql(
-            'INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?)',
-            ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 1, date('Y-m-d H:i:s')],
-            ['string', 'string', 'smallint', 'string']
+            "INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?)",
+            ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 1, date('Y-m-d H:i:s')]
         );
 
         // Init member table
         $this->addSql(
-            'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?)', //Sql
-            ['be152a3e-f423-11e6-a4a4-acbc32bf6185', 'admin@example.com', md5('1212'), 'Administrator', 1, 9, date('Y-m-d H:i:s')], // Params
-            ['string', 'string', 'string', 'string', 'smallint', 'smallint', 'string'] // Types
+            'INSERT INTO `sys_member` (`member_id`, `member_email`, `member_password`, `member_name`, `member_status`, `member_level`, `member_expired`, `member_created`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', //Sql
+            ['be152a3e-f423-11e6-a4a4-acbc32bf6185', 'admin@example.com', md5('1212'), 'Administrator', 1, 9, '2099-12-30 23:59:59', date('Y-m-d H:i:s')]
         );
 
         // Init department with member table
         $this->addSql(
             'INSERT INTO `sys_department_member` (`dept`, `member`) VALUES (?, ?)',
-            ['ad739904-f423-11e6-b154-acbc32bf6185', 'be152a3e-f423-11e6-a4a4-acbc32bf6185'],
-            ['string', 'string']
+            ['ad739904-f423-11e6-b154-acbc32bf6185', 'be152a3e-f423-11e6-a4a4-acbc32bf6185']
         );
 
 

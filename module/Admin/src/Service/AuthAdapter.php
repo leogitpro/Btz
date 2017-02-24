@@ -8,6 +8,7 @@
 namespace Admin\Service;
 
 use Admin\Entity\Member;
+use Doctrine\ORM\NonUniqueResultException;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -66,7 +67,18 @@ class AuthAdapter extends BaseEntityManager implements AdapterInterface
      */
     public function getMemberByEmail($email)
     {
-        return $this->entityManager->getRepository(Member::class)->findOneBy(['memberEmail' => $email]);
+        $qb = $this->entityManager->createQueryBuilder();
+
+        $qb->from(Member::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.memberEmail', '?1'));
+        $qb->setParameter(1, $email);
+
+        try {
+            return $qb->getQuery()->getOneOrNullResult();
+        } catch (NonUniqueResultException $e) {
+            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
+            return null;
+        }
     }
 
 
@@ -99,6 +111,15 @@ class AuthAdapter extends BaseEntityManager implements AdapterInterface
                 Result::FAILURE_CREDENTIAL_INVALID,
                 null,
                 ['Password is incorrect.']
+            );
+        }
+
+        $expired = $member->getMemberExpired();
+        if(date('Ymd') > $expired->format('Ymd')) {
+            return new Result(
+                Result::FAILURE,
+                null,
+                ['Expired']
             );
         }
 

@@ -156,7 +156,7 @@ return [
     // End AclController router
 
 
-    // AclController router configuration
+    // MessageController router configuration
     'message' => [
         'type' => Segment::class,
         'options' => [
@@ -172,9 +172,9 @@ return [
             ],
         ],
     ],
-    // End AclController router
+    // End MessageController router
 
-    // AclController router configuration
+    // FeedbackController router configuration
     'feedback' => [
         'type' => Segment::class,
         'options' => [
@@ -190,6 +190,25 @@ return [
             ],
         ],
     ],
-    // End AclController router
+    // End FeedbackController router
+
+
+    // WechatController router configuration
+    'wechat' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'wechat[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\WechatController::class,
+                'action' => 'index',
+            ],
+        ],
+    ],
+    // End WechatController router
 
 ];

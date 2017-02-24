@@ -33,10 +33,13 @@ $form->prepare();
             <strong>警告!</strong> 登入账户( E-Mail) 地址无效.
             <?php } ?>
             <?php if(-4 == $login_code) { ?>
-                <strong>警告!</strong> 该账号目前被锁定, 暂不允许登入系统.
+                <strong>警告!</strong> 该账号目前被锁定, 暂不允许登入.
             <?php } ?>
             <?php if(-3 == $login_code) { ?>
-                <strong>警告!</strong> 登入认证失败! 请使用正确的账号和密码登入.
+                <strong>警告!</strong> 请使用正确的账号和密码登入.
+            <?php } ?>
+            <?php if(0 == $login_code) { ?>
+                <strong>警告!</strong> 您的账号已经过期, 禁止登入!
             <?php } ?>
         </div>
         <?php } ?>
