@@ -19,6 +19,6 @@ return [
     'DoctrineORMModule',
     'Zend\Session',
     'Application',
-    //'User',
+    'Api',
     'Admin',
 ];

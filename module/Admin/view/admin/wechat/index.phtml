@@ -17,7 +17,10 @@ $this->headScript()->appendFile($this->basePath('js/admin/wechat.index.js'));
             <div class="row">
                 <div class="col-lg-7">
                     <p>AppID: <?php echo $wechat->getWxAppId(); ?></p>
-                    <p>AppID: <?php echo $wechat->getWxAppSecret(); ?></p>
+                    <p>
+                        AppSecret: <?php echo substr($wechat->getWxAppSecret(), 0, 5) . '*********' . substr($wechat->getWxAppSecret(), -5); ?>
+                        <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/wechat', ['action' => 'edit', 'suffix' => '.html']); ?>">修改配置</a>
+                    </p>
                 </div>
                 <div class="col-lg-2 text-center">
                     <p>运行状态</p>

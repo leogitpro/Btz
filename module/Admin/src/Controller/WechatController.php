@@ -10,6 +10,7 @@ namespace Admin\Controller;
 
 
 use Admin\Entity\Wechat;
+use Admin\Form\WechatClientForm;
 use Admin\Form\WechatForm;
 use Admin\Wechat\Service;
 use Zend\View\Model\JsonModel;
@@ -92,7 +93,60 @@ class WechatController extends AdminBaseController
         ]);
     }
 
+    /**
+     * Edit wechat
+     */
+    public function editAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $wechatManager = $this->getWechatManager();
+        $wechat = $wechatManager->getWechatByMember($myself);
+        if (!$wechat instanceof Wechat) {
+            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
+        }
 
+        $form = new WechatForm($wechatManager, $wechat);
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                if ($wechat->getWxChecked() != Wechat::STATUS_CHECKED) {
+                    $appid = $data['appid'];
+                    $wechat->setWxAppId($data['appid']);
+                } else {
+                    $appid = $wechat->getWxAppId();
+                }
+
+                $wechat->setWxAppSecret($data['appsecret']);
+                $wechatManager->saveModifiedEntity($wechat);
+
+                return $this->getMessagePlugin()->show(
+                    '公众号已经修改',
+                    '您的微信公众号 ' . $appid . ' 信息已经创建成功!',
+                    $this->url()->fromRoute('admin/wechat'),
+                    '返回',
+                    3
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'wechat' => $wechat,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
+    /**
+     * Test can get wechat server ip list
+     *
+     * @return JsonModel
+     */
     public function checkAction()
     {
         $result = ['success' => false, 'message' => '', 'hosts' => []];
@@ -124,9 +178,63 @@ class WechatController extends AdminBaseController
     }
 
 
+    /**
+     * 添加一个 Client
+     */
+    public function addclientAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $wechatManager = $this->getWechatManager();
+        $wechat = $wechatManager->getWechatByMember($myself);
+
+        if (!$wechat instanceof Wechat) {
+            return $this->getMessagePlugin()->show(
+                '公众号还未创建',
+                '您的微信公众号还未创建, 不能执行当前的操作!',
+                $this->url()->fromRoute('admin/wechat'),
+                '返回',
+                3
+            );
+        }
+
+
+        $form = new WechatClientForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                //$wechatManager->createMemberWechat($this->getMemberManager()->getCurrentMember(), $appid, $appsecret);
+
+                return $this->getMessagePlugin()->show(
+                    '客户端已经创建',
+                    '您的微信公众号访问客户端已经创建成功!',
+                    $this->url()->fromRoute('admin/wechat'),
+                    '返回',
+                    3
+                );
+            }
+        }
+
+
+        return new ViewModel([
+            'form' => $form,
+            'activeId' => __CLASS__,
+        ]);
+
+
+
+
+    }
+
+
     public function clientAction()
     {
-        //todo
+        //
     }
 
 
@@ -142,6 +250,8 @@ class WechatController extends AdminBaseController
         $item['actions']['index'] = self::CreateActionRegistry('index', '公众号管理', 1, 'university', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '创建公众号');
         $item['actions']['check'] = self::CreateActionRegistry('check', '验证 AppId');
+
+        $item['actions']['addclient'] = self::CreateActionRegistry('addclient', '添加访问客户端');
 
         return $item;
     }

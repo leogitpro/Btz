@@ -1,0 +1,88 @@
+<?php
+$this->pageTitleBar('添加一个客户端');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$form->get('name')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '客户端名称'
+]);
+
+$form->get('domain')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里输入域名, 不限制请留空, 格式: www.example.com'
+]);
+
+$form->get('ips')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里输入IP地址, 多IP地址使用英文逗号(,)隔开.'
+]);
+
+$form->get('active')->setAttributes([
+    'class' => 'form-control',
+]);
+
+$form->get('expire')->setAttributes([
+    'class' => 'form-control',
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$helper = $this->formElementErrors();
+$helper->setMessageOpenFormat('<p class="text-danger">');
+$helper->setMessageSeparatorString('</p><p class="text-danger">');
+$helper->setMessageCloseString('</p>');
+
+$form->prepare();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <div class="alert alert-warning" role="alert"><strong>请注意:</strong> 公众号经过验证可用后 <strong>AppID</strong> 将不再被允许修改!</div>
+
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('name'), '设置客户端名称'); ?>
+            <?php echo $this->formElement($form->get('name')); ?>
+            <?php echo $this->formElementErrors($form->get('name')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('domain'), '客户端使用的域名'); ?>
+            <?php echo $this->formElement($form->get('domain')); ?>
+            <?php echo $this->formElementErrors($form->get('domain')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('ips'), '客户端使用的IP地址清单'); ?>
+            <?php echo $this->formElement($form->get('ips')); ?>
+            <?php echo $this->formElementErrors($form->get('ips')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('active'), '允许客户端访问的开始时间'); ?>
+            <?php echo $this->formElement($form->get('active')); ?>
+            <?php echo $this->formElementErrors($form->get('active')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('expire'), '允许客户端访问的结束时间'); ?>
+            <?php echo $this->formElement($form->get('expire')); ?>
+            <?php echo $this->formElementErrors($form->get('expire')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

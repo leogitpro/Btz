@@ -23,7 +23,7 @@
     "autoload": {
         "psr-4": {
             "Application\\": "module/Application/src/",
-            "User\\": "module/User/src/",
+            "Api\\": "module/Api/src/",
             "Admin\\": "module/Admin/src/"
         }
     },

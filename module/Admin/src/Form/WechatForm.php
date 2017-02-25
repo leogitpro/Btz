@@ -9,30 +9,31 @@
 namespace Admin\Form;
 
 
-use Admin\Entity\Member;
+use Admin\Entity\Wechat;
 use Admin\Service\WechatManager;
 use Admin\Validator\WechatAppIdUniqueValidator;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
+
 
 class WechatForm extends Form
 {
 
     private $wecahtManager;
 
+    /**
+     * @var Wechat
+     */
     private $wechat;
 
-    private $fields;
 
-
-    public function __construct(WechatManager $wechatManager, $fields = ['*'], $wechat = null)
+    public function __construct(WechatManager $wechatManager, $wechat = null)
     {
         parent::__construct('wechat_form');
 
         $this->setAttributes(['method' => 'post', 'role' => 'form']);
 
         $this->wecahtManager = $wechatManager;
-        $this->fields = (array)$fields;
         $this->wechat = $wechat;
 
         $this->setInputFilter(new InputFilter());
@@ -55,27 +56,25 @@ class WechatForm extends Form
             ],
         ]);
 
-        if (in_array('*', $this->fields) || in_array('appid', $this->fields)) {
+        if(!$this->wechat instanceof Wechat || $this->wechat->getWxChecked() != Wechat::STATUS_CHECKED) {
             $this->add([
                 'type' => 'text',
                 'name' => 'appid',
                 'attributes' => [
                     'id' => 'appid',
-                    'value' => ($this->wechat instanceof Member) ? $this->wechat->getWxAppId() : '',
+                    'value' => ($this->wechat instanceof Wechat) ? $this->wechat->getWxAppId() : '',
                 ],
             ]);
         }
 
-        if (in_array('*', $this->fields) || in_array('appsecret', $this->fields)) {
-            $this->add([
-                'type' => 'text',
-                'name' => 'appsecret',
-                'attributes' => [
-                    'id' => 'appsecret',
-                    'value' => ($this->wechat instanceof Member) ? $this->wechat->getWxAppSecret() : '',
-                ],
-            ]);
-        }
+        $this->add([
+            'type' => 'text',
+            'name' => 'appsecret',
+            'attributes' => [
+                'id' => 'appsecret',
+                'value' => ($this->wechat instanceof Wechat) ? $this->wechat->getWxAppSecret() : '',
+            ],
+        ]);
 
 
         $this->add([
@@ -91,7 +90,7 @@ class WechatForm extends Form
 
     public function addFilters()
     {
-        if (in_array('*', $this->fields) || in_array('appid', $this->fields)) {
+        if(!$this->wechat instanceof Wechat || $this->wechat->getWxChecked() != Wechat::STATUS_CHECKED) {
             $this->getInputFilter()->add([
                 'name' => 'appid',
                 'required' => true,
@@ -134,41 +133,38 @@ class WechatForm extends Form
             ]);
         }
 
-
-        if (in_array('*', $this->fields) || in_array('appsecret', $this->fields)) {
-            $this->getInputFilter()->add([
-                'name' => 'appsecret',
-                'required' => true,
-                'break_on_failure' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                    ['name' => 'StripTags'],
-                ],
-                'validators' => [
-                    [
-                        'name' => 'NotEmpty',
-                        'break_chain_on_failure' => true,
-                        'options' => [
-                            'messages' => [
-                                \Zend\Validator\NotEmpty::IS_EMPTY => '微信的 AppSecret 不填写后面没法继续愉快的玩耍了哦!',
-                            ],
-                        ],
-                    ],
-                    [
-                        'name' => 'StringLength',
-                        'break_chain_on_failure' => true,
-                        'options' => [
-                            'min' => 18,
-                            'max' => 255,
-                            'messages' => [
-                                \Zend\Validator\StringLength::TOO_SHORT => '微信的 AppSecret 不止这么短吧. 你确定是从公众后台号复制过来的?',
-                                \Zend\Validator\StringLength::TOO_LONG => '微信的 AppSecret 有这么长? 你确定是从公众后台号复制过来的?',
-                            ],
+        $this->getInputFilter()->add([
+            'name' => 'appsecret',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '微信的 AppSecret 不填写后面没法继续愉快的玩耍了哦!',
                         ],
                     ],
                 ],
-            ]);
-        }
+                [
+                    'name' => 'StringLength',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'min' => 18,
+                        'max' => 255,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '微信的 AppSecret 不止这么短吧. 你确定是从公众后台号复制过来的?',
+                            \Zend\Validator\StringLength::TOO_LONG => '微信的 AppSecret 有这么长? 你确定是从公众后台号复制过来的?',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
     }
 

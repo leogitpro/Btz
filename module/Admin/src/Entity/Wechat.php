@@ -9,6 +9,7 @@
 namespace Admin\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -95,6 +96,19 @@ class Wechat
      */
     private $member;
 
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WechatClient", mappedBy="wechat")
+     */
+    private $clients;
+
+
+    public function __construct()
+    {
+        $this->clients = new ArrayCollection();
+    }
 
 
     /**
@@ -239,6 +253,22 @@ class Wechat
     public function setMember($member)
     {
         $this->member = $member;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+
+    /**
+     * @param ArrayCollection $clients
+     */
+    public function setClients($clients)
+    {
+        $this->clients = $clients;
     }
 
 

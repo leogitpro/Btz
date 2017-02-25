@@ -18,6 +18,22 @@ return [
     // Router configuration
     'router' => [
         'routes' => [
+            'wxapi' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/wx[/:action[/:key]][:suffix]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                        'key' => '[a-zA-Z0-9_\-]+',
+                        'suffix' => '(/|.html)',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\WechatController::class,
+                        'action' => 'index',
+                    ],
+                ],
+            ],
+
             'api' => [
                 'type'    => Segment::class,
                 'options' => [
