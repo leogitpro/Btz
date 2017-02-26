@@ -11,6 +11,8 @@ namespace Admin\Service;
 
 use Admin\Entity\Member;
 use Admin\Entity\Wechat;
+use Admin\Entity\WechatClient;
+use Ramsey\Uuid\Uuid;
 
 class WechatManager extends BaseEntityManager
 {
@@ -28,6 +30,22 @@ class WechatManager extends BaseEntityManager
         $qb->select('t')->from(Wechat::class, 't');
         $qb->where($qb->expr()->eq('t.wxId', '?1'));
         $qb->setParameter(1, $wechatId);
+
+        return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * @param string $clientId
+     * @return WechatClient
+     */
+    public function getWechatClient($clientId)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(WechatClient::class, 't');
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $clientId);
 
         return $this->getEntityFromPersistence();
     }
@@ -83,6 +101,10 @@ class WechatManager extends BaseEntityManager
     }
 
 
+
+
+
+
     /**
      * @param Member $member
      * @param string $appid
@@ -99,6 +121,31 @@ class WechatManager extends BaseEntityManager
         $wechat->setMember($member);
 
         $this->saveModifiedEntity($wechat);
+    }
+
+
+    /**
+     * @param WechatClient $wechat
+     * @param string $name
+     * @param string $domain
+     * @param string $ips
+     * @param integer $start
+     * @param integer $end
+     */
+    public function createWechatClient($wechat, $name, $domain, $ips, $start, $end)
+    {
+        $client = new WechatClient();
+        $client->setId(Uuid::uuid1()->toString());
+        $client->setName($name);
+        $client->setDomains($domain);
+        $client->setIps($ips);
+        $client->setActiveTime($start);
+        $client->setExpireTime($end);
+        $client->setStatus(WechatClient::STATUS_VALID);
+        $client->setCreated(new \DateTime());
+        $client->setWechat($wechat);
+
+        $this->saveModifiedEntity($client);
     }
 
 }

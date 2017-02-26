@@ -9,4 +9,15 @@ $(function () {
        }, "json");
        return false;
    });
+
+
+   $(".remove-client").click(function () {
+      if(confirm("确定要删除这个来访客户端配置么? 删除后立即生效, 不可恢复!")) {
+          return true;
+      } else {
+          return false;
+      }
+   });
+
+
 });
