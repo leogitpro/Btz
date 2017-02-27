@@ -54,6 +54,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\WechatController::class => InvokableFactory::class,
+            Controller\QrcodeController::class => InvokableFactory::class,
         ],
     ],
 

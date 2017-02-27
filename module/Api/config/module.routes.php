@@ -47,4 +47,21 @@ return [
             ],
         ],
     ], // End WechatController router
+
+    // QrcodeController router configuration
+    'qrcode' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'qrcode[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\QrcodeController::class,
+                'action' => 'index',
+            ],
+        ],
+    ], // End QrcodeController router
 ];

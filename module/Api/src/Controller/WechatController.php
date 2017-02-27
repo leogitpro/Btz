@@ -11,6 +11,8 @@ namespace Api\Controller;
 
 
 
+use SimpleSoftwareIO\QrCode\BaconQrCodeGenerator;
+
 class WechatController extends ApiBaseController
 {
 
@@ -66,6 +68,20 @@ class WechatController extends ApiBaseController
     public function oauthedAction()
     {
         return $this->sendHtmlResponse('oked');
+    }
+
+    public function qrcodeAction()
+    {
+
+        $qrcode = new BaconQrCodeGenerator();
+
+        $img = $qrcode->format('png')->size(400)->generate('http://www.baidu.com');
+
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        $headers->addHeaderLine('content-type', 'image/png');
+        $response->setContent($img);
+        return $response;
     }
 
 }
