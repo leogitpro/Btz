@@ -17,6 +17,9 @@ class DashboardController extends AdminBaseController
 
     public function indexAction()
     {
+        //$config = $this->getConfigPlugin()->get('view_helpers');
+        //echo '<pre>';print_r($config); echo '</pre>';
+
         return new ViewModel();
     }
 

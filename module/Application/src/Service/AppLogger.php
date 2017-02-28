@@ -35,6 +35,19 @@ class AppLogger implements LoggerInterface
     }
 
     /**
+     * @param \Exception $e
+     */
+    public function excaption($e)
+    {
+        $message = $e->getMessage() . PHP_EOL;
+        $message .= 'Code: ' . $e->getCode() . PHP_EOL;
+        $message .= 'Line: ' . $e->getLine() . PHP_EOL;
+        $message .= 'File: ' . $e->getFile();
+
+        $this->getLogger()->err($message);
+    }
+
+    /**
      * @param string $message
      * @param array|Traversable $extra
      * @return LoggerInterface

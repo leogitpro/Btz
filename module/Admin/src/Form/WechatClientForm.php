@@ -62,7 +62,7 @@ class WechatClientForm extends Form
             'name' => 'domain',
             'attributes' => [
                 'id' => 'domain',
-                'value' => ($this->client instanceof WechatClient) ? $this->client->getDomains() : '',
+                'value' => ($this->client instanceof WechatClient) ? $this->client->getDomain() : '',
             ],
         ]);
 
@@ -71,7 +71,7 @@ class WechatClientForm extends Form
             'name' => 'ip',
             'attributes' => [
                 'id' => 'ip',
-                'value' => ($this->client instanceof WechatClient) ? $this->client->getIps() : '',
+                'value' => ($this->client instanceof WechatClient) ? $this->client->getIp() : '',
             ],
         ]);
 

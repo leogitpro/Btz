@@ -63,6 +63,7 @@ return [
         'factories' => [
             View\Helper\Menu::class => View\Helper\Factory\MenuFactory::class,
             View\Helper\Breadcrumbs::class => InvokableFactory::class,
+            \Zend\Form\View\Helper\FormElementErrors::class => View\Helper\Factory\FormElementErrorsFactory::class,
         ],
         'aliases' => [
             'barMenu' => View\Helper\Menu::class,

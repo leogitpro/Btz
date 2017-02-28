@@ -12,6 +12,7 @@ namespace Admin\Service;
 use Admin\Entity\Member;
 use Admin\Entity\Wechat;
 use Admin\Entity\WechatClient;
+use Admin\Entity\WechatQrcode;
 use Ramsey\Uuid\Uuid;
 
 class WechatManager extends BaseEntityManager
@@ -128,24 +129,47 @@ class WechatManager extends BaseEntityManager
      * @param WechatClient $wechat
      * @param string $name
      * @param string $domain
-     * @param string $ips
+     * @param string $ip
      * @param integer $start
      * @param integer $end
      */
-    public function createWechatClient($wechat, $name, $domain, $ips, $start, $end)
+    public function createWechatClient($wechat, $name, $domain, $ip, $start, $end)
     {
         $client = new WechatClient();
         $client->setId(Uuid::uuid1()->toString());
         $client->setName($name);
-        $client->setDomains($domain);
-        $client->setIps($ips);
+        $client->setDomain($domain);
+        $client->setIp($ip);
         $client->setActiveTime($start);
         $client->setExpireTime($end);
-        $client->setStatus(WechatClient::STATUS_VALID);
         $client->setCreated(new \DateTime());
         $client->setWechat($wechat);
 
         $this->saveModifiedEntity($client);
+    }
+
+
+    /**
+     * @param Wechat $wechat
+     * @param string $name
+     * @param string $type
+     * @param integer $expired
+     * @param string $scene
+     * @param string $url
+     */
+    public function createWechatQrcode($wechat, $name, $type, $expired, $scene, $url)
+    {
+        $qrcode = new WechatQrcode();
+        $qrcode->setId(Uuid::uuid1()->toString());
+        $qrcode->setName($name);
+        $qrcode->setType($type);
+        $qrcode->setExpired((time() + $expired));
+        $qrcode->setScene($scene);
+        $qrcode->setUrl($url);
+        $qrcode->setCreated(new \DateTime());
+        $qrcode->setWechat($wechat);
+
+        $this->saveModifiedEntity($qrcode);
     }
 
 }

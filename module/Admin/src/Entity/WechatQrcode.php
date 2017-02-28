@@ -1,11 +1,10 @@
 <?php
 /**
- * WechatClient.php
+ * WechatQrcode.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
  */
-
 
 namespace Admin\Entity;
 
@@ -14,14 +13,35 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 /**
- * Class WechatClient
+ * Class WechatQrcode
  * @package Admin\Entity
  *
  * @ORM\Entity
- * @ORM\Table(name="app_wx_client")
+ * @ORM\Table(name="app_wx_qrcode")
  */
-class WechatClient
+class WechatQrcode
 {
+    const TYPE_TEMP = 'QR_SCENE';
+    const TYPE_FOREVER = 'QR_LIMIT_STR_SCENE';
+
+
+    public static function getTypeList()
+    {
+        return [
+            self::TYPE_TEMP => '临时二维码',
+            self::TYPE_FOREVER => '永久二维码',
+        ];
+    }
+
+    public function getTypeAsString()
+    {
+        $list = self::getTypeList();
+        if (isset($list[$this->type])) {
+            return $list[$this->type];
+        }
+        return '未知类型二维码';
+    }
+
 
     /**
      * @var string
@@ -39,34 +59,33 @@ class WechatClient
      */
     private $name = '';
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=18)
+     */
+    private $type = self::TYPE_TEMP;
 
     /**
-     * @var integer
+     * @var int
      *
-     * @ORM\Column(name="active_time", type="integer")
+     * @ORM\Column(name="expired", type="integer")
      */
-    private $activeTime = 0;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="expire_time", type="integer")
-     */
-    private $expireTime = 0;
+    private $expired = 0;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="domain", type="string", length=255)
+     * @ORM\Column(name="scene", type="string", length=64)
      */
-    private $domain = '';
+    private $scene = '';
 
     /**
      * @var string
      *
-     * @ORM\Column(name="ip", type="string", length=255)
+     * @ORM\Column(name="url", type="string", length=255)
      */
-    private $ip = '';
+    private $url = '';
 
     /**
      * @var \DateTime
@@ -78,7 +97,7 @@ class WechatClient
     /**
      * @var Wechat
      *
-     * @ORM\ManyToOne(targetEntity="Admin\Entity\Wechat", inversedBy="clients")
+     * @ORM\ManyToOne(targetEntity="Admin\Entity\Wechat", inversedBy="qrcodes")
      * @ORM\JoinColumn(name="wx", referencedColumnName="wx_id")
      */
     private $wechat;
@@ -117,67 +136,67 @@ class WechatClient
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
      * @return int
      */
-    public function getActiveTime()
+    public function getExpired()
     {
-        return $this->activeTime;
+        return $this->expired;
     }
 
     /**
-     * @param int $activeTime
+     * @param int $expired
      */
-    public function setActiveTime($activeTime)
+    public function setExpired($expired)
     {
-        $this->activeTime = $activeTime;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExpireTime()
-    {
-        return $this->expireTime;
-    }
-
-    /**
-     * @param int $expireTime
-     */
-    public function setExpireTime($expireTime)
-    {
-        $this->expireTime = $expireTime;
+        $this->expired = $expired;
     }
 
     /**
      * @return string
      */
-    public function getDomain()
+    public function getScene()
     {
-        return $this->domain;
+        return $this->scene;
     }
 
     /**
-     * @param string $domain
+     * @param string $scene
      */
-    public function setDomain($domain)
+    public function setScene($scene)
     {
-        $this->domain = $domain;
+        $this->scene = $scene;
     }
 
     /**
      * @return string
      */
-    public function getIp()
+    public function getUrl()
     {
-        return $this->ip;
+        return $this->url;
     }
 
     /**
-     * @param string $ip
+     * @param string $url
      */
-    public function setIp($ip)
+    public function setUrl($url)
     {
-        $this->ip = $ip;
+        $this->url = $url;
     }
 
     /**
@@ -211,6 +230,7 @@ class WechatClient
     {
         $this->wechat = $wechat;
     }
+
 
 
 

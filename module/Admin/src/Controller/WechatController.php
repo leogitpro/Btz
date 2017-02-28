@@ -11,8 +11,10 @@ namespace Admin\Controller;
 
 use Admin\Entity\Wechat;
 use Admin\Entity\WechatClient;
+use Admin\Entity\WechatQrcode;
 use Admin\Form\WechatClientForm;
 use Admin\Form\WechatForm;
+use Admin\Form\WechatQrcodeForm;
 use Admin\Wechat\Service;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -206,8 +208,6 @@ class WechatController extends AdminBaseController
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
 
-                $this->getLoggerPlugin()->err('posted');
-
                 $data = $form->getData();
                 $start = new \DateTime($data['active']);
                 $activeTime = $start->format('U');
@@ -278,7 +278,6 @@ class WechatController extends AdminBaseController
                 $expireTime = $end->format('U') - 1;
                 $wechatClient->setExpireTime($expireTime);
 
-
                 $wechatManager->saveModifiedEntity($wechatClient);
 
                 return $this->getMessagePlugin()->show(
@@ -340,7 +339,7 @@ class WechatController extends AdminBaseController
         $wechatManager = $this->getWechatManager();
         $wechat = $wechatManager->getWechatByMember($myself);
         if (!$wechat instanceof Wechat) {
-            throw new \Exception('未查询到您的公众号信息, 无法继续操作!');
+            throw new \Exception('未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!');
         }
 
         return new ViewModel([
@@ -348,6 +347,92 @@ class WechatController extends AdminBaseController
             'activeId' => __METHOD__,
         ]);
     }
+
+
+
+    public function qrcodelistAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $wechatManager = $this->getWechatManager();
+        $wechat = $wechatManager->getWechatByMember($myself);
+        if (!$wechat instanceof Wechat) {
+            throw new \Exception('未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!');
+        }
+
+        return new ViewModel([
+            'wechat' => $wechat,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+
+    /**
+     * 添加一个二维码
+     */
+    public function qrcodeaddAction()
+    {
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $wechatManager = $this->getWechatManager();
+        $wechat = $wechatManager->getWechatByMember($myself);
+
+        if (!$wechat instanceof Wechat) {
+            return $this->go('公众号还未创建', '您的微信公众号还未创建, 不能执行当前的操作!', $this->url()->fromRoute('admin/wechat'));
+        }
+
+        $form = new WechatQrcodeForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $name = $data['name']; //二维码名称
+                $type = array_key_exists($data['type'], WechatQrcode::getTypeList()) ? $data['type'] : WechatQrcode::TYPE_TEMP;
+
+                if (preg_match("/^[0-9]+$/", $data['scene'])) {
+                    $scene = intval($data['scene']);
+                } else {
+                    $scene = (string)$data['scene'];
+                }
+                if (empty($scene)) {
+                    throw new \Exception('二维码参数不合适, 无法进行申请!');
+                }
+
+                if (WechatQrcode::TYPE_FOREVER == $type) {
+                    $expired = 0;
+                } else {
+                    $expired = (int)$data['expired'];
+                    if ($expired < 30) { $expired = 30; }
+                }
+
+                $wechatService = $this->getWechatService($wechat->getWxId());
+                $result = $wechatService->getQrCode($type, $scene, $expired);
+
+                if (!empty($result) && isset($result['url'])) {
+                    $wechatManager->createWechatQrcode($wechat, $name, $type, $expired, $scene, $result['url']);
+                    $title = '二维码创建成功';
+                    $message = '您申请的二维码已经创建成功!';
+                } else {
+                    $title = '二维码创建失败';
+                    $message = '您申请的二维码已经创建失败, 请重新再试!';
+                }
+
+                return $this->go($title, $message, $this->url()->fromRoute('admin/wechat', ['action' => 'qrcodelist']));
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
+
 
 
     /**
@@ -365,6 +450,10 @@ class WechatController extends AdminBaseController
 
         $item['actions']['client'] = self::CreateActionRegistry('client', '公众号客户端', 1, 'laptop', 8);
         $item['actions']['addclient'] = self::CreateActionRegistry('addclient', '添加访问客户端');
+
+
+        $item['actions']['qrcodelist'] = self::CreateActionRegistry('qrcodelist', '二维码管理', 1, 'qrcode', 6);
+        $item['actions']['qrcodeadd'] = self::CreateActionRegistry('qrcodeadd', '增加二维码');
 
         return $item;
     }

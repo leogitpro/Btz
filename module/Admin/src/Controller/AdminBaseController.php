@@ -96,6 +96,22 @@ class AdminBaseController extends AppBaseController
 
 
     /**
+     * Show redirect page
+     *
+     * @param string $title
+     * @param string $message
+     * @param string $url
+     * @param string $back
+     * @param int $delay
+     * @return mixed
+     */
+    protected function go($title, $message, $url, $back = '返回', $delay = 3)
+    {
+        return $this->getMessagePlugin()->show($title, $message, $url, $back, $delay);
+    }
+
+
+    /**
      * Get the controller actions information
      *
      * @return array

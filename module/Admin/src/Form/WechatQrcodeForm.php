@@ -1,0 +1,146 @@
+<?php
+/**
+ * WechatQrcodeForm.php
+ *
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
+ */
+
+namespace Admin\Form;
+
+
+use Admin\Entity\WechatQrcode;
+
+class WechatQrcodeForm extends BaseForm
+{
+
+    private function addNameElement()
+    {
+        $this->add([
+            'type' => 'text',
+            'name' => 'name',
+            'attributes' => [
+                'id' => 'name',
+            ],
+        ]);
+        $this->getInputFilter()->add([
+            'name' => 'name',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的名称方便您日后管理!',
+                        ],
+                    ],
+                ],
+                [
+                    'name' => 'StringLength',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'min' => 2,
+                        'max' => 45,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的二维码重名哦.',
+                            \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+
+    private function addTypeElement()
+    {
+        $this->add([
+            'type' => 'select',
+            'name' => 'type',
+            'attributes' => [
+                'id' => 'type',
+            ],
+            'options' => [
+                'value_options' => WechatQrcode::getTypeList(),
+            ],
+        ]);
+
+        $this->getInputFilter()->add([
+            'name' => 'type',
+        ]);
+    }
+
+    private function addExpiredElement()
+    {
+        $this->add([
+            'type' => 'text',
+            'name' => 'expired',
+            'attributes' => [
+                'id' => 'expired',
+            ],
+        ]);
+        $this->getInputFilter()->add([
+            'name' => 'expired',
+        ]);
+    }
+
+    private function addSceneElement()
+    {
+        $this->add([
+            'type' => 'text',
+            'name' => 'scene',
+            'attributes' => [
+                'id' => 'scene',
+            ],
+        ]);
+        $this->getInputFilter()->add([
+            'name' => 'scene',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的参数, 这个非常重要.',
+                        ],
+                    ],
+                ],
+                [
+                    'name' => 'StringLength',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'max' => 64,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_LONG => '参数太长, 微信不允许设置这么长的参数哦.',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+
+
+    public function addElements()
+    {
+        $this->addCsrfElement();
+        $this->addNameElement();
+        $this->addTypeElement();
+        $this->addExpiredElement();
+        $this->addSceneElement();
+        $this->addSubmitElement();
+    }
+
+}

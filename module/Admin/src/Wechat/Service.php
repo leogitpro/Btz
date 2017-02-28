@@ -53,11 +53,11 @@ class Service
         try {
             return $this->local->getAccessToken($this->wxId);
         } catch (InvalidArgumentException $e) {
-            $this->logger->err($e->getMessage());
+            $this->logger->excaption($e);
         } catch (ExpiredException $e) {
-            $this->logger->err($e->getMessage());
+            $this->logger->excaption($e);
         } catch (RuntimeException $e) {
-            $this->logger->err($e->getMessage());
+            $this->logger->excaption($e);
         }
 
         return '';
@@ -74,9 +74,23 @@ class Service
         try {
             return $this->local->getCallbackHosts($this->wxId);
         } catch (RuntimeException $e) {
-            $this->logger->err($e->getMessage());
+            $this->logger->excaption($e);
         }
 
+        return [];
+    }
+
+
+    /**
+     * 生成带参数微信二维码
+     */
+    public function getQrCode($type, $scene, $expired = 0)
+    {
+        try {
+            return $this->local->createQrCode($this->wxId, $type, $scene, $expired);
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+        }
         return [];
     }
 

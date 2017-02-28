@@ -55,15 +55,17 @@ class Local
     {
         $wechat = $this->wechatManager->getWechat($wx_id);
         if (!$wechat instanceof Wechat) {
-            throw new InvalidArgumentException('The register wechat id is invalid.');
+            throw new InvalidArgumentException('无效的微信公众号 ID: ' . $wx_id);
         }
 
         if (time() > $wechat->getWxExpired()) {
-            throw new ExpiredException('The wechat api service is expired.');
+            throw new ExpiredException('公众号服务已经过期, 公众号 ID:' . $wx_id);
         }
 
         if (time() > $wechat->getWxAccessTokenExpired()) {
+
             $data = $this->remote->getAccessToken($wechat->getWxAppId(), $wechat->getWxAppSecret());
+
             if (isset($data['access_token']) && isset($data['expires_in'])) {
                 $wechat->setWxAccessToken($data['access_token']);
                 $expired = intval($data['expires_in'] * 0.9) + time();
@@ -71,7 +73,7 @@ class Local
                 $this->wechatManager->saveModifiedEntity($wechat);
                 return $data['access_token'];
             } else {
-                throw new RuntimeException($data['errcode'] . ':' . $data['errmsg']);
+                throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
             }
 
         } else {
@@ -82,19 +84,64 @@ class Local
 
     /**
      * @param integer $wx_id
-     * @return array
+     * @return array|bool
      * @throws RuntimeException
      */
     public function getCallbackHosts($wx_id)
     {
-        $token = $this->getAccessToken($wx_id);
+        try {
+            $token = $this->getAccessToken($wx_id);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+            return false;
+        } catch (ExpiredException $e) {
+            $this->logger->excaption($e);
+            return false;
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return false;
+        }
+
         $data = $this->remote->getCallbackHosts($token);
         if (isset($data['ip_list'])) {
             return $data['ip_list'];
         } else {
-            throw new RuntimeException($data['errcode'] . ':' . $data['errmsg']);
+            throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
         }
     }
+
+
+    /**
+     * @param string $wx_id
+     * @param string $type
+     * @param string|integer $scene
+     * @param integer $expired
+     * @return array|bool
+     * @throws RuntimeException
+     */
+    public function createQrCode($wx_id, $type, $scene, $expired)
+    {
+        try {
+            $token = $this->getAccessToken($wx_id);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+            return false;
+        } catch (ExpiredException $e) {
+            $this->logger->excaption($e);
+            return false;
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return false;
+        }
+
+        $data = $this->remote->createQrCode($token, $type, $scene, $expired);
+        if (isset($data['url'])) {
+            return $data;
+        } else {
+            throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
+        }
+    }
+
 
 
 }

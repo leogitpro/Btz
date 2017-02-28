@@ -105,9 +105,20 @@ class Wechat
     private $clients;
 
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WechatQrcode", mappedBy="wechat")
+     */
+    private $qrcodes;
+
+
+
+
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+        $this->qrcodes = new ArrayCollection();
     }
 
 
@@ -269,6 +280,22 @@ class Wechat
     public function setClients($clients)
     {
         $this->clients = $clients;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getQrcodes()
+    {
+        return $this->qrcodes;
+    }
+
+    /**
+     * @param ArrayCollection $qrcodes
+     */
+    public function setQrcodes($qrcodes)
+    {
+        $this->qrcodes = $qrcodes;
     }
 
 
