@@ -1,10 +1,11 @@
 <?php
 /**
- * WeChatClient.php
+ * WechatClient.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
  */
+
 
 namespace Admin\Entity;
 
@@ -13,13 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 /**
- * Class WeChatClient
+ * Class WechatClient
  * @package Admin\Entity
  *
  * @ORM\Entity
  * @ORM\Table(name="app_wx_client")
  */
-class WeChatClient
+class WechatClients
 {
 
     /**
@@ -75,12 +76,12 @@ class WeChatClient
     private $created;
 
     /**
-     * @var WeChat
+     * @var Wechat
      *
-     * @ORM\ManyToOne(targetEntity="Admin\Entity\WeChat", inversedBy="clients")
+     * @ORM\ManyToOne(targetEntity="Admin\Entity\Wechat", inversedBy="clients")
      * @ORM\JoinColumn(name="wx", referencedColumnName="wx_id")
      */
-    private $weChat;
+    private $wechat;
 
 
     /**
@@ -196,19 +197,21 @@ class WeChatClient
     }
 
     /**
-     * @return WeChat
+     * @return Wechat
      */
-    public function getWeChat()
+    public function getWechat()
     {
-        return $this->weChat;
+        return $this->wechat;
     }
 
     /**
-     * @param WeChat $weChat
+     * @param Wechat $wechat
      */
-    public function setWeChat($weChat)
+    public function setWechat($wechat)
     {
-        $this->weChat = $weChat;
+        $this->wechat = $wechat;
     }
+
+
 
 }

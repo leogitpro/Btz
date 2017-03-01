@@ -67,13 +67,17 @@ class Local
             $data = $this->remote->getAccessToken($wechat->getWxAppId(), $wechat->getWxAppSecret());
 
             if (isset($data['access_token']) && isset($data['expires_in'])) {
-                $wechat->setWxAccessToken($data['access_token']);
+
                 $expired = intval($data['expires_in'] * 0.9) + time();
+
                 $wechat->setWxAccessTokenExpired(intval($expired));
+                $wechat->setWxAccessToken($data['access_token']);
+
                 $this->wechatManager->saveModifiedEntity($wechat);
+
                 return $data['access_token'];
             } else {
-                throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
+                throw new RuntimeException('与微信服务器通信错误: ' . $data['errmsg'], $data['errcode']);
             }
 
         } else {
@@ -106,7 +110,7 @@ class Local
         if (isset($data['ip_list'])) {
             return $data['ip_list'];
         } else {
-            throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
+            throw new RuntimeException('与微信服务器通信错误: ' . $data['errmsg'], $data['errcode']);
         }
     }
 
@@ -138,7 +142,7 @@ class Local
         if (isset($data['url'])) {
             return $data;
         } else {
-            throw new RuntimeException('与微信服务器通信错误: [' . $data['errcode'] . '] ' . $data['errmsg']);
+            throw new RuntimeException('与微信服务器通信错误: ' . $data['errmsg'], $data['errcode']);
         }
     }
 

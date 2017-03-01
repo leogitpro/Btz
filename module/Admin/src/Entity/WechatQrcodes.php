@@ -1,6 +1,6 @@
 <?php
 /**
- * WeChatQrCode.php
+ * WechatQrcode.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -13,13 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 /**
- * Class WeChatQrCode
+ * Class WechatQrcode
  * @package Admin\Entity
  *
  * @ORM\Entity
  * @ORM\Table(name="app_wx_qrcode")
  */
-class WeChatQrCode
+class WechatQrcodes
 {
     const TYPE_TEMP = 'QR_SCENE';
     const TYPE_FOREVER = 'QR_LIMIT_STR_SCENE';
@@ -95,12 +95,12 @@ class WeChatQrCode
     private $created;
 
     /**
-     * @var WeChat
+     * @var Wechat
      *
-     * @ORM\ManyToOne(targetEntity="Admin\Entity\WeChat", inversedBy="qrCodes")
+     * @ORM\ManyToOne(targetEntity="Admin\Entity\Wechat", inversedBy="qrcodes")
      * @ORM\JoinColumn(name="wx", referencedColumnName="wx_id")
      */
-    private $weChat;
+    private $wechat;
 
 
     /**
@@ -216,19 +216,22 @@ class WeChatQrCode
     }
 
     /**
-     * @return WeChat
+     * @return Wechat
      */
-    public function getWeChat()
+    public function getWechat()
     {
-        return $this->weChat;
+        return $this->wechat;
     }
 
     /**
-     * @param WeChat $weChat
+     * @param Wechat $wechat
      */
-    public function setWeChat($weChat)
+    public function setWechat($wechat)
     {
-        $this->weChat = $weChat;
+        $this->wechat = $wechat;
     }
+
+
+
 
 }

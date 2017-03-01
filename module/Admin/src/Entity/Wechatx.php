@@ -1,6 +1,6 @@
 <?php
 /**
- * WeChat.php
+ * Wechat.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -14,13 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 /**
- * Class WeChat
+ * Class Wechat
  * @package Admin\Entity
  *
  * @ORM\Entity
  * @ORM\Table(name="app_wx")
  */
-class WeChat
+class Wechatx
 {
 
     const STATUS_UNCHECK = 0;
@@ -100,7 +100,7 @@ class WeChat
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Admin\Entity\WeChatClient", mappedBy="weChat")
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WechatClient", mappedBy="wechat")
      */
     private $clients;
 
@@ -108,16 +108,17 @@ class WeChat
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Admin\Entity\WeChatQrCode", mappedBy="weChat")
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WechatQrcode", mappedBy="wechat")
      */
-    private $qrCodes;
+    private $qrcodes;
+
 
 
 
     public function __construct()
     {
         $this->clients = new ArrayCollection();
-        $this->qrCodes = new ArrayCollection();
+        $this->qrcodes = new ArrayCollection();
     }
 
 
@@ -284,17 +285,21 @@ class WeChat
     /**
      * @return ArrayCollection
      */
-    public function getQrCodes()
+    public function getQrcodes()
     {
-        return $this->qrCodes;
+        return $this->qrcodes;
     }
 
     /**
-     * @param ArrayCollection $qrCodes
+     * @param ArrayCollection $qrcodes
      */
-    public function setQrCodes($qrCodes)
+    public function setQrcodes($qrcodes)
     {
-        $this->qrCodes = $qrCodes;
+        $this->qrcodes = $qrcodes;
     }
+
+
+
+
 
 }

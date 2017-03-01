@@ -102,16 +102,18 @@ return [
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\WechatManager::class => Service\Factory\EntityManagerFactory::class,
+            //Service\WechatManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\WeChatManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\WeChatClientManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\WeChatQrCodeManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\MessageManager::class => Service\Factory\MessageManagerFactory::class,
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
 
-            Wechat\Service::class => Wechat\Factory\ServiceFactory::class,
-            Wechat\Local::class => Wechat\Factory\LocalFactory::class,
-            Wechat\Remote::class => Wechat\Factory\RemoteFactory::class,
-            Wechat\Http::class => Wechat\Factory\BaseFactory::class,
+            //Wechat\Service::class => Wechat\Factory\ServiceFactory::class,
+            //Wechat\Local::class => Wechat\Factory\LocalFactory::class,
+            //Wechat\Remote::class => Wechat\Factory\BaseFactory::class,
 
         ],
     ],

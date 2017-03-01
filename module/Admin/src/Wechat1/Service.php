@@ -83,6 +83,8 @@ class Service
 
     /**
      * 生成带参数微信二维码
+     *
+     * @return
      */
     public function getQrCode($type, $scene, $expired = 0)
     {

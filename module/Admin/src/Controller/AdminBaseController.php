@@ -17,7 +17,9 @@ use Admin\Service\DepartmentManager;
 use Admin\Service\FeedbackManager;
 use Admin\Service\MemberManager;
 use Admin\Service\MessageManager;
-use Admin\Service\WechatManager;
+use Admin\Service\WeChatClientManager;
+use Admin\Service\WeChatManager;
+use Admin\Service\WeChatQrCodeManager;
 use Application\Controller\AppBaseController;
 
 
@@ -31,11 +33,27 @@ class AdminBaseController extends AppBaseController
 {
 
     /**
-     * @return WechatManager
+     * @return WeChatQrCodeManager
      */
-    protected function getWechatManager()
+    protected function getWeChatQrCodeManager()
     {
-        return $this->getSm(WechatManager::class);
+        return $this->getSm(WeChatQrCodeManager::class);
+    }
+
+    /**
+     * @return WeChatClientManager
+     */
+    protected function getWeChatClientManager()
+    {
+        return $this->getSm(WeChatClientManager::class);
+    }
+
+    /**
+     * @return WeChatManager
+     */
+    protected function getWeChatManager()
+    {
+        return $this->getSm(WeChatManager::class);
     }
 
     /**

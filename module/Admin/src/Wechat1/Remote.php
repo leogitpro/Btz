@@ -10,24 +10,19 @@
 namespace Admin\Wechat;
 
 
+use Admin\Wechat\Exception\NetworkRequestException;
 use Application\Service\AppLogger;
+use Zend\Json\Json;
 
 class Remote
 {
-
-    /**
-     * @var Http
-     */
-    private $http;
-
     /**
      * @var AppLogger
      */
     private $logger;
 
-    public function __construct(Http $http, AppLogger $logger)
+    public function __construct(AppLogger $logger)
     {
-        $this->http = $http;
         $this->logger = $logger;
     }
 
@@ -35,7 +30,7 @@ class Remote
     /**
      * @param string $appid
      * @param string $appsecret
-     * @return array|bool
+     * @return array
      */
     public function getAccessToken($appid, $appsecret)
     {
@@ -46,7 +41,7 @@ class Remote
 
     /**
      * @param string $access_token
-     * @return array|bool
+     * @return array
      */
     public function getCallbackHosts($access_token)
     {
@@ -60,13 +55,16 @@ class Remote
      * @param string $type
      * @param string|integer $scene
      * @param integer $expired
-     * @return array|bool
+     * @return array
      */
     public function createQrCode($access_token, $type, $scene, $expired)
     {
         $apiUrl = ApiURL::GetCreateQrCodeUrl($access_token);
+
         $post = new \stdClass();
+
         $sceneValue = new \stdClass();
+
         if ('QR_SCENE' == $type) {
             $post->expire_seconds = (int)$expired;
             $post->action_name = 'QR_SCENE';
@@ -78,7 +76,7 @@ class Remote
             $post->action_name = 'QR_LIMIT_STR_SCENE';
             $sceneValue->scene_str = (string)$scene;
         } else {
-            return false;
+            return [];
         }
 
         $sceneObj = new \stdClass();
@@ -86,42 +84,43 @@ class Remote
 
         $post->action_info = $sceneObj;
 
-        return $this->sendPostRequest($apiUrl, json_encode($post));
+        return $this->sendPostRequest($apiUrl, Json::encode($post, true));
     }
 
 
     /**
      * @param string $url
      * @param string $post
-     * @return bool|array
+     * @return array
      */
     private function sendPostRequest($url, $post)
     {
-        $this->logger->debug('Send http post request: ' . PHP_EOL . $url);
-        $result = $this->http->post($url, $post);
-        if (!$result) {
-            return false;
+        try {
+            $response = Http::Post($url, $post);
+        } catch (NetworkRequestException $e) {
+            $this->logger->excaption($e);
+            return [];
         }
 
-        return json_decode($result, true);
+        return Json::decode($response, Json::TYPE_ARRAY);
     }
 
 
 
     /**
      * @param string $url
-     * @return bool|array
+     * @return array
      */
     private function sendGetRequest($url)
     {
-        $this->logger->debug('Send http get request: ' . PHP_EOL . $url);
-
-        $result = $this->http->get($url);
-        if (!$result) {
-            return false;
+        try {
+            $response = Http::Get($url);
+        } catch (NetworkRequestException $e) {
+            $this->logger->excaption($e);
+            return [];
         }
 
-        return json_decode($result, true);
+        return Json::decode($response, Json::TYPE_ARRAY);
     }
 
 }

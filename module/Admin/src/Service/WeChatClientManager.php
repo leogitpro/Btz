@@ -1,6 +1,6 @@
 <?php
 /**
- * WeChatManager.php
+ * WeChatClientManager.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -9,7 +9,7 @@
 namespace Admin\Service;
 
 
-class WeChatManager extends BaseEntityManager
+class WeChatClientManager extends BaseEntityManager
 {
 
 }

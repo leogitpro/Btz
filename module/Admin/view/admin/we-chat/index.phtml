@@ -1,0 +1,50 @@
+<?php
+$this->pageTitleBar('我的公众号');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$this->headScript()->appendFile($this->basePath('js/admin/wechat.index.js'));
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <?php if (!$wechat instanceof \Admin\Entity\Wechat) { ?>
+            <p>
+                <span>您还没有创建您的微信公众号, 是否需要现在创建? </span>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/wechat', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw" ></i> 添加公众号</a>
+            </p>
+        <?php } else { ?>
+            <div class="row">
+                <div class="col-lg-7">
+                    <p>AppID: <?php echo $wechat->getWxAppId(); ?></p>
+                    <p>
+                        AppSecret: <?php echo substr($wechat->getWxAppSecret(), 0, 5) . '*********' . substr($wechat->getWxAppSecret(), -5); ?>
+                        <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/wechat', ['action' => 'edit', 'suffix' => '.html']); ?>">修改配置</a>
+                    </p>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <p>运行状态</p>
+                    <?php if(time() < $wechat->getWxExpired()) { ?>
+                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>运行中</strong></p>
+                    <?php } else { ?>
+                        <p class="text-muted"><i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>已过期</strong></p>
+                    <?php } ?>
+                </div>
+                <div class="col-lg-3 text-center">
+                    <p>验证状态</p>
+                    <?php if(\Admin\Entity\Wechat::STATUS_CHECKED == $wechat->getWxChecked()) { ?>
+                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong></p>
+                    <?php } else { ?>
+                        <p class="text-muted">
+                            <i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>未验证</strong>
+                            <a class="check-wechat btn btn-default btn-xs" href="<?php echo $this->url('admin/wechat', ['action'=>'check']); ?>">现在验证</a>
+                        </p>
+                    <?php } ?>
+                </div>
+            </div>
+            <hr>
+
+        <?php } ?>
+    </div>
+</div>
+
