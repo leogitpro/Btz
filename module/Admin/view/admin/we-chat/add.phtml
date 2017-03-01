@@ -1,0 +1,52 @@
+<?php
+$this->pageTitleBar('创建公众号');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$form->get('appid')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里请填写 AppID'
+]);
+
+$form->get('appsecret')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '这里请填写 AppSecret'
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <div class="alert alert-warning" role="alert"><strong>请注意:</strong> 公众号经过验证可用后 <strong>AppID</strong> 将不再被允许修改!</div>
+
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('appid'), '微信公众号 AppID'); ?>
+            <?php echo $this->formElement($form->get('appid')); ?>
+            <?php echo $this->formElementErrors($form->get('appid')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('appsecret'), '微信公众号 AppSecret'); ?>
+            <?php echo $this->formElement($form->get('appsecret')); ?>
+            <?php echo $this->formElementErrors($form->get('appsecret')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

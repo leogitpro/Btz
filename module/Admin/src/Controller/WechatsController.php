@@ -38,27 +38,6 @@ class WechatsController extends AdminBaseController
      */
     public function indexAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
-
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-        if (!$wechat instanceof Wechat) {
-            return new ViewModel([
-                'wechat' => null,
-                'activeId' => __METHOD__,
-            ]);
-        }
-
-        //$wechatService = $this->getWechatService($wechat->getWxId());
-
-        //var_dump($wechatService->getAccessToken());
-
-
-
-        return new ViewModel([
-            'wechat' => $wechat,
-            'activeId' => __METHOD__,
-        ]);
     }
 
 
@@ -67,34 +46,6 @@ class WechatsController extends AdminBaseController
      */
     public function addAction()
     {
-        $wechatManager = $this->getWechatManager();
-        $form = new WechatForm($wechatManager);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-                $appid = $data['appid'];
-                $appsecret = $data['appsecret'];
-
-                $wechatManager->createMemberWechat($this->getMemberManager()->getCurrentMember(), $appid, $appsecret);
-
-                return $this->getMessagePlugin()->show(
-                    '公众号已经创建',
-                    '您的微信公众号: ' . $appid . ' 已经创建成功!',
-                    $this->url()->fromRoute('admin/wechat'),
-                    '返回',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'activeId' => __CLASS__,
-        ]);
     }
 
     /**
@@ -541,7 +492,7 @@ class WechatsController extends AdminBaseController
      *
      * @return array
      */
-    public static function ComponentRegistry()
+    public static function ComponentRegistryX()
     {
         $item = self::CreateControllerRegistry(__CLASS__, '微信服务', 'admin/wechat', 1, 'wechat', 22);
 

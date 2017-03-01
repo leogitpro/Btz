@@ -193,22 +193,22 @@ return [
     // End FeedbackController router
 
 
-    // WechatController router configuration
-    'wechat' => [
+    // WeChatController router configuration
+    'weChat' => [
         'type' => Segment::class,
         'options' => [
-            'route' => 'wechat[/:action[/:key]][:suffix]',
+            'route' => 'we-chat[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                 'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
-                'controller' => Controller\WechatController::class,
+                'controller' => Controller\WeChatController::class,
                 'action' => 'index',
             ],
         ],
     ],
-    // End WechatController router
+    // End WeChatController router
 
 ];

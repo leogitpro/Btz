@@ -7,10 +7,10 @@
  */
 
 
-namespace Admin\Wechat;
+namespace Admin\WeChat;
 
 
-use Admin\Wechat\Exception\NetworkRequestException;
+use Admin\WeChat\Exception\NetworkRequestException;
 use Curl\Curl;
 
 

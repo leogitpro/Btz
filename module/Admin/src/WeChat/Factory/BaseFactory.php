@@ -7,7 +7,7 @@
  */
 
 
-namespace Admin\Wechat\Factory;
+namespace Admin\WeChat\Factory;
 
 
 use Interop\Container\ContainerInterface;

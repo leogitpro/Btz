@@ -1,22 +1,22 @@
 <?php
 /**
- * Service.php
+ * WeChatService.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
  */
 
 
-namespace Admin\Wechat;
+namespace Admin\WeChat;
 
 
-use Admin\Wechat\Exception\ExpiredException;
-use Admin\Wechat\Exception\InvalidArgumentException;
-use Admin\Wechat\Exception\RuntimeException;
+use Admin\WeChat\Exception\ExpiredException;
+use Admin\WeChat\Exception\InvalidArgumentException;
+use Admin\WeChat\Exception\RuntimeException;
 use Application\Service\AppLogger;
 
 
-class Service
+class WeChatService
 {
 
     /**
@@ -84,7 +84,7 @@ class Service
     /**
      * 生成带参数微信二维码
      *
-     * @return
+     * @return array
      */
     public function getQrCode($type, $scene, $expired = 0)
     {

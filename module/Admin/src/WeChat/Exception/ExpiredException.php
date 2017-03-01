@@ -7,7 +7,7 @@
  */
 
 
-namespace Admin\Wechat\Exception;
+namespace Admin\WeChat\Exception;
 
 
 class ExpiredException extends \LogicException

@@ -7,24 +7,25 @@
  */
 
 
-namespace Admin\Wechat\Factory;
+namespace Admin\WeChat\Factory;
 
 
-use Admin\Service\WechatManager;
-use Admin\Wechat\Local;
-use Admin\Wechat\Remote;
+use Admin\Service\WeChatManager;
+use Admin\WeChat\Local;
+use Admin\WeChat\Remote;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+
 
 class LocalFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $wechatManager = $container->get(WechatManager::class);
+        $wcm = $container->get(WeChatManager::class);
         $remote = $container->get(Remote::class);
         $logger = $container->get('Logger');
 
-        return new Local($wechatManager, $remote, $logger);
+        return new Local($wcm, $remote, $logger);
     }
 
 

@@ -7,12 +7,13 @@
  */
 
 
-namespace Admin\Wechat;
+namespace Admin\WeChat;
 
 
-use Admin\Wechat\Exception\NetworkRequestException;
+use Admin\WeChat\Exception\NetworkRequestException;
 use Application\Service\AppLogger;
 use Zend\Json\Json;
+
 
 class Remote
 {

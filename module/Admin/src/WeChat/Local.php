@@ -7,15 +7,16 @@
  */
 
 
-namespace Admin\Wechat;
+namespace Admin\WeChat;
 
 
 use Admin\Entity\Wechat;
 use Admin\Service\WechatManager;
-use Admin\Wechat\Exception\ExpiredException;
-use Admin\Wechat\Exception\InvalidArgumentException;
-use Admin\Wechat\Exception\RuntimeException;
+use Admin\WeChat\Exception\ExpiredException;
+use Admin\WeChat\Exception\InvalidArgumentException;
+use Admin\WeChat\Exception\RuntimeException;
 use Application\Service\AppLogger;
+
 
 class Local
 {

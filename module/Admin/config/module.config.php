@@ -44,7 +44,7 @@ return [
             Controller\AclController::class => InvokableFactory::class,
             Controller\MessageController::class => InvokableFactory::class,
             Controller\FeedbackController::class => InvokableFactory::class,
-            Controller\WechatController::class => InvokableFactory::class,
+            Controller\WeChatController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -102,7 +102,6 @@ return [
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
-            //Service\WechatManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatClientManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatQrCodeManager::class => Service\Factory\EntityManagerFactory::class,
@@ -111,9 +110,9 @@ return [
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
 
-            //Wechat\Service::class => Wechat\Factory\ServiceFactory::class,
-            //Wechat\Local::class => Wechat\Factory\LocalFactory::class,
-            //Wechat\Remote::class => Wechat\Factory\BaseFactory::class,
+            WeChat\WeChatService::class => WeChat\Factory\WeChatServiceFactory::class,
+            WeChat\Local::class => WeChat\Factory\LocalFactory::class,
+            WeChat\Remote::class => WeChat\Factory\BaseFactory::class,
 
         ],
     ],

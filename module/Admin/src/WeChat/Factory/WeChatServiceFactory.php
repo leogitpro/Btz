@@ -1,6 +1,6 @@
 <?php
 /**
- * ServiceFactory.php
+ * WeChatServiceFactory.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -10,12 +10,13 @@
 namespace Admin\Wechat\Factory;
 
 
-use Admin\Wechat\Local;
-use Admin\Wechat\Service;
+use Admin\WeChat\Local;
+use Admin\WeChat\WeChatService;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class ServiceFactory implements FactoryInterface
+
+class WeChatServiceFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -28,7 +29,7 @@ class ServiceFactory implements FactoryInterface
 
         $logger = $container->get('Logger');
 
-        return new Service($wxId, $local, $logger);
+        return new WeChatService($wxId, $local, $logger);
 
     }
 
