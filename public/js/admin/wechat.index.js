@@ -1,10 +1,13 @@
 
 $(function () {
-   $(".check-wechat").click(function () {
+   $("#validateWeChat").click(function () {
        var url = $(this).attr("href");
        $(this).blur().attr("disabled", true).removeAttr("href");
        $.get(url, function (dt) {
            console.log(dt);
+           if(!dt.success) {
+               alert("当前公众号配置未能通过微信验证. 请确认公众号配置是否正确.\n或者还有其他的平台授权操作公众号 Token?");
+           }
            window.location.reload(true);
        }, "json");
        return false;

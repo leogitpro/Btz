@@ -53,47 +53,6 @@ class WechatsController extends AdminBaseController
      */
     public function editAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-        if (!$wechat instanceof Wechat) {
-            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
-        }
-
-        $form = new WechatForm($wechatManager, $wechat);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-
-                if ($wechat->getWxChecked() != Wechat::STATUS_CHECKED) {
-                    $appid = $data['appid'];
-                    $wechat->setWxAppId($data['appid']);
-                } else {
-                    $appid = $wechat->getWxAppId();
-                }
-
-                $wechat->setWxAppSecret($data['appsecret']);
-                $wechatManager->saveModifiedEntity($wechat);
-
-                return $this->getMessagePlugin()->show(
-                    '公众号已经修改',
-                    '您的微信公众号 ' . $appid . ' 信息已经创建成功!',
-                    $this->url()->fromRoute('admin/wechat'),
-                    '返回',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'wechat' => $wechat,
-            'activeId' => __CLASS__,
-        ]);
     }
 
 

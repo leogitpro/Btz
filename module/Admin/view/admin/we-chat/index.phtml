@@ -2,7 +2,28 @@
 $this->pageTitleBar('我的公众号');
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$this->headScript()->appendFile($this->basePath('js/admin/wechat.index.js'));
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+    $(function () {
+       $("#validateWeChat").click(function () {
+           var url = $(this).attr("href");
+           if(url.length < 2) {
+               return false;
+           }
+           $(this).blur().attr("disabled", true).attr("href", "#");
+           $.get(url, function (dt) {
+               if(!dt.success) {
+                   alert("当前公众号配置未能通过微信验证. 请确认公众号配置是否正确. 或者还有其他的平台授权操作公众号 Token?");
+               }
+               window.location.reload(true);
+           }, "json");
+           return false;
+       });
+    });
+JS;
+$this->inlineScript()->captureEnd();
+
 ?>
 
 
@@ -33,13 +54,14 @@ $this->headScript()->appendFile($this->basePath('js/admin/wechat.index.js'));
                 <div class="col-lg-3 text-center">
                     <p>验证状态</p>
                     <?php if(\Admin\Entity\WeChat::STATUS_CHECKED == $weChat->getWxChecked()) { ?>
-                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong></p>
+                        <p class="text-success">
+                            <i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong>
                     <?php } else { ?>
                         <p class="text-muted">
                             <i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>未验证</strong>
-                            <a class="check-wechat btn btn-default btn-xs" href="<?php echo $this->url('admin/weChat', ['action'=>'check']); ?>">现在验证</a>
-                        </p>
                     <?php } ?>
+                            <a id="validateWeChat" class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChat', ['action'=>'validate']); ?>">验证</a>
+                        </p>
                 </div>
             </div>
             <hr>
