@@ -3,8 +3,6 @@ $this->pageTitleBar('申请二维码');
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
-//$this->headScript()->appendFile($this->basePath('js/admin/wechat.qrcodeadd.js'));
-
 $form->get('name')->setAttributes([
     'class' => 'form-control',
     'placeholder' => '二维码名称'
@@ -28,6 +26,22 @@ $form->get('scene')->setAttributes([
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $form->prepare();
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".qrcode-type").change(function () {
+        if("none" == $("#expired-row").css("display")) {
+            $("#expired-row").show();
+        } else {
+            $("#expired-row").hide();
+        }
+    });
+})
+JS;
+$this->inlineScript()->captureEnd();
+
 
 ?>
 
