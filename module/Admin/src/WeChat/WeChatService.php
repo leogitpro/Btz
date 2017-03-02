@@ -84,6 +84,9 @@ class WeChatService
     /**
      * 生成带参数微信二维码
      *
+     * @param string $type
+     * @param string|int $scene
+     * @param int $expired
      * @return array
      */
     public function getQrCode($type, $scene, $expired = 0)

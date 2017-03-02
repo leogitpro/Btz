@@ -40,9 +40,9 @@ class WeChatClientController extends AdminBaseController
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $wcm = $this->getWeChatClientManager();
+        $cm = $this->getWeChatClientManager();
 
-        $count = $wcm->getClientCountByWeChat($weChat);
+        $count = $cm->getClientCountByWeChat($weChat);
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -55,7 +55,7 @@ class WeChatClientController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChatClient', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $wcm->getClientsWithLimitPageByWeChat($weChat, $page, $size);
+        $rows = $cm->getClientsWithLimitPageByWeChat($weChat, $page, $size);
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -117,7 +117,7 @@ class WeChatClientController extends AdminBaseController
 
         return new ViewModel([
             'form' => $form,
-            'activeId' => __CLASS__,
+            'activeId' => __METHOD__,
         ]);
     }
 
@@ -159,7 +159,7 @@ class WeChatClientController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号客户端', 'admin/weChatClient', 1, 'laptop', 22);
+        $item = self::CreateControllerRegistry(__CLASS__, '公众号客户端', 'admin/weChatClient', 1, 'laptop', 21);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '客户端列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '添加客户端', 1, 'plus', 8);

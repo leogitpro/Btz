@@ -108,18 +108,6 @@ class WechatsController extends AdminBaseController
 
     public function qrcodelistAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
-
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-        if (!$wechat instanceof Wechat) {
-            throw new \Exception('未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!');
-        }
-
-        return new ViewModel([
-            'wechat' => $wechat,
-            'activeId' => __METHOD__,
-        ]);
     }
 
 
@@ -128,62 +116,6 @@ class WechatsController extends AdminBaseController
      */
     public function qrcodeaddAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
-
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-
-        if (!$wechat instanceof Wechat) {
-            return $this->go('公众号还未创建', '您的微信公众号还未创建, 不能执行当前的操作!', $this->url()->fromRoute('admin/wechat'));
-        }
-
-        $form = new WechatQrcodeForm();
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-                $data = $form->getData();
-
-                $name = $data['name']; //二维码名称
-                $type = array_key_exists($data['type'], WechatQrcode::getTypeList()) ? $data['type'] : WechatQrcode::TYPE_TEMP;
-
-                if (preg_match("/^[0-9]+$/", $data['scene'])) {
-                    $scene = intval($data['scene']);
-                } else {
-                    $scene = (string)$data['scene'];
-                }
-                if (empty($scene)) {
-                    throw new \Exception('二维码参数不合适, 无法进行申请!');
-                }
-
-                if (WechatQrcode::TYPE_FOREVER == $type) {
-                    $expired = 0;
-                } else {
-                    $expired = (int)$data['expired'];
-                    if ($expired < 30) { $expired = 30; }
-                }
-
-                $wechatService = $this->getWechatService($wechat->getWxId());
-                $result = $wechatService->getQrCode($type, $scene, $expired);
-
-                if (!empty($result) && isset($result['url'])) {
-                    $wechatManager->createWechatQrcode($wechat, $name, $type, $expired, $scene, $result['url']);
-                    $title = '二维码创建成功';
-                    $message = '您申请的二维码已经创建成功!';
-                } else {
-                    $title = '二维码创建失败';
-                    $message = '您申请的二维码已经创建失败, 请重新再试!';
-                }
-
-                return $this->go($title, $message, $this->url()->fromRoute('admin/wechat', ['action' => 'qrcodelist']));
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'activeId' => __CLASS__,
-        ]);
     }
 
 
@@ -219,70 +151,6 @@ class WechatsController extends AdminBaseController
      */
     public function qrcodemakeAction()
     {
-        if($this->getRequest()->isPost()) {
-
-            $value = $this->params()->fromPost('qr_value', '');
-            $type = $this->params()->fromPost('qr_type', '');
-            $size = (int)$this->params()->fromPost('qr_size', '');
-            $margin = (int)$this->params()->fromPost('qr_margin', '');
-            $color = $this->params()->fromPost('qr_color', '');
-            $bgcolor = $this->params()->fromPost('qr_bgcolor', '');
-            $error = strtoupper($this->params()->fromPost('qr_error', ''));
-
-            $mimes = [
-                'png' => 'image/png',
-                'eps' => 'application/postscript',
-                'svg' => 'image/svg+xml',
-            ];
-
-            if (!empty($value)) {
-                $url = urldecode($value);
-                if (!array_key_exists($type, $mimes)) {
-                    $type = 'png';
-                }
-                if (empty($size)) {
-                    $size = 400;
-                }
-                if (empty($margin)) {
-                    $margin = 20;
-                    if ($margin > $size / 2) {
-                        $margin = intval($size * 0.1);
-                    }
-                }
-                if(!preg_match("/^[0-9A-F]{6}$/", $color)) {
-                    $color = '000000';
-                }
-                list($colorR, $colorG, $colorB) = array_map('hexdec', str_split($color, 2));
-
-                if(!preg_match("/^[0-9A-F]{6}$/", $bgcolor)) {
-                    $bgcolor = 'FFFFFF';
-                }
-                list($bgcolorR, $bgcolorG, $bgcolorB) = array_map('hexdec', str_split($bgcolor, 2));
-
-                if(!in_array($error, ['L', 'M', 'Q', 'H'])) {
-                    $error = 'H';
-                }
-
-                $qrcodeMaker = new BaconQrCodeGenerator();
-                $qrcodeMaker->format($type); //二维码格式
-                $qrcodeMaker->size($size); //二维码尺寸
-                $qrcodeMaker->margin($margin); //二维码边距
-                $qrcodeMaker->color($colorR, $colorG, $colorB); //二维码颜色
-                $qrcodeMaker->backgroundColor($bgcolorR, $bgcolorG, $bgcolorB); //二维码背景颜色
-                $qrcodeMaker->encoding('UTF-8'); //二维码内容编码
-                $qrcodeMaker->errorCorrection($error); //二维码容错设置
-
-                $data = $qrcodeMaker->generate($url);
-
-                $response = $this->getResponse();
-                $headers = $response->getHeaders();
-                $headers->addHeaderLine('content-type', $mimes[$type]);
-                $response->setContent($data);
-                return $response;
-            }
-        }
-
-        return $this->getResponse();
     }
 
 

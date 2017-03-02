@@ -6,14 +6,19 @@
  * @version: 1.0
  */
 
+
 namespace Admin\Form;
 
 
-use Admin\Entity\WechatQrcode;
+use Admin\Entity\WeChatQrCode;
 
-class WechatQrcodeForm extends BaseForm
+
+class WeChatQrCodeForm extends BaseForm
 {
 
+    /**
+     * 二维码名字
+     */
     private function addNameElement()
     {
         $this->add([
@@ -58,6 +63,9 @@ class WechatQrcodeForm extends BaseForm
     }
 
 
+    /**
+     * 二维码类型
+     */
     private function addTypeElement()
     {
         $this->add([
@@ -67,15 +75,22 @@ class WechatQrcodeForm extends BaseForm
                 'id' => 'type',
             ],
             'options' => [
-                'value_options' => WechatQrcode::getTypeList(),
+                'value_options' => WeChatQrCode::getTypeList(),
             ],
         ]);
 
         $this->getInputFilter()->add([
             'name' => 'type',
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
         ]);
     }
 
+    /**
+     * 二维码过期时间
+     */
     private function addExpiredElement()
     {
         $this->add([
@@ -87,9 +102,17 @@ class WechatQrcodeForm extends BaseForm
         ]);
         $this->getInputFilter()->add([
             'name' => 'expired',
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
         ]);
     }
 
+
+    /**
+     * 二维码参数
+     */
     private function addSceneElement()
     {
         $this->add([

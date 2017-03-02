@@ -1,0 +1,79 @@
+<?php
+$this->pageTitleBar('二维码列表');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".delete").click(function () {
+        if(confirm("确定要删除这个二维码么? 删除后立即生效, 不可恢复!")) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <?php if (empty($qrCodes)) { ?>
+            <p>
+                <span>未发现您之前有生成二维码, 是否需要现在申请? </span>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatQrCode', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw" ></i> 申请二维码</a>
+            </p>
+        <?php } else { ?>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>
+                        <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatQrCode', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw" ></i> 申请二维码</a>
+                    </p>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>二维码</th>
+                            <th>创建时间</th>
+                            <th>失效时间</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php
+                        foreach ($qrCodes as $qrCode) {
+                            if ($qrCode instanceof \Admin\Entity\WeChatQrCode) {
+                                ?>
+                                <tr>
+                                    <td><i class="fa fa-qrcode fa-fw"></i><?php echo $qrCode->getName(); ?></td>
+                                    <td><?php echo $qrCode->getCreated()->format('Y-m-d H:i:s'); ?></td>
+                                    <td>
+                                        <?php
+                                        $forever = '永久';
+                                        if (\Admin\Entity\WechatQrcode::TYPE_TEMP == $qrCode->getType()) {
+                                            $expired = date('Y-m-d H:i:s', $qrCode->getExpired());
+                                        } else {
+                                            $expired = $forever;
+                                        }
+                                        echo $expired;
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php if($forever == $expired || $qrCode->getExpired() > time()) { ?>
+                                            <a href="<?php echo $this->url('admin/weChatQrCode', ['action' => 'make', 'key' => $qrCode->getId()]); ?>">生成二维码</a>
+                                            <span> | </span>
+                                        <?php } ?>
+                                        <a class="delete" href="<?php echo $this->url('admin/weChatQrCode', ['action' => 'delete', 'key' => $qrCode->getId()]); ?>">删除</a>
+                                    </td>
+                                </tr>
+                            <?php } } ?>
+
+                    </table>
+
+                </div>
+            </div>
+
+        <?php } ?>
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>

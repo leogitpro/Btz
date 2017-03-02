@@ -47,6 +47,7 @@ return [
 
             Controller\WeChatController::class => InvokableFactory::class,
             Controller\WeChatClientController::class => InvokableFactory::class,
+            Controller\WeChatQrCodeController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [

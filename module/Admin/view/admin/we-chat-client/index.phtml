@@ -6,7 +6,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
 $this->inlineScript()->captureStart();
 echo <<<JS
 $(function () {
-    $(".remove-client").click(function () {
+    $(".delete").click(function () {
         if(confirm("确定要删除这个来访客户端配置么? 删除后立即生效, 不可恢复!")) {
             return true;
         } else {
@@ -54,7 +54,7 @@ $this->inlineScript()->captureEnd();
                                         IP: <?php echo $client->getIp(); ?>
                                     </td>
                                     <td>
-                                        <a class="remove-client" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a>
+                                        <a class="delete" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a>
                                     </td>
                                 </tr>
                             <?php } } ?>

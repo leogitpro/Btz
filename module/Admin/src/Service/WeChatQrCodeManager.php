@@ -34,6 +34,47 @@ class WeChatQrCodeManager extends BaseEntityManager
     }
 
 
+    /**
+     * @param WeChat $weChat
+     * @return int
+     */
+    public function getQrCodeCountByWeChat($weChat)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(WeChatQrCode::class, 't');
+
+        $qb->where($qb->expr()->eq('t.weChat', '?1'));
+        $qb->setParameter(1, $weChat);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * @param WeChat $weChat
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getQrCodesWithLimitPageByWeChat($weChat, $page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(WeChatQrCode::class, 't');
+
+        $qb->where($qb->expr()->eq('t.weChat', '?1'));
+        $qb->setParameter(1, $weChat);
+
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
+
+        $qb->orderBy('t.expired', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
 
     /**
      * @param WeChat $weChat
