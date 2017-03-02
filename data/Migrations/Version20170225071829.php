@@ -28,6 +28,7 @@ class Version20170225071829 extends AbstractMigration
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['wx']);
+        $table->addIndex(['expire_time']);
 
     }
 

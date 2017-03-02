@@ -63,32 +63,7 @@ class WechatsController extends AdminBaseController
      */
     public function checkAction()
     {
-        $result = ['success' => false, 'message' => '', 'hosts' => []];
 
-        $myself = $this->getMemberManager()->getCurrentMember();
-
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-
-        if (Wechat::STATUS_CHECKED == $wechat->getWxChecked()) {
-            $result['success'] = true;
-            return new JsonModel($result);
-        }
-
-        if (!$wechat instanceof Wechat) {
-            return new JsonModel($result);
-        }
-
-        $wechatService = $this->getWechatService($wechat->getWxId());
-        $wxHosts = $wechatService->getCallbackHosts();
-        if(!empty($wxHosts)) {
-            $wechat->setWxChecked(Wechat::STATUS_CHECKED);
-            $wechatManager->saveModifiedEntity($wechat);
-        }
-
-        $result['success'] = true;
-        $result['hosts'] = $wxHosts;
-        return new JsonModel($result);
     }
 
 
@@ -98,18 +73,6 @@ class WechatsController extends AdminBaseController
      */
     public function clientAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
-
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-        if (!$wechat instanceof Wechat) {
-            throw new \Exception('未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!');
-        }
-
-        return new ViewModel([
-            'wechat' => $wechat,
-            'activeId' => __METHOD__,
-        ]);
     }
 
 
@@ -120,53 +83,7 @@ class WechatsController extends AdminBaseController
      */
     public function addclientAction()
     {
-        $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wechatManager = $this->getWechatManager();
-        $wechat = $wechatManager->getWechatByMember($myself);
-
-        if (!$wechat instanceof Wechat) {
-            return $this->getMessagePlugin()->show(
-                '公众号还未创建',
-                '您的微信公众号还未创建, 不能执行当前的操作!',
-                $this->url()->fromRoute('admin/wechat'),
-                '返回',
-                3
-            );
-        }
-
-        $form = new WechatClientForm();
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-                $start = new \DateTime($data['active']);
-                $activeTime = $start->format('U');
-
-                $end = new \DateTime($data['expire']);
-                $end->modify("+1 day");
-                $expireTime = $end->format('U') - 1;
-
-                $wechatManager->createWechatClient($wechat, $data['name'], $data['domain'], $data['ip'], $activeTime, $expireTime);
-
-                return $this->getMessagePlugin()->show(
-                    '客户端已经创建',
-                    '您的微信公众号访问客户端已经创建成功!',
-                    $this->url()->fromRoute('admin/wechat', ['action' => 'client']),
-                    '返回',
-                    3
-                );
-            }
-        }
-
-
-        return new ViewModel([
-            'form' => $form,
-            'activeId' => __CLASS__,
-        ]);
     }
 
 
@@ -175,59 +92,6 @@ class WechatsController extends AdminBaseController
      */
     public function editclientAction()
     {
-
-        $clientId = (string)$this->params()->fromRoute('key');
-
-        $wechatManager = $this->getWechatManager();
-        $wechatClient = $wechatManager->getWechatClient($clientId);
-        if (!$wechatClient instanceof WechatClient) {
-            throw new \Exception('无法查询到此客户端信息!');
-        }
-
-        $myself = $this->getMemberManager()->getCurrentMember();
-        if ($myself->getMemberId() != $wechatClient->getWechat()->getMember()->getMemberId()) {
-            throw new \Exception('厉害了我的哥, 能修改别人的客户端信息了!');
-        }
-
-
-        $form = new WechatClientForm($wechatClient);
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-            if ($form->isValid()) {
-
-                $data = $form->getData();
-
-                $wechatClient->setName($data['name']);
-                $wechatClient->setDomains($data['domain']);
-                $wechatClient->setIps($data['ip']);
-
-                $start = new \DateTime($data['active']);
-                $activeTime = $start->format('U');
-                $wechatClient->setActiveTime($activeTime);
-
-                $end = new \DateTime($data['expire']);
-                $end->modify("+1 day");
-                $expireTime = $end->format('U') - 1;
-                $wechatClient->setExpireTime($expireTime);
-
-                $wechatManager->saveModifiedEntity($wechatClient);
-
-                return $this->getMessagePlugin()->show(
-                    '客户端信息已经修改',
-                    '您的微信公众号访问客户端信息已经成功修改!',
-                    $this->url()->fromRoute('admin/wechat', ['action' => 'client']),
-                    '返回',
-                    3
-                );
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-            'activeId' => __CLASS__,
-        ]);
     }
 
 
@@ -236,30 +100,7 @@ class WechatsController extends AdminBaseController
      */
     public function removeAction()
     {
-        $clientId = (string)$this->params()->fromRoute('key');
 
-        $wechatManager = $this->getWechatManager();
-        $wechatClient = $wechatManager->getWechatClient($clientId);
-        if (!$wechatClient instanceof WechatClient) {
-            throw new \Exception('无法查询到此客户端信息!');
-        }
-
-        $myself = $this->getMemberManager()->getCurrentMember();
-        if ($myself->getMemberId() != $wechatClient->getWechat()->getMember()->getMemberId()) {
-            throw new \Exception('厉害了我的哥, 你这是删除别人的客户端配置啊, 要逆天了!');
-        }
-
-        $name = $wechatClient->getName();
-
-        $wechatManager->removeEntity($wechatClient);
-
-        return $this->getMessagePlugin()->show(
-            '客户端信息已经删除',
-            '您的微信公众号访问客户端 ' . $name . ' 已经删除! 相关访问已经被禁止.',
-            $this->url()->fromRoute('admin/wechat', ['action' => 'client']),
-            '返回',
-            3
-        );
     }
 
 

@@ -1,0 +1,72 @@
+<?php
+$this->pageTitleBar('公众号客户端列表');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".remove-client").click(function () {
+        if(confirm("确定要删除这个来访客户端配置么? 删除后立即生效, 不可恢复!")) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <?php if (empty($clients)) { ?>
+            <p>
+                <span>您的微信公众号还没有创建可用的客户端, 是否需要现在创建? </span>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatClient', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加客户端</a>
+            </p>
+        <?php } else { ?>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>
+                        <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatClient', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加客户端</a>
+                    </p>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>客户端</th>
+                            <th>生效时间</th>
+                            <th>失效时间</th>
+                            <th>访问控制(允许的域名及 IP)</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php
+                        foreach ($clients as $client) {
+                            if ($client instanceof \Admin\Entity\WeChatClient) {
+                                ?>
+                                <tr>
+                                    <td><?php echo $client->getName(); ?></td>
+                                    <td><?php echo date('Y-m-d', $client->getActiveTime()); ?></td>
+                                    <td><?php echo date('Y-m-d', $client->getExpireTime()); ?></td>
+                                    <td>
+                                        域名: <?php echo $client->getDomain();  ?><br>
+                                        IP: <?php echo $client->getIp(); ?>
+                                    </td>
+                                    <td>
+                                        <a class="remove-client" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a>
+                                    </td>
+                                </tr>
+                            <?php } } ?>
+
+                    </table>
+
+                </div>
+            </div>
+
+        <?php } ?>
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>
+

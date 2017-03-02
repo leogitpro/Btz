@@ -211,4 +211,23 @@ return [
     ],
     // End WeChatController router
 
+
+    // WeChatController router configuration
+    'weChatClient' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'we-chat-client[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\WeChatClientController::class,
+                'action' => 'index',
+            ],
+        ],
+    ],
+    // End WeChatController router
+
 ];

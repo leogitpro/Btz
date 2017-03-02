@@ -17,7 +17,6 @@ use Ramsey\Uuid\Uuid;
 class WeChatClientManager extends BaseEntityManager
 {
 
-
     /**
      * @param string $clientId
      * @return WeChatClient
@@ -31,6 +30,47 @@ class WeChatClientManager extends BaseEntityManager
         $qb->setParameter(1, $clientId);
 
         return $this->getEntityFromPersistence();
+    }
+
+
+    /**
+     * @param WeChat $weChat
+     * @return int
+     */
+    public function getClientCountByWeChat($weChat)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(WeChatClient::class, 't');
+
+        $qb->where($qb->expr()->eq('t.weChat', '?1'));
+        $qb->setParameter(1, $weChat);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * @param WeChat $weChat
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getClientsWithLimitPageByWeChat($weChat, $page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(WeChatClient::class, 't');
+
+        $qb->where($qb->expr()->eq('t.weChat', '?1'));
+        $qb->setParameter(1, $weChat);
+
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
+
+        $qb->orderBy('t.expireTime', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
     }
 
 

@@ -10,101 +10,21 @@
 namespace Admin\Form;
 
 
-use Admin\Entity\WechatClient;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
-
-class WechatClientForm extends Form
+class WeChatClientForm extends BaseForm
 {
-
-    private $client;
-
-    public function __construct($client = null)
+    /**
+     * 客户端名字
+     */
+    private function addNameElement()
     {
-        parent::__construct('wx_client_form');
-
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-
-        $this->setInputFilter(new InputFilter());
-
-        $this->client = $client;
-
-        $this->addElements();
-        $this->addFilters();
-    }
-
-
-    public function addElements()
-    {
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
-
         $this->add([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
-                'id' => 'name',
-                'value' => ($this->client instanceof WechatClient) ? $this->client->getName() : '',
+                'id' => 'name'
             ],
         ]);
-
-        $this->add([
-            'type' => 'text',
-            'name' => 'domain',
-            'attributes' => [
-                'id' => 'domain',
-                'value' => ($this->client instanceof WechatClient) ? $this->client->getDomain() : '',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'text',
-            'name' => 'ip',
-            'attributes' => [
-                'id' => 'ip',
-                'value' => ($this->client instanceof WechatClient) ? $this->client->getIp() : '',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'date',
-            'name' => 'active',
-            'attributes' => [
-                'id' => 'active',
-                'value' => ($this->client instanceof WechatClient) ? date('Y-m-d', $this->client->getActiveTime()) : '',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'date',
-            'name' => 'expire',
-            'attributes' => [
-                'id' => 'expire',
-                'value' => ($this->client instanceof WechatClient) ? date('Y-m-d', $this->client->getExpireTime()) : '',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Submit',
-            ],
-        ]);
-    }
-
-    public function addFilters()
-    {
 
         $this->getInputFilter()->add([
             'name' => 'name',
@@ -138,8 +58,20 @@ class WechatClientForm extends Form
                 ],
             ],
         ]);
+    }
 
-
+    /**
+     * 客户端域名
+     */
+    private function addDomainElement()
+    {
+        $this->add([
+            'type' => 'text',
+            'name' => 'domain',
+            'attributes' => [
+                'id' => 'domain'
+            ],
+        ]);
 
         $this->getInputFilter()->add([
             'name' => 'domain',
@@ -200,7 +132,20 @@ class WechatClientForm extends Form
             ],
         ]);
 
+    }
 
+    /**
+     * 客户端 IP
+     */
+    private function addIpElement()
+    {
+        $this->add([
+            'type' => 'text',
+            'name' => 'ip',
+            'attributes' => [
+                'id' => 'ip'
+            ],
+        ]);
 
         $this->getInputFilter()->add([
             'name' => 'ip',
@@ -222,8 +167,61 @@ class WechatClientForm extends Form
                 ],
             ],
         ]);
-
-
     }
 
+    /**
+     * 激活时间
+     */
+    private function addActiveElement()
+    {
+        $this->add([
+            'type' => 'date',
+            'name' => 'active',
+            'attributes' => [
+                'id' => 'active'
+            ],
+        ]);
+
+        $this->getInputFilter()->add([
+            'name' => 'active',
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
+        ]);
+    }
+
+    /**
+     * 过期时间
+     */
+    private function addExpireElement()
+    {
+        $this->add([
+            'type' => 'date',
+            'name' => 'expire',
+            'attributes' => [
+                'id' => 'expire'
+            ],
+        ]);
+
+        $this->getInputFilter()->add([
+            'name' => 'expire',
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+            ],
+        ]);
+    }
+
+
+    public function addElements()
+    {
+        $this->addCsrfElement();
+        $this->addNameElement();
+        $this->addDomainElement();
+        $this->addIpElement();
+        $this->addActiveElement();
+        $this->addExpireElement();
+        $this->addSubmitElement();
+    }
 }
