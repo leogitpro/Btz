@@ -232,17 +232,18 @@ class WeChatQrCodeController extends AdminBaseController
                     $size = 400;
                 }
                 if (empty($margin)) {
-                    $margin = 20;
+                    $margin = 2;
                     if ($margin > $size / 2) {
-                        $margin = intval($size * 0.1);
+                        $margin = 2;
                     }
                 }
-                if(!preg_match("/^[0-9A-F]{6}$/", $color)) {
+
+                if(!preg_match("/^[0-9A-Fa-f]{6}$/", $color)) {
                     $color = '000000';
                 }
                 list($colorR, $colorG, $colorB) = array_map('hexdec', str_split($color, 2));
 
-                if(!preg_match("/^[0-9A-F]{6}$/", $bgcolor)) {
+                if(!preg_match("/^[0-9A-Fa-f]{6}$/", $bgcolor)) {
                     $bgcolor = 'FFFFFF';
                 }
                 list($bgcolorR, $bgcolorG, $bgcolorB) = array_map('hexdec', str_split($bgcolor, 2));
@@ -260,7 +261,27 @@ class WeChatQrCodeController extends AdminBaseController
                 $qrCodeMaker->encoding('UTF-8'); //二维码内容编码
                 $qrCodeMaker->errorCorrection($error); //二维码容错设置
 
+                // Lots of memory request. shutdown the error display
+                ini_set('display_errors', false);
+                error_reporting(0);
+
+                // Register shutdown callback
+                register_shutdown_function(function () {
+                    $error = error_get_last();
+                    if(null !== $error) {
+                        //echo '<pre>'; print_r($error); echo '</pre>';
+                        if (E_ERROR == $error['type']) {
+                            if(preg_match("/^Allowed memory/", $error['message'])) {
+                                echo '系统无法支持制作您设定的超大尺寸二维码. ' .  intval(memory_get_peak_usage(false)/1024/1024) . 'M' ;
+                            } else {
+                                echo 'System error!';
+                            }
+                        }
+                    }
+                });
+
                 $data = $qrCodeMaker->generate($url);
+
 
                 $response = $this->getResponse();
                 $headers = $response->getHeaders();
