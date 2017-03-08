@@ -21,11 +21,16 @@ class LocalFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $wxId = 0;
+        if (isset($options['wx_id'])) {
+            $wxId = $options['wx_id'];
+        }
+
         $wcm = $container->get(WeChatManager::class);
         $remote = $container->get(Remote::class);
         $logger = $container->get('Logger');
 
-        return new Local($wcm, $remote, $logger);
+        return new Local($wxId, $wcm, $remote, $logger);
     }
 
 

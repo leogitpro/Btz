@@ -46,21 +46,11 @@ class WeChatService
     /**
      * 获取微信基础 Access Token
      *
-     * @return string
+     * @return string|false
      */
     public function getAccessToken()
     {
-        try {
-            return $this->local->getAccessToken($this->wxId);
-        } catch (InvalidArgumentException $e) {
-            $this->logger->excaption($e);
-        } catch (ExpiredException $e) {
-            $this->logger->excaption($e);
-        } catch (RuntimeException $e) {
-            $this->logger->excaption($e);
-        }
-
-        return '';
+        return $this->local->getAccessToken();
     }
 
 
@@ -72,12 +62,23 @@ class WeChatService
     public function getCallbackHosts()
     {
         try {
-            return $this->local->getCallbackHosts($this->wxId);
+            return $this->local->getCallbackHosts();
         } catch (RuntimeException $e) {
             $this->logger->excaption($e);
         }
 
         return [];
+    }
+
+
+    /**
+     * 微信公众号用户标签列表
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->local->getTags();
     }
 
 
@@ -92,7 +93,7 @@ class WeChatService
     public function getQrCode($type, $scene, $expired = 0)
     {
         try {
-            return $this->local->createQrCode($this->wxId, $type, $scene, $expired);
+            return $this->local->createQrCode($type, $scene, $expired);
         } catch (RuntimeException $e) {
             $this->logger->excaption($e);
         }

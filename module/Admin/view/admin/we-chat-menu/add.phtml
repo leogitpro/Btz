@@ -1,0 +1,273 @@
+<?php
+$this->pageTitleBar('增加菜单');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".top-menu-type").change(function () {
+        if("parent" == $(this).val()) {
+            $(this).parent().next("span").fadeOut();
+            $(this).parent().parent().children(".subMenus").fadeIn();
+        } else {
+            $(this).parent().next("span").fadeIn();
+            $(this).parent().parent().children(".subMenus").fadeOut();
+        }
+        $(this).blur();
+    });
+    
+    
+    $("#menuContainer").on("click", ".add-top-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if(1 == size) { // First ele
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+            $(this).hide().next().show();
+        } else if(2 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+        } else {
+            return false;
+        }
+        
+        //Fix input names
+        topParent.children().each(function(i){
+            var nameReg = /^([\w]+)(\[{1})(\d{1})(\]{1})(\[\])*$/;
+            
+            $(this).find("input").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+            
+            $(this).find("select").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+        });
+        
+        return false;
+    });
+     
+    $("#menuContainer").on("click", ".remove-top-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+ 
+        return false;
+    });
+    
+      
+    $("#menuContainer").on("click", ".add-sub-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if (4 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            topParent.append(copyDom);
+            return false;
+        }
+        
+        if (size > 4) {
+            $(this).hide().next().show();
+            return false;
+        }
+        
+        var copyDom = $(this).parent().parent().clone(true, true);
+        topParent.append(copyDom);
+        
+        $(this).hide().next().show();
+   
+        return false;
+    });
+    
+         
+    $("#menuContainer").on("click", ".remove-sub-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+        return false;
+    });
+    
+    $(".menu-category").change(function() {
+        var target = $(this).parent().next(".form-group");
+        if("none" == target.css("display")) {
+            target.fadeIn();
+        } else {
+            target.fadeOut();
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<style>
+    #menuContainer > div:first-child > hr {
+        display: none;
+    }
+    .subMenus > div {
+        margin-top: 15px;
+    }
+    .subMenus > div:first-child {
+        margin-top: 0;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <form method="post" role="form" id="menu_form">
+            <div class="form-group">
+                <label>菜单名称</label>
+                <input type="text" class="form-control" name="menuTitle" placeholder="菜单名称">
+            </div>
+
+            <div class="form-group">
+                <div class="panel panel-default">
+                    <div id="menuContainer" class="panel-body">
+
+                        <div class="form-inline">
+                            <hr>
+                            <span>
+                                <label>菜单名称:</label>
+                                <input type="text" name="menuName[0]" placeholder="菜单名称">
+                            </span>
+                            <span style="padding: 0 20px;">
+                                <label>菜单类型:</label>
+                                <select class="top-menu-type" name="menuType[0]">
+                                    <option value="click">发送事件消息</option>
+                                    <option value="view">进入新页面</option>
+                                    <option value="parent">一级菜单(含子菜单)</option>
+                                </select>
+                            </span>
+                            <span style="padding-right: 20px;">
+                                <label>KEY/URL:</label>
+                                <input type="text" name="menuValue[0]" placeholder="菜单的 KEY 或者指向的 URL">
+                            </span>
+                            <span>
+                                <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                <a class="remove-top-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                            </span>
+
+                            <div class="subMenus" style="display: none; padding: 20px 0 0 20px;">
+                                <div class="form-inLine">
+                                    <span>
+                                        <label>子菜单名称:</label>
+                                        <input type="text" name="subMenuName[0][]" placeholder="子菜单名称">
+                                    </span>
+                                    <span style="padding: 0 20px;">
+                                        <label>子菜单类型:</label>
+                                        <select class="sub-menu-type" name="subMenuType[0][]">
+                                            <option value="click">发送事件消息</option>
+                                            <option value="view">进入新页面</option>
+                                        </select>
+                                    </span>
+                                    <span style="padding-right: 20px;">
+                                        <label>KEY/URL:</label>
+                                        <input type="text" name="subMenuValue[0][]" placeholder="子菜单的 KEY 或者指向的 URL">
+                                    </span>
+                                    <span>
+                                        <a class="add-sub-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                        <a class="remove-sub-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>菜单类型</label>
+                <select name="menuCategory" class="form-control menu-category">
+                    <?php
+                    $list = \Admin\Entity\WeChatMenu::getTypeList();
+                    foreach ($list as $k => $v) {
+                    ?>
+                        <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <div class="form-group" style="display: none;">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>设置用户性别</label>
+                            <select name="menuForSex" class="form-control">
+                                <option value="" selected>不设置</option>
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置手机系统</label>
+                            <select name="menuForPlatform" class="form-control">
+                                <option value="" selected>不设置</option>
+                                <option value="1">IOS</option>
+                                <option value="2">Android</option>
+                                <option value="3">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户标签</label>
+                            <select name="menuForTag" class="form-control">
+                                <option value="" selected>不设置</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户地区</label>
+                            <select name="menuForRegion" class="form-control">
+                                <option value="" selected>不设置</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户语音</label>
+                            <select name="menuForLang" class="form-control">
+                                <option value="" selected>不设置</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="submit"></label>
+                <input type="submit" name="submit" class="btn btn-primary" id="name" value="Submit">
+            </div>
+        </form>
+
+    </div>
+</div>
+

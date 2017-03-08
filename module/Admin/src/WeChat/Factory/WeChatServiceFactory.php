@@ -20,13 +20,12 @@ class WeChatServiceFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $local = $container->get(Local::class);
-
         $wxId = 0;
         if (isset($options['wx_id'])) {
             $wxId = $options['wx_id'];
         }
 
+        $local = $container->build(Local::class, ['wx_id' => $wxId]);
         $logger = $container->get('Logger');
 
         return new WeChatService($wxId, $local, $logger);

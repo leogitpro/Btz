@@ -29,13 +29,13 @@ class Remote
 
 
     /**
-     * @param string $appid
-     * @param string $appsecret
+     * @param string $appId
+     * @param string $appSecret
      * @return array
      */
-    public function getAccessToken($appid, $appsecret)
+    public function getAccessToken($appId, $appSecret)
     {
-        $apiUrl = ApiURL::GetAccessTokenUrl($appid, $appsecret);
+        $apiUrl = ApiURL::GetAccessTokenUrl($appId, $appSecret);
         return $this->sendGetRequest($apiUrl);
     }
 
@@ -87,6 +87,17 @@ class Remote
 
         return $this->sendPostRequest($apiUrl, Json::encode($post, true));
     }
+
+
+    /**
+     * @param $access_token
+     * @return array
+     */
+    public function getTags($access_token)
+    {
+        return $this->sendGetRequest(ApiURL::GetTagUrl($access_token));
+    }
+
 
 
     /**

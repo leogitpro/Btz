@@ -104,6 +104,13 @@ class WeChat
      */
     private $clients;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WeChatMenu", mappedBy="weChat")
+     */
+    private $menus;
+
 
     /**
      * @var ArrayCollection
@@ -117,6 +124,7 @@ class WeChat
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+        $this->menus = new ArrayCollection();
         $this->qrCodes = new ArrayCollection();
     }
 
@@ -279,6 +287,22 @@ class WeChat
     public function setClients($clients)
     {
         $this->clients = $clients;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getMenus()
+    {
+        return $this->menus;
+    }
+
+    /**
+     * @param ArrayCollection $menus
+     */
+    public function setMenus($menus)
+    {
+        $this->menus = $menus;
     }
 
     /**

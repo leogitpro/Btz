@@ -231,6 +231,24 @@ return [
     // End WeChatController router
 
     // WeChatQrCodeController router configuration
+    'weChatMenu' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'we-chat-menu[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\WeChatMenuController::class,
+                'action' => 'index',
+            ],
+        ],
+    ],
+    // End WeChatQrCodeController router
+
+    // WeChatQrCodeController router configuration
     'weChatQrCode' => [
         'type' => Segment::class,
         'options' => [
