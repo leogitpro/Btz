@@ -7,11 +7,35 @@ $this->inlineScript()->captureStart();
 echo <<<JS
 $(function () {
     $(".delete").click(function () {
-        if(confirm("确定要删除这个菜单么? 删除后立即生效, 不可恢复!")) {
+        if(confirm("确定要删除这个菜单么? 删除后立即生效, 不可恢复! \\n删除本地菜单不影响公众号现有的菜单配置.")) {
             return true;
         } else {
             return false;
         }
+    });
+    
+    $(".async").click(function() {
+        var target = $(this);
+        var url = target.attr("href");
+        if(url.length < 10) {
+            $(this).blur();
+            return false;
+        }
+        if(confirm("同步 自定义菜单 微信公众号菜单, 将覆盖之前公众号的所有菜单配置. \\n同步 个性化菜单只能同步三个. 需要进行么?")) {
+            alert("同步过程可能需要点时间. 请耐心等待. 同步成功. 页面会刷新! 点确定开始同步.");
+            target.removeAttr("href");
+            $.get(url, function(dt) {
+                if(!dt.success) {
+                    target.attr("href", url);
+                    alert(dt.message);
+                } else {
+                    window.location.reload(true);
+                }
+            });
+            return false;
+        }
+        $(this).blur();
+        return false;
     });
 });
 JS;
@@ -32,11 +56,14 @@ $this->inlineScript()->captureEnd();
                 <div class="col-lg-12">
                     <p>
                         <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加菜单</a>
+                        <br>
+                        <a href="#"></a>
                     </p>
                     <table class="table table-striped">
                         <tr>
                             <th>菜单名称</th>
                             <th>菜单类型</th>
+                            <th>菜单状态</th>
                             <th>修改时间</th>
                             <th>操作</th>
                         </tr>
@@ -47,8 +74,23 @@ $this->inlineScript()->captureEnd();
                                 <tr>
                                     <td><?php echo $menu->getName(); ?></td>
                                     <td><?php echo $menu->getTypeAsString(); ?></td>
+                                    <td><?php echo $menu-> getStatusAsString(); ?></td>
                                     <td><?php echo $menu->getUpdated()->format('Y-m-d H:i:s'); ?></td>
                                     <td>
+                                        <a class="async" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'async', 'key' => $menu->getId()]); ?>">
+                                            <?php if($menu->getType() == \Admin\Entity\WeChatMenu::TYPE_CONDITIONAL) { ?>
+                                                <?php if($menu->getStatus() == \Admin\Entity\WeChatMenu::STATUS_ACTIVATED) { ?>
+                                                    删除公众号个性化菜单
+                                                <?php } else { ?>
+                                                    添加公众号个性化菜单
+                                                <?php } ?>
+                                            <?php } else { ?>
+                                                重置公众号菜单
+                                            <?php } ?>
+                                        </a>
+                                        <span> | </span>
+                                        <a href="<?php echo $this->url('admin/weChatMenu', ['action' => 'edit', 'key' => $menu->getId()]); ?>">编辑</a>
+                                        <span> | </span>
                                         <a class="delete" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'delete', 'key' => $menu->getId()]); ?>">删除</a>
                                     </td>
                                 </tr>

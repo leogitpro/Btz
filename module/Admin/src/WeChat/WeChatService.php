@@ -101,7 +101,23 @@ class WeChatService
     }
 
 
+    /**
+     * @return array
+     */
+    public function removeAllMenus()
+    {
+        return $this->local->deleteAllMenus();
+    }
 
+
+    /**
+     * @param string $menu
+     * @return array
+     */
+    public function createDefaultMenu($menu)
+    {
+        return $this->local->createDefaultMenu($menu);
+    }
 
 
 }

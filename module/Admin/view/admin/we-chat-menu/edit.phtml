@@ -1,0 +1,347 @@
+<?php
+
+if(!$menu instanceof \Admin\Entity\WeChatMenu) {
+    throw new Exception("视图数据异常!");
+}
+
+$json = json_decode($menu->getMenu(), true);
+
+$this->pageTitleBar('编辑菜单');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$menuForSex = "";
+$menuForPlatform = "";
+$menuForTag = '';
+$menuForCountry = '';
+$menuForProvince = '';
+$menuForCity = '';
+$menuForLang = '';
+
+if (isset($json['matchrule'])) {
+    if(isset($json['matchrule']['sex']) && !empty($json['matchrule']['sex'])) {
+        $menuForSex = $json['matchrule']['sex'];
+    }
+    if(isset($json['matchrule']['client_platform_type']) && !empty($json['matchrule']['client_platform_type'])) {
+        $menuForPlatform = $json['matchrule']['client_platform_type'];
+    }
+    if(isset($json['matchrule']['tag_id']) && !empty($json['matchrule']['tag_id'])) {
+        $menuForTag = $json['matchrule']['tag_id'];
+    }
+    if(isset($json['matchrule']['country']) && !empty($json['matchrule']['country'])) {
+        $menuForCountry = $json['matchrule']['country'];
+    }
+    if(isset($json['matchrule']['province']) && !empty($json['matchrule']['province'])) {
+        $menuForProvince = $json['matchrule']['province'];
+    }
+    if(isset($json['matchrule']['city']) && !empty($json['matchrule']['city'])) {
+        $menuForCity = $json['matchrule']['city'];
+    }
+    if(isset($json['matchrule']['language']) && !empty($json['matchrule']['language'])) {
+        $menuForLang = $json['matchrule']['language'];
+    }
+}
+
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".top-menu-type").change(function () {
+        if("parent" == $(this).val()) {
+            $(this).parent().next("span").fadeOut();
+            $(this).parent().parent().children(".subMenus").fadeIn();
+        } else {
+            $(this).parent().next("span").fadeIn();
+            $(this).parent().parent().children(".subMenus").fadeOut();
+        }
+        $(this).blur();
+    });
+    
+    
+    $("#menuContainer").on("click", ".add-top-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if(1 == size) { // First ele
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+            $(this).hide().next().show();
+        } else if(2 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            copyDom.children("span").show();
+            copyDom.children(".subMenus").hide();
+            topParent.append(copyDom);
+        } else {
+            return false;
+        }
+        
+        //Fix input names
+        topParent.children().each(function(i){
+            var nameReg = /^([\w]+)(\[{1})(\d{1})(\]{1})(\[\])*$/;
+            
+            $(this).find("input").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+            
+            $(this).find("select").each(function() {
+                var name = $(this).attr("name");
+                var updatedName = name.replace(nameReg, "$1$2" + i + "$4$5");
+                $(this).attr("name", updatedName);
+            });
+        });
+        
+        return false;
+    });
+     
+    $("#menuContainer").on("click", ".remove-top-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+ 
+        return false;
+    });
+    
+      
+    $("#menuContainer").on("click", ".add-sub-menu", function() {
+        $(this).blur();
+        
+        var topParent = $(this).parent().parent().parent();
+        var size = topParent.children().length;
+        
+        if (4 == size) {
+            $(this).hide().next().show();
+            var copyDom = $(this).parent().parent().clone(true, true);
+            topParent.append(copyDom);
+            return false;
+        }
+        
+        if (size > 4) {
+            $(this).hide().next().show();
+            return false;
+        }
+        
+        var copyDom = $(this).parent().parent().clone(true, true);
+        topParent.append(copyDom);
+        
+        $(this).hide().next().show();
+   
+        return false;
+    });
+    
+         
+    $("#menuContainer").on("click", ".remove-sub-menu", function() {
+        $(this).blur();
+        var topParent = $(this).parent().parent().parent();
+        $(this).parent().parent().remove();
+        var size = topParent.children().length;
+        if (1 == size) {
+            var span = topParent.children().first().children("span").last();
+            span.children().last().hide();
+            span.children().first().show();
+        }
+        return false;
+    });
+    
+    $(".menu-category").change(function() {
+        var target = $(this).parent().next(".form-group");
+        if("none" == target.css("display")) {
+            target.fadeIn();
+        } else {
+            target.fadeOut();
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<style>
+    #menuContainer > div:first-child > hr {
+        display: none;
+    }
+    .subMenus > div {
+        margin-top: 15px;
+    }
+    .subMenus > div:first-child {
+        margin-top: 0;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <form method="post" role="form" id="menu_form">
+            <div class="form-group">
+                <label>菜单名称</label>
+                <input type="text" class="form-control" name="menuTitle" placeholder="菜单名称" value="<?php echo $menu->getName(); ?>">
+            </div>
+
+            <div class="form-group">
+                <div class="panel panel-default">
+                    <div id="menuContainer" class="panel-body">
+                    <?php $step = 0; foreach ($json['button'] as $k => $topMenu) { $step++; ?>
+
+                        <div class="form-inline">
+                            <hr>
+                            <span>
+                                <label>菜单名称:</label>
+                                <input type="text" name="menuName[<?php echo $k; ?>]" placeholder="菜单名称" value="<?php echo @$topMenu['name']; ?>">
+                            </span>
+                            <span style="padding: 0 20px;">
+                                <label>菜单类型:</label>
+                                <select class="top-menu-type" name="menuType[<?php echo $k; ?>]">
+                                    <option value="click"<?php echo 'click' == @$topMenu['type'] ? ' selected' : ''; ?>>发送事件消息</option>
+                                    <option value="view"<?php echo 'view' == @$topMenu['type'] ? ' selected' : ''; ?>>进入新页面</option>
+                                    <option value="scancode_push"<?php echo 'scancode_push' == @$topMenu['type'] ? ' selected' : ''; ?>>扫码推事件</option>
+                                    <option value="scancode_waitmsg"<?php echo 'scancode_waitmsg' == @$topMenu['type'] ? ' selected' : ''; ?>>扫码推事件且弹出“消息接收中”提示框</option>
+                                    <option value="pic_sysphoto"<?php echo 'pic_sysphoto' == @$topMenu['type'] ? ' selected' : ''; ?>>弹出系统拍照发图</option>
+                                    <option value="pic_photo_or_album"<?php echo 'pic_photo_or_album' == @$topMenu['type'] ? ' selected' : ''; ?>>弹出拍照或者相册发图</option>
+                                    <option value="pic_weixin"<?php echo 'pic_weixin' == @$topMenu['type'] ? ' selected' : ''; ?>>弹出微信相册发图器</option>
+                                    <option value="location_select"<?php echo 'location_select' == @$topMenu['type'] ? ' selected' : ''; ?>>弹出地理位置选择器</option>
+                                    <option value="media_id"<?php echo 'media_id' == @$topMenu['type'] ? ' selected' : ''; ?>>下发素材消息</option>
+                                    <option value="view_limited"<?php echo 'view_limited' == @$topMenu['type'] ? ' selected' : ''; ?>>跳转图文消息URL</option>
+                                    <option value="parent"<?php echo empty($topMenu['sub_button']) ? '' : ' selected'; ?>>一级菜单(含子菜单)</option>
+                                </select>
+                            </span>
+                            <span style="padding-right: 20px;<?php echo empty($topMenu['sub_button']) ? '':'display: none;'; ?>">
+                                <label>KEY/URL:</label>
+                                <input type="text" name="menuValue[<?php echo $k; ?>]" value="<?php echo @$topMenu['media_id'] . @$topMenu['url'] . @$topMenu['key']; ?>" placeholder="菜单的 KEY 或者指向的 URL">
+                            </span>
+                            <span>
+                            <?php if(1 == count($json['button'])) { ?>
+                                <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                <a class="remove-top-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                            <?php } else if(3 == count($json['button'])) { ?>
+                                <a class="add-top-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                <a class="remove-top-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                            <?php } else { ?>
+                                <?php if($step == count($json['button'])) { ?>
+                                    <a class="add-top-menu text-success" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                    <a class="remove-top-menu text-danger" style="display: none;" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                <?php } else { ?>
+                                    <a class="add-top-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                    <a class="remove-top-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                <?php } ?>
+                            <?php } ?>
+                            </span>
+
+                            <div class="subMenus" style="padding: 20px 0 0 20px;<?php echo empty($topMenu['sub_button']) ? 'display: none;':''; ?>">
+                                <?php for($i = 0; $i < 5; $i++) { $subMenus = @$topMenu['sub_button']; ?>
+                                <div class="form-inLine">
+                                    <span>
+                                        <label>子菜单名称:</label>
+                                        <input type="text" name="subMenuName[<?php echo $k; ?>][]" value="<?php echo @$subMenus[$i]['name']; ?>" placeholder="子菜单名称">
+                                    </span>
+                                    <span style="padding: 0 20px;">
+                                        <label>子菜单类型:</label>
+                                        <select class="sub-menu-type" name="subMenuType[<?php echo $k; ?>][]">
+                                            <option value="click"<?php echo 'click' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>发送事件消息</option>
+                                            <option value="view"<?php echo 'view' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>进入新页面</option>
+                                            <option value="scancode_push"<?php echo 'scancode_push' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>扫码推事件</option>
+                                            <option value="scancode_waitmsg"<?php echo 'scancode_waitmsg' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>扫码推事件且弹出“消息接收中”提示框</option>
+                                            <option value="pic_sysphoto"<?php echo 'pic_sysphoto' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>弹出系统拍照发图</option>
+                                            <option value="pic_photo_or_album"<?php echo 'pic_photo_or_album' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>弹出拍照或者相册发图</option>
+                                            <option value="pic_weixin"<?php echo 'pic_weixin' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>弹出微信相册发图器</option>
+                                            <option value="location_select"<?php echo 'location_select' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>弹出地理位置选择器</option>
+                                            <option value="media_id"<?php echo 'media_id' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>下发素材消息</option>
+                                            <option value="view_limited"<?php echo 'view_limited' == @$subMenus[$i]['type'] ? ' selected' : ''; ?>>跳转图文消息URL</option>
+                                        </select>
+                                    </span>
+                                    <span style="padding-right: 20px;">
+                                        <label>KEY/URL:</label>
+                                        <input type="text" name="subMenuValue[<?php echo $k; ?>][]" value="<?php echo @$subMenus[$i]['media_id'] . @$subMenus[$i]['url'] . @$subMenus[$i]['key']; ?>" placeholder="子菜单的 KEY 或者指向的 URL">
+                                    </span>
+                                    <span>
+                                        <a class="add-sub-menu text-success" style="display: none;" href="#"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                        <a class="remove-sub-menu text-danger" href="#"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                    </span>
+                                </div>
+                                <?php } ?>
+                            </div>
+
+                        </div>
+
+                    <?php } ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>菜单类型</label>
+                <select name="menuCategory" class="form-control menu-category">
+                    <?php
+                    $list = \Admin\Entity\WeChatMenu::getTypeList();
+                    foreach ($list as $k => $v) {
+                    ?>
+                        <option value="<?php echo $k; ?>"<?php echo $k == $menu->getType() ? ' selected' : ''; ?>><?php echo $v; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <div class="form-group" style="<?php echo $menu->getType() != \Admin\Entity\WeChatMenu::TYPE_CONDITIONAL ? 'display: none;' : ''; ?>">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label>设置用户性别</label>
+                            <select name="menuForSex" class="form-control">
+                                <option value=""<?php echo "" == $menuForSex ? ' selected':''; ?>>不设置</option>
+                                <option value="1"<?php echo 1 == $menuForSex ? ' selected':''; ?>>男</option>
+                                <option value="2"<?php echo 2 == $menuForSex ? ' selected':''; ?>>女</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置手机系统</label>
+                            <select name="menuForPlatform" class="form-control">
+                                <option value=""<?php echo "" == $menuForPlatform ? ' selected':''; ?>>不设置</option>
+                                <option value="1"<?php echo 1 == $menuForPlatform ? ' selected':''; ?>>IOS</option>
+                                <option value="2"<?php echo 2 == $menuForPlatform ? ' selected':''; ?>>Android</option>
+                                <option value="3"<?php echo 3 == $menuForPlatform ? ' selected':''; ?>>Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户标签</label>
+                            <select name="menuForTag" class="form-control">
+                                <option value=""<?php echo "" == $menuForTag ? ' selected':''; ?>>不设置</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户地区</label>
+                            <select name="menuForRegion" class="form-control">
+                                <option value=""<?php echo "" == $menuForCountry ? ' selected':''; ?>>不设置</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>设置用户语音</label>
+                            <select name="menuForLang" class="form-control">
+                                <option value=""<?php echo "" == $menuForLang ? ' selected':''; ?>>不设置</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="submit"></label>
+                <input type="submit" name="submit" class="btn btn-primary" id="name" value="Submit">
+            </div>
+        </form>
+
+    </div>
+</div>
+

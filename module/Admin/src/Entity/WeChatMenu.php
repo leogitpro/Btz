@@ -25,6 +25,9 @@ class WeChatMenu
     const TYPE_DEFAULT = 0;
     const TYPE_CONDITIONAL = 1;
 
+    const STATUS_ACTIVATED = 1;
+    const STATUS_RETIRED = 0;
+
     /**
      * @var string
      *
@@ -55,6 +58,13 @@ class WeChatMenu
      * @ORM\Column(name="type", type="smallint")
      */
     private $type = self::TYPE_DEFAULT;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="status", type="smallint")
+     */
+    private $status = self::STATUS_RETIRED;
 
     /**
      * @var \DateTime
@@ -93,6 +103,30 @@ class WeChatMenu
             return $list[$this->type];
         }
         return '未知类型菜单';
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function getStatusList()
+    {
+        return [
+            self::STATUS_ACTIVATED => '使用中',
+            self:: STATUS_RETIRED => '未使用',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusAsString()
+    {
+        $list = self::getStatusList();
+        if (isset($list[$this->status])) {
+            return $list[$this->status];
+        }
+        return '未知状态';
     }
 
     /**
@@ -157,6 +191,22 @@ class WeChatMenu
     public function setType($type)
     {
         $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     /**

@@ -99,6 +99,28 @@ class Remote
     }
 
 
+    /**
+     * @param string $access_token
+     * @return array
+     */
+    public function deleteAllMenus($access_token)
+    {
+        return $this->sendGetRequest(ApiURL::GetMenuDeleteAllUrl($access_token));
+    }
+
+
+    /**
+     * @param string $access_token
+     * @param string $menu
+     * @return array
+     */
+    public function createDefaultMenu($access_token, $menu)
+    {
+        $apiUrl = ApiURL::GetMenuCreateDefaultUrl($access_token);
+        return $this->sendPostRequest($apiUrl, $menu);
+    }
+
+
 
     /**
      * @param string $url

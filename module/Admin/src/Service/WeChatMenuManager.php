@@ -36,6 +36,29 @@ class WeChatMenuManager extends BaseEntityManager
 
     /**
      * @param WeChat $weChat
+     * @param int $type
+     * @return int
+     */
+    public function getActivatedMenuCountByWeChatWithType($weChat, $type)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(WeChatMenu::class, 't');
+
+        $qb->where($qb->expr()->andX(
+            $qb->expr()->eq('t.weChat', '?1'),
+            $qb->expr()->eq('t.type', '?2'),
+            $qb->expr()->eq('t.status', '?3')
+        ));
+        $qb->setParameter(1, $weChat)->setParameter(2, $type)->setParameter(3, WeChatMenu::STATUS_ACTIVATED);
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * @param WeChat $weChat
      * @return int
      */
     public function getMenuCountByWeChat($weChat)
@@ -69,50 +92,9 @@ class WeChatMenuManager extends BaseEntityManager
 
         $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
 
-        $qb->orderBy('t.type', 'ASC')->addOrderBy('t.updated', 'DESC');
+        $qb->orderBy('t.status', 'DESC')->addOrderBy('t.type', 'ASC')->addOrderBy('t.updated', 'DESC');
 
         return $this->getEntitiesFromPersistence();
-    }
-
-
-    /**
-     * @param WeChat $weChat
-     * @param string $name
-     * @param string $menu
-     */
-    public function createDefaultWeChatMenu($weChat, $name, $menu)
-    {
-        $menuEntity = new WeChatMenu();
-        $menuEntity->setId(Uuid::uuid1()->toString());
-        $menuEntity->setName($name);
-        $menuEntity->setMenu($menu);
-        $menuEntity->setType(WeChatMenu::TYPE_DEFAULT);
-        $menuEntity->setCond('');
-        $menuEntity->setUpdated(new \DateTime());
-        $menuEntity->setWeChat($weChat);
-
-        $this->saveModifiedEntity($menuEntity);
-    }
-
-
-    /**
-     * @param WeChat $weChat
-     * @param string $name
-     * @param string $menu
-     * @param string $cond
-     */
-    public function createConditionalWeChatMenu($weChat, $name, $menu, $cond)
-    {
-        $menuEntity = new WeChatMenu();
-        $menuEntity->setId(Uuid::uuid1()->toString());
-        $menuEntity->setName($name);
-        $menuEntity->setMenu($menu);
-        $menuEntity->setType(WeChatMenu::TYPE_CONDITIONAL);
-        $menuEntity->setCond($cond);
-        $menuEntity->setUpdated(new \DateTime());
-        $menuEntity->setWeChat($weChat);
-
-        $this->saveModifiedEntity($menuEntity);
     }
 
 
@@ -129,6 +111,7 @@ class WeChatMenuManager extends BaseEntityManager
         $menuEntity->setName($name);
         $menuEntity->setMenu($menu);
         $menuEntity->setType($type);
+        $menuEntity->setStatus(WeChatMenu::STATUS_RETIRED);
         $menuEntity->setUpdated(new \DateTime());
         $menuEntity->setWeChat($weChat);
 

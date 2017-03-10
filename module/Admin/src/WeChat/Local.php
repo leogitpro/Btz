@@ -138,5 +138,25 @@ class Local
     }
 
 
+    /**
+     * @return array
+     */
+    public function deleteAllMenus()
+    {
+        $token = $this->getAccessToken();
+        return $this->remote->deleteAllMenus($token);
+    }
+
+    /**
+     * @param string $menu
+     * @return array
+     */
+    public function createDefaultMenu($menu)
+    {
+        $token = $this->getAccessToken();
+        return $this->remote->createDefaultMenu($token, $menu);
+    }
+
+
 
 }

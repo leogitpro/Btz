@@ -28,6 +28,28 @@ class ApiURL
 
 
     /**
+     * @param string $access_token
+     * @return string
+     */
+    public static function GetMenuCreateDefaultUrl($access_token)
+    {
+        $path = 'cgi-bin/menu/create?access_token=' . (string)$access_token;
+        return self::GetHost() . $path;
+    }
+
+
+    /**
+     * @param string $access_token
+     * @return string
+     */
+    public static function GetMenuDeleteAllUrl($access_token)
+    {
+        $path = 'cgi-bin/menu/delete?access_token=' . (string)$access_token;
+        return self::GetHost() . $path;
+    }
+
+
+    /**
      *
      * @param string $access_token
      * @return string

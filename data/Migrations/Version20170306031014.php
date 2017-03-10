@@ -22,12 +22,12 @@ class Version20170306031014 extends AbstractMigration
         $table->addColumn('name', 'string', ['length' => 45]);
         $table->addColumn('menu', 'text');
         $table->addColumn('type', 'smallint', ['unsigned' => true]);
+        $table->addColumn('status', 'smallint', ['unsigned' => true]);
         $table->addColumn('updated', 'datetime');
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['wx']);
-        $table->addIndex(['type']);
-        $table->addIndex(['updated']);
+        $table->addIndex(['status', 'type', 'updated']);
     }
 
     /**
