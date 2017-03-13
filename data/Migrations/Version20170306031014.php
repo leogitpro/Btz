@@ -20,6 +20,7 @@ class Version20170306031014 extends AbstractMigration
         $table->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
         $table->addColumn('wx', 'integer', ['unsigned' => true]);
         $table->addColumn('name', 'string', ['length' => 45]);
+        $table->addColumn('menuid', 'string', ['length' => 45]);
         $table->addColumn('menu', 'text');
         $table->addColumn('type', 'smallint', ['unsigned' => true]);
         $table->addColumn('status', 'smallint', ['unsigned' => true]);

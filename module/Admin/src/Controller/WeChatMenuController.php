@@ -459,10 +459,10 @@ class WeChatMenuController extends AdminBaseController
     {
         $result = ['success' => false, 'code' => 0, 'message' => ''];
 
-        $menuId = (string)$this->params()->fromRoute('key');
+        $key = (string)$this->params()->fromRoute('key');
         $wm = $this->getWeChatMenuManager();
 
-        $weChatMenu = $wm->getWeChatMenu($menuId);
+        $weChatMenu = $wm->getWeChatMenu($key);
         if (!$weChatMenu instanceof WeChatMenu) {
             $result['message'] = '未查询到您的菜单信息信息, 请确认你的菜单信息信息没有错误!';
             return new JsonModel($result);
@@ -483,8 +483,15 @@ class WeChatMenuController extends AdminBaseController
         $ws = $this->getWeChatService($weChat->getWxId());
 
         if(WeChatMenu::TYPE_DEFAULT == $weChatMenu->getType()) {
-            $ws->removeAllMenus(); //Delete all remote menu
-            $ws->createDefaultMenu($weChatMenu->getMenu()); //Create default menu
+            if (!$ws->deleteDefaultMenu()) { //Delete all remote menu
+                $result['message'] = '公众号菜单清理失败!';
+                return new JsonModel($result);
+            }
+
+            if (!$ws->createDefaultMenu($weChatMenu->getMenu())) { //Create default menu
+                $result['message'] = '自定义菜单创建失败!';
+                return new JsonModel($result);
+            }
 
             //Reset all local menu status
             $menus = $weChat->getMenus();
@@ -493,6 +500,7 @@ class WeChatMenuController extends AdminBaseController
                 if($menu instanceof WeChatMenu) {
                     if($menu->getId() != $weChatMenu->getId()) {
                         $menu->setStatus(WeChatMenu::STATUS_RETIRED);
+                        $menu->setMenuid('');
                         $updated[] = $menu;
                     }
                 }
@@ -502,18 +510,40 @@ class WeChatMenuController extends AdminBaseController
 
             $wm->saveModifiedEntities($updated);
         } else {
-            $count = $wm->getActivatedMenuCountByWeChatWithType($weChat, WeChatMenu::TYPE_CONDITIONAL);
-            if($count > 2) {
-                $result['message'] = '个性化菜单已经使用满额!';
-                return new JsonModel($result);
+            if(WeChatMenu::STATUS_ACTIVATED == $weChatMenu->getStatus()) { // Delete match menu
+                if(!$ws->deleteConditionalMenu($weChatMenu->getMenuid())) {
+                    $result['message'] = '个性化菜单删除失败!';
+                    return new JsonModel($result);
+                } else {
+                    $weChatMenu->setMenuid('');
+                    $weChatMenu->setStatus(WeChatMenu::STATUS_RETIRED);
+
+                    $wm->saveModifiedEntity($weChatMenu);
+                }
+            } else { //
+                $count = $wm->getActivatedMenuCountByWeChatWithType($weChat, WeChatMenu::TYPE_CONDITIONAL);
+                if($count > 2) {
+                    $result['message'] = '个性化菜单已经使用满额! 不能再增加了.';
+                    return new JsonModel($result);
+                }
+
+                $menuid = $ws->createConditionalMenu($weChatMenu->getMenu());
+                if (empty($menuid)) {
+                    $result['message'] = '个性化菜单添加失败!';
+                    return new JsonModel($result);
+                }
+
+                $weChatMenu->setMenuid($menuid);
+                $weChatMenu->setStatus(WeChatMenu::STATUS_ACTIVATED);
+                $wm->saveModifiedEntity($weChatMenu);
             }
-
-            //todo
         }
+
+        $result['success'] = true;
+        $result['message'] = '菜单同步成功!';
+
+        return new JsonModel($result);
     }
-
-
-
 
 
 

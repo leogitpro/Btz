@@ -14,6 +14,23 @@ $(function () {
         }
     });
     
+    $(".import").click(function() {
+        if(confirm("导入微信公众号目前的菜单信息后, 本地已有的菜单将被全部删除. 确定要导入么?")) {
+            return false;
+        } else {
+            return false;
+        }
+    });
+    
+    $(".trash").click(function() {
+        if(confirm("清空微信公众号目前的菜单信息后, 用户进入公众号将不再显示底部菜单. 确定要清空么?")) {
+            return false;
+        } else {
+            return false;
+        }
+    });
+    
+    
     $(".async").click(function() {
         var target = $(this);
         var url = target.attr("href");
@@ -21,7 +38,7 @@ $(function () {
             $(this).blur();
             return false;
         }
-        if(confirm("同步 自定义菜单 微信公众号菜单, 将覆盖之前公众号的所有菜单配置. \\n同步 个性化菜单只能同步三个. 需要进行么?")) {
+        if(confirm("同步微信公众号 自定义菜单, 将覆盖之前公众号的所有菜单(自定义菜单+个性化菜地)配置. 需要进行么?")) {
             alert("同步过程可能需要点时间. 请耐心等待. 同步成功. 页面会刷新! 点确定开始同步.");
             target.removeAttr("href");
             $.get(url, function(dt) {
@@ -29,7 +46,8 @@ $(function () {
                     target.attr("href", url);
                     alert(dt.message);
                 } else {
-                    window.location.reload(true);
+                    alert(dt.message);
+                    //window.location.reload(true);
                 }
             });
             return false;
@@ -55,9 +73,17 @@ $this->inlineScript()->captureEnd();
             <div class="row">
                 <div class="col-lg-12">
                     <p>
-                        <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加菜单</a>
-                        <br>
-                        <a href="#"></a>
+                        <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'add']); ?>">
+                            <i class="fa fa-plus fa-fw"></i> 添加本地菜单
+                        </a>
+                        <span> &nbsp;&nbsp; </span>
+                        <a class="btn btn-default btn-sm import" href="#">
+                            <i class="fa fa-share fa-fw" aria-hidden="true"></i> 导入微信公众号现有菜单
+                        </a>
+                        <span> &nbsp;&nbsp; </span>
+                        <a class="btn btn-default btn-sm trash" href="#">
+                            <i class="fa fa-trash fa-fw" aria-hidden="true"></i> 清空微信公众号现有菜单
+                        </a>
                     </p>
                     <table class="table table-striped">
                         <tr>
@@ -80,12 +106,12 @@ $this->inlineScript()->captureEnd();
                                         <a class="async" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'async', 'key' => $menu->getId()]); ?>">
                                             <?php if($menu->getType() == \Admin\Entity\WeChatMenu::TYPE_CONDITIONAL) { ?>
                                                 <?php if($menu->getStatus() == \Admin\Entity\WeChatMenu::STATUS_ACTIVATED) { ?>
-                                                    删除公众号个性化菜单
+                                                    删除<strong>个性化菜单</strong>
                                                 <?php } else { ?>
-                                                    添加公众号个性化菜单
+                                                    添加<strong>个性化菜单</strong>
                                                 <?php } ?>
                                             <?php } else { ?>
-                                                重置公众号菜单
+                                                同步<strong>自定义菜单</strong>
                                             <?php } ?>
                                         </a>
                                         <span> | </span>

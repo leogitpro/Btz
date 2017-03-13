@@ -10,6 +10,7 @@
 namespace Admin\WeChat;
 
 
+use Admin\WeChat\Exception\InvalidArgumentException;
 use Admin\WeChat\Exception\NetworkRequestException;
 use Application\Service\AppLogger;
 use Zend\Json\Json;
@@ -29,14 +30,21 @@ class Remote
 
 
     /**
+     * 提取公众号 AccessToken
+     *
      * @param string $appId
      * @param string $appSecret
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getAccessToken($appId, $appSecret)
     {
         $apiUrl = ApiURL::GetAccessTokenUrl($appId, $appSecret);
-        return $this->sendGetRequest($apiUrl);
+        $result = $this->sendGetRequest($apiUrl);
+        if (!isset($result['access_token']) || !isset($result['expires_in'])) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+        return $result;
     }
 
 
@@ -100,24 +108,88 @@ class Remote
 
 
     /**
+     * 删除自定义菜单
+     *
      * @param string $access_token
-     * @return array
+     * @return true
+     * @throws InvalidArgumentException
      */
-    public function deleteAllMenus($access_token)
+    public function deleteDefaultMenu($access_token)
     {
-        return $this->sendGetRequest(ApiURL::GetMenuDeleteAllUrl($access_token));
+        $result = $this->sendGetRequest(ApiURL::GetMenuDeleteDefaultUrl($access_token));
+
+        if (!isset($result['errcode']) || 0 != $result['errcode']) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+
+        return true;
     }
 
 
     /**
+     * 创建自定义菜单
+     *
      * @param string $access_token
      * @param string $menu
-     * @return array
+     * @return true
+     * @throws InvalidArgumentException
      */
     public function createDefaultMenu($access_token, $menu)
     {
         $apiUrl = ApiURL::GetMenuCreateDefaultUrl($access_token);
-        return $this->sendPostRequest($apiUrl, $menu);
+        $result = $this->sendPostRequest($apiUrl, $menu);
+
+        if (!isset($result['errcode']) || 0 != $result['errcode']) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 删除个性化菜单
+     *
+     * @param $access_token
+     * @param string $menuid
+     * @return true
+     * @throws InvalidArgumentException
+     */
+    public function deleteConditionalMenu($access_token, $menuid)
+    {
+        $post = new \stdClass();
+        $post->menuid = (string)$menuid;
+
+        $apiUrl = ApiURL::GetMenuDeleteConditionalUrl($access_token);
+
+        $result = $this->sendPostRequest($apiUrl, json_encode($post));
+
+        if (!isset($result['errcode']) || 0 != $result['errcode']) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 创建个性化菜单
+     *
+     * @param string $access_token
+     * @param string $menu
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    public function createConditionalMenu($access_token, $menu)
+    {
+        $apiUrl = ApiURL::GetMenuCreateConditionalUrl($access_token);
+        $result = $this->sendPostRequest($apiUrl, $menu);
+
+        if (!isset($result['menuid'])) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+
+        return $result['menuid'];
     }
 
 

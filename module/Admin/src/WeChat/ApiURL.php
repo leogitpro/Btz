@@ -28,6 +28,34 @@ class ApiURL
 
 
     /**
+     * 接口地址: 创建个性化菜单
+     *
+     * @param string $access_token
+     * @return string
+     */
+    public static function GetMenuCreateConditionalUrl($access_token)
+    {
+        $path = 'cgi-bin/menu/addconditional?access_token=' . (string)$access_token;
+        return self::GetHost() . $path;
+    }
+
+
+    /**
+     * 接口地址: 删除个性化菜单
+     *
+     * @param string $access_token
+     * @return string
+     */
+    public static function GetMenuDeleteConditionalUrl($access_token)
+    {
+        $path = 'cgi-bin/menu/delconditional?access_token=' . (string)$access_token;
+        return self::GetHost() . $path;
+    }
+
+
+    /**
+     * 接口地址: 创建自定义菜单
+     *
      * @param string $access_token
      * @return string
      */
@@ -39,10 +67,12 @@ class ApiURL
 
 
     /**
+     * 接口地址: 删除自定义菜单
+     *
      * @param string $access_token
      * @return string
      */
-    public static function GetMenuDeleteAllUrl($access_token)
+    public static function GetMenuDeleteDefaultUrl($access_token)
     {
         $path = 'cgi-bin/menu/delete?access_token=' . (string)$access_token;
         return self::GetHost() . $path;
@@ -88,7 +118,7 @@ class ApiURL
 
 
     /**
-     * 获取微信基础 Access Token API 地址
+     * 接口地址: AccessToken
      *
      * @param string $appid
      * @param string $appsecret

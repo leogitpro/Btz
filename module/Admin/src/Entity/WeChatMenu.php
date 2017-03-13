@@ -44,6 +44,12 @@ class WeChatMenu
      */
     private $name = '';
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="menuid", type="string", length=45)
+     */
+    private $menuid = '';
 
     /**
      * @var string
@@ -159,6 +165,22 @@ class WeChatMenu
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMenuid()
+    {
+        return $this->menuid;
+    }
+
+    /**
+     * @param string $menuid
+     */
+    public function setMenuid($menuid)
+    {
+        $this->menuid = $menuid;
     }
 
     /**

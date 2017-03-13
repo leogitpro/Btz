@@ -102,22 +102,49 @@ class WeChatService
 
 
     /**
-     * @return array
+     * 删除自定义菜单
+     *
+     * @return bool
      */
-    public function removeAllMenus()
+    public function deleteDefaultMenu()
     {
-        return $this->local->deleteAllMenus();
+        return $this->local->deleteDefaultMenu();
     }
 
 
     /**
+     * 创建自定义菜单
+     *
      * @param string $menu
-     * @return array
+     * @return bool
      */
     public function createDefaultMenu($menu)
     {
         return $this->local->createDefaultMenu($menu);
     }
 
+
+    /**
+     * 删除个性化菜单
+     *
+     * @param string $menuid
+     * @return bool
+     */
+    public function deleteConditionalMenu($menuid)
+    {
+        return $this->local->deleteConditionalMenu($menuid);
+    }
+
+
+    /**
+     * 创建个性化菜单
+     *
+     * @param string $menu
+     * @return string
+     */
+    public function createConditionalMenu($menu)
+    {
+        return $this->local->createConditionalMenu($menu);
+    }
 
 }
