@@ -140,10 +140,11 @@ class Remote
      */
     public function deleteDefaultMenu($access_token)
     {
-        $result = $this->sendGetRequest(ApiURL::GetMenuDeleteDefaultUrl($access_token));
+        $res = $this->sendGetRequest(ApiURL::GetMenuDeleteDefaultUrl($access_token));
 
-        if (!isset($result['errcode']) || 0 != $result['errcode']) {
-            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        $errCode = @$res['errcode'];
+        if (0 != $errCode) {
+            throw new InvalidArgumentException($res['errmsg'], $errCode);
         }
 
         return true;
@@ -161,10 +162,11 @@ class Remote
     public function createDefaultMenu($access_token, $menu)
     {
         $apiUrl = ApiURL::GetMenuCreateDefaultUrl($access_token);
-        $result = $this->sendPostRequest($apiUrl, $menu);
+        $res = $this->sendPostRequest($apiUrl, $menu);
 
-        if (!isset($result['errcode']) || 0 != $result['errcode']) {
-            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        $errCode = @$res['errcode'];
+        if (0 != $errCode) {
+            throw new InvalidArgumentException($res['errmsg'], $errCode);
         }
 
         return true;
@@ -186,10 +188,11 @@ class Remote
 
         $apiUrl = ApiURL::GetMenuDeleteConditionalUrl($access_token);
 
-        $result = $this->sendPostRequest($apiUrl, json_encode($post));
+        $res = $this->sendPostRequest($apiUrl, json_encode($post));
 
-        if (!isset($result['errcode']) || 0 != $result['errcode']) {
-            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        $errCode = @$res['errcode'];
+        if (0 != $errCode) {
+            throw new InvalidArgumentException($res['errmsg'], $errCode);
         }
 
         return true;
@@ -207,13 +210,13 @@ class Remote
     public function createConditionalMenu($access_token, $menu)
     {
         $apiUrl = ApiURL::GetMenuCreateConditionalUrl($access_token);
-        $result = $this->sendPostRequest($apiUrl, $menu);
+        $res = $this->sendPostRequest($apiUrl, $menu);
 
-        if (!isset($result['menuid'])) {
-            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        if (!isset($res['menuid'])) {
+            throw new InvalidArgumentException($res['errmsg'], $res['errcode']);
         }
 
-        return $result['menuid'];
+        return $res['menuid'];
     }
 
 

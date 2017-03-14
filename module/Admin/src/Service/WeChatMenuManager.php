@@ -100,6 +100,23 @@ class WeChatMenuManager extends BaseEntityManager
 
     /**
      * @param WeChat $weChat
+     */
+    public function trashedWeChatMenu($weChat)
+    {
+        $qb = $this->resetQb();
+
+        $qb->update(WeChatMenu::class, 't');
+        $qb->set('t.status', '?1');
+        $qb->where($qb->expr()->eq('t.weChat', '?2'));
+        $qb->setParameter(1, WeChatMenu::STATUS_RETIRED);
+        $qb->setParameter(2, $weChat);
+        $qb->getQuery()->execute();
+    }
+
+
+
+    /**
+     * @param WeChat $weChat
      * @param string $name
      * @param string $menu
      * @param int $type

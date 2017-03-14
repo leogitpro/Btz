@@ -15,6 +15,13 @@ $(function () {
     });
     
     $(".import").click(function() {
+        
+        var target = $(this);
+        var url = target.attr("href");
+        if(url.length < 2) {
+            return false;
+        }
+        
         if(confirm("导入微信公众号目前的菜单信息后, 本地已有的菜单将被全部删除. 确定要导入么?")) {
             return false;
         } else {
@@ -23,11 +30,30 @@ $(function () {
     });
     
     $(".trash").click(function() {
-        if(confirm("清空微信公众号目前的菜单信息后, 用户进入公众号将不再显示底部菜单. 确定要清空么?")) {
-            return false;
-        } else {
+        
+        var target = $(this);
+        var url = target.attr("href");
+        if(url.length < 2) {
             return false;
         }
+        
+        if(confirm("清空微信公众号目前的菜单信息后, 用户进入公众号将不再显示底部菜单. 确定要清空么?")) {
+            target.attr("href", "");
+            $.get(url, function(dt) {
+                if(!dt.success) {
+                    target.attr("href", url);
+                    alert(dt.message);
+                } else {
+                    alert(dt.message);
+                    window.location.reload(true);
+                }
+            });
+            
+            $(this).blur();
+            return false;
+        } 
+        $(this).blur();
+        return false;
     });
     
     
@@ -40,14 +66,14 @@ $(function () {
         }
         if(confirm("同步微信公众号 自定义菜单, 将覆盖之前公众号的所有菜单(自定义菜单+个性化菜地)配置. 需要进行么?")) {
             alert("同步过程可能需要点时间. 请耐心等待. 同步成功. 页面会刷新! 点确定开始同步.");
-            target.removeAttr("href");
+            target.attr("href", "");
             $.get(url, function(dt) {
                 if(!dt.success) {
                     target.attr("href", url);
                     alert(dt.message);
                 } else {
                     alert(dt.message);
-                    //window.location.reload(true);
+                    window.location.reload(true);
                 }
             });
             return false;
@@ -81,7 +107,7 @@ $this->inlineScript()->captureEnd();
                             <i class="fa fa-share fa-fw" aria-hidden="true"></i> 导入微信公众号现有菜单
                         </a>
                         <span> &nbsp;&nbsp; </span>
-                        <a class="btn btn-default btn-sm trash" href="#">
+                        <a class="btn btn-default btn-sm trash" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'trash']); ?>">
                             <i class="fa fa-trash fa-fw" aria-hidden="true"></i> 清空微信公众号现有菜单
                         </a>
                     </p>
@@ -100,7 +126,15 @@ $this->inlineScript()->captureEnd();
                                 <tr>
                                     <td><?php echo $menu->getName(); ?></td>
                                     <td><?php echo $menu->getTypeAsString(); ?></td>
-                                    <td><?php echo $menu-> getStatusAsString(); ?></td>
+                                    <td>
+                                        <?php if(\Admin\Entity\WeChatMenu::STATUS_ACTIVATED == $menu->getStatus()) { ?>
+                                            <span class="label label-success">
+                                        <?php } else { ?>
+                                            <span class="label label-default">
+                                        <?php } ?>
+                                        <?php echo $menu-> getStatusAsString(); ?>
+                                            </span>
+                                    </td>
                                     <td><?php echo $menu->getUpdated()->format('Y-m-d H:i:s'); ?></td>
                                     <td>
                                         <a class="async" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'async', 'key' => $menu->getId()]); ?>">

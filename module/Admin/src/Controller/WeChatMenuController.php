@@ -507,7 +507,7 @@ class WeChatMenuController extends AdminBaseController
             }
 
             if (!$ws->createDefaultMenu($weChatMenu->getMenu())) { //Create default menu
-                $result['message'] = '自定义菜单创建失败!';
+                $result['message'] = '自定义菜单同步失败!';
                 return new JsonModel($result);
             }
 
@@ -564,6 +564,65 @@ class WeChatMenuController extends AdminBaseController
     }
 
 
+    /**
+     * 清空微信公众号菜单
+     */
+    public function trashAction()
+    {
+        $result = ['success' => false, 'code' => 0, 'message' => 'Invalid WeChat'];
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
+
+        if (!$weChat instanceof WeChat) {
+            return new JsonModel($result);
+        }
+
+        if(!$this->getWeChatService($weChat->getWxId())->deleteDefaultMenu()) {
+            $result['message'] = '清空公众号菜单失败!';
+            return new JsonModel($result);
+        }
+
+        $this->getWeChatMenuManager()->trashedWeChatMenu($weChat);
+
+        $result['success'] = true;
+        $result['message'] = '公众号菜单已经清理完毕.';
+
+        return new JsonModel($result);
+    }
+
+
+    /**
+     * 导入微信公众号菜单到本地
+     */
+    public function importAction()
+    {
+        $result = ['success' => false, 'code' => 0, 'message' => 'Invalid WeChat'];
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+
+        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
+
+        if (!$weChat instanceof WeChat) {
+            return new JsonModel($result);
+        }
+
+        //todo
+        if(!$this->getWeChatService($weChat->getWxId())->deleteDefaultMenu()) {
+            $result['message'] = '清空公众号菜单失败!';
+            return new JsonModel($result);
+        }
+
+        $this->getWeChatMenuManager()->trashedWeChatMenu($weChat);
+
+        $result['success'] = true;
+        $result['message'] = '公众号菜单已经清理完毕.';
+
+        return new JsonModel($result);
+    }
+
+
 
     /**
      *  ACL 登记
@@ -577,8 +636,10 @@ class WeChatMenuController extends AdminBaseController
         $item['actions']['index'] = self::CreateActionRegistry('index', '菜单列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '增加菜单', 1, 'plus', 6);
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑菜单');
-        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除菜单');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除本地菜单');
         $item['actions']['async'] = self::CreateActionRegistry('async', '同步菜单');
+        $item['actions']['trash'] = self::CreateActionRegistry('trash', '删除微信菜单');
+        $item['actions']['import'] = self::CreateActionRegistry('import', '导入微信菜单');
 
         return $item;
     }
