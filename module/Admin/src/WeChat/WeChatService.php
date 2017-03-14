@@ -61,13 +61,7 @@ class WeChatService
      */
     public function getCallbackHosts()
     {
-        try {
-            return $this->local->getCallbackHosts();
-        } catch (RuntimeException $e) {
-            $this->logger->excaption($e);
-        }
-
-        return [];
+        return $this->local->getCallbackHosts();
     }
 
 
@@ -92,12 +86,7 @@ class WeChatService
      */
     public function getQrCode($type, $scene, $expired = 0)
     {
-        try {
-            return $this->local->createQrCode($type, $scene, $expired);
-        } catch (RuntimeException $e) {
-            $this->logger->excaption($e);
-        }
-        return [];
+        return $this->local->createQrCode($type, $scene, $expired);
     }
 
 

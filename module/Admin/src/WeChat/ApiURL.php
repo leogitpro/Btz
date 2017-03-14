@@ -80,6 +80,7 @@ class ApiURL
 
 
     /**
+     * 接口地址: 用户标签
      *
      * @param string $access_token
      * @return string
@@ -92,7 +93,7 @@ class ApiURL
 
 
     /**
-     * 获取微信生成二维码接口地址
+     * 接口地址: 微信生成二维码
      *
      * @param string $access_token
      * @return string
@@ -105,7 +106,7 @@ class ApiURL
 
 
     /**
-     * 获取微信服务器 IP 地址的 API 地址
+     * 接口地址: 微信服务器 IP 地址
      *
      * @param string $access_token
      * @return string

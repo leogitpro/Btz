@@ -13,7 +13,7 @@ use Zend\Router\Http\Segment;
 
 
 return [
-    // IndexController router configuration
+
     'index' => [
         'type' => Segment::class,
         'options' => [
@@ -28,9 +28,8 @@ return [
                 'action' => 'index',
             ],
         ],
-    ], // End IndexController router
+    ],
 
-    // DashboardController router configuration
     'dashboard' => [
         'type' => Segment::class,
         'options' => [
@@ -45,9 +44,8 @@ return [
                 'action' => 'index',
             ],
         ],
-    ], // End DashboardController router
+    ],
 
-    // DashboardController router configuration
     'search' => [
         'type' => Segment::class,
         'options' => [
@@ -62,9 +60,8 @@ return [
                 'action' => 'index',
             ],
         ],
-    ], // End DashboardController router
+    ],
 
-    // DashboardController router configuration
     'profile' => [
         'type' => Segment::class,
         'options' => [
@@ -79,9 +76,8 @@ return [
                 'action' => 'index',
             ],
         ],
-    ], // End DashboardController router
+    ],
 
-    // DepartmentController router configuration
     'dept' => [
         'type' => Segment::class,
         'options' => [
@@ -97,10 +93,7 @@ return [
             ],
         ],
     ],
-    // End DepartmentController router
 
-
-    // MemberController router configuration
     'member' => [
         'type' => Segment::class,
         'options' => [
@@ -116,10 +109,7 @@ return [
             ],
         ],
     ],
-    // End MemberController router
 
-
-    // ComponentController router configuration
     'component' => [
         'type' => Segment::class,
         'options' => [
@@ -135,9 +125,7 @@ return [
             ],
         ],
     ],
-    // End ComponentController router
 
-    // AclController router configuration
     'acl' => [
         'type' => Segment::class,
         'options' => [
@@ -153,10 +141,7 @@ return [
             ],
         ],
     ],
-    // End AclController router
 
-
-    // MessageController router configuration
     'message' => [
         'type' => Segment::class,
         'options' => [
@@ -172,9 +157,7 @@ return [
             ],
         ],
     ],
-    // End MessageController router
 
-    // FeedbackController router configuration
     'feedback' => [
         'type' => Segment::class,
         'options' => [
@@ -190,10 +173,7 @@ return [
             ],
         ],
     ],
-    // End FeedbackController router
 
-
-    // WeChatController router configuration
     'weChat' => [
         'type' => Segment::class,
         'options' => [
@@ -209,10 +189,23 @@ return [
             ],
         ],
     ],
-    // End WeChatController router
 
+    'weChatAccount' => [
+        'type' => Segment::class,
+        'options' => [
+            'route' => 'we-chat-account[/:action[/:key]][:suffix]',
+            'constraints' => [
+                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\WeChatAccountController::class,
+                'action' => 'index',
+            ],
+        ],
+    ],
 
-    // WeChatController router configuration
     'weChatClient' => [
         'type' => Segment::class,
         'options' => [
@@ -228,9 +221,7 @@ return [
             ],
         ],
     ],
-    // End WeChatController router
 
-    // WeChatQrCodeController router configuration
     'weChatMenu' => [
         'type' => Segment::class,
         'options' => [
@@ -246,9 +237,7 @@ return [
             ],
         ],
     ],
-    // End WeChatQrCodeController router
 
-    // WeChatQrCodeController router configuration
     'weChatQrCode' => [
         'type' => Segment::class,
         'options' => [
@@ -264,6 +253,5 @@ return [
             ],
         ],
     ],
-    // End WeChatQrCodeController router
 
 ];

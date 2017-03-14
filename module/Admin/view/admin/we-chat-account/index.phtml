@@ -1,0 +1,72 @@
+<?php
+$this->pageTitleBar('我的公众号');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+    $(function () {
+       $("#validateWeChat").click(function () {
+           var url = $(this).attr("href");
+           if(url.length < 2) {
+               return false;
+           }
+           $(this).blur().attr("disabled", true).attr("href", "#");
+           $.get(url, function (dt) {
+               if(!dt.success) {
+                   alert("当前公众号配置未能通过微信验证. 请确认公众号配置是否正确. 或者还有其他的平台授权操作公众号 Token?");
+               }
+               window.location.reload(true);
+           }, "json");
+           return false;
+       });
+    });
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <?php if (!$weChat instanceof \Admin\Entity\WeChat) { ?>
+            <p>
+                <span>您还没有创建您的微信公众号, 是否需要现在创建? </span>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChat', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加公众号</a>
+            </p>
+        <?php } else { ?>
+            <div class="row">
+                <div class="col-lg-7">
+                    <p>AppID: <?php echo $weChat->getWxAppId(); ?></p>
+                    <p>
+                        AppSecret: <?php echo substr($weChat->getWxAppSecret(), 0, 5) . '*********' . substr($weChat->getWxAppSecret(), -5); ?>
+                        <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChat', ['action' => 'edit', 'suffix' => '.html']); ?>">修改配置</a>
+                    </p>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <p>运行状态</p>
+                    <?php if(time() < $weChat->getWxExpired()) { ?>
+                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>运行中</strong></p>
+                    <?php } else { ?>
+                        <p class="text-muted"><i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>已过期</strong></p>
+                    <?php } ?>
+                </div>
+                <div class="col-lg-3 text-center">
+                    <p>验证状态</p>
+                    <?php if(\Admin\Entity\WeChat::STATUS_CHECKED == $weChat->getWxChecked()) { ?>
+                    <p class="text-success">
+                        <i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong>
+                        <?php } else { ?>
+                    <p class="text-muted">
+                        <i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>未验证</strong>
+                        <?php } ?>
+                        <a id="validateWeChat" class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChat', ['action'=>'validate']); ?>">验证</a>
+                    </p>
+                </div>
+            </div>
+            <hr>
+
+        <?php } ?>
+    </div>
+</div>
+

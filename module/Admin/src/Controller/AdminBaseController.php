@@ -21,6 +21,7 @@ use Admin\Service\WeChatClientManager;
 use Admin\Service\WeChatManager;
 use Admin\Service\WeChatMenuManager;
 use Admin\Service\WeChatQrCodeManager;
+use Admin\Service\WeChatTagManager;
 use Admin\WeChat\WeChatService;
 use Application\Controller\AppBaseController;
 
@@ -33,6 +34,14 @@ use Application\Controller\AppBaseController;
  */
 class AdminBaseController extends AppBaseController
 {
+
+    /**
+     * @return WeChatTagManager
+     */
+    protected function getWeChatTagManager()
+    {
+        return $this->getSm(WeChatTagManager::class);
+    }
 
     /**
      * @return WeChatQrCodeManager

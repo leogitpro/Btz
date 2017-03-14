@@ -1,0 +1,68 @@
+<?php
+$this->pageTitleBar('用户标签列表');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $(".async").click(function () {
+        var target = $(this);
+        var url = target.attr("href");
+        if(url.length < 2) {
+            return false;
+        }
+        if(confirm("同步微信公众号后台的用户标签需要一定的时间, 同步过程请勿关闭本页. 同步完成页面会自动刷新! 确定同步么?")) {
+            target.blur();
+            target.children("i").addClass("fa-spin");
+            target.attr("href", "");
+            $.get(url, function(dt) {
+                if(!dt.success) {
+                    target.children("i").removeClass("fa-spin");
+                    target.attr("href", url);
+                    alert(dt.message);
+                } else {
+                    alert(dt.message);
+                    window.location.reload(true);
+                }
+            });
+            return  false;
+        } else {
+            $(this).blur();
+            return false;
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+?>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-12">
+                <p>
+                    <a class="btn btn-default btn-sm async" href="<?php echo $this->url('admin/weChatAccount', ['action'=>'asynctag']); ?>"><i class="fa fa-refresh fa-fw" ></i> 同步用户标签</a>
+                </p>
+                <table class="table table-striped">
+                    <tr>
+                        <th>ID</th>
+                        <th>标签</th>
+                        <th>用户数</th>
+                    </tr>
+                    <?php
+                    foreach ($tags as $tag) {
+                        if ($tag instanceof \Admin\Entity\WeChatTag) {
+                            ?>
+                            <tr>
+                                <td><?php echo $tag->getTagid(); ?></td>
+                                <td><?php echo $tag->getTagname(); ?></td>
+                                <td><?php echo $tag->getTagcount(); ?></td>
+                            </tr>
+                        <?php } } ?>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>

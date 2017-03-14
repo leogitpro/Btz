@@ -318,6 +318,9 @@ $this->inlineScript()->captureEnd();
                             <label>设置用户标签</label>
                             <select name="menuForTag" class="form-control">
                                 <option value=""<?php echo "" == $menuForTag ? ' selected':''; ?>>不设置</option>
+                                <?php if(!empty($tags)) { foreach($tags as $tag) { if($tag instanceof \Admin\Entity\WeChatTag) { ?>
+                                    <option value="<?php echo $tag->getTagid(); ?>"<?php echo $tag->getTagid() == $menuForTag ? ' selected':''; ?>><?php echo $tag->getTagname(); ?></option>
+                                <?php } } } ?>
                             </select>
                         </div>
                         <div class="form-group">

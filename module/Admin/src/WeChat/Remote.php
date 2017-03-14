@@ -49,22 +49,32 @@ class Remote
 
 
     /**
+     * 微信服务器 IP 地址
+     *
      * @param string $access_token
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getCallbackHosts($access_token)
     {
         $apiUrl = ApiURL::GetWechatCallbackHosts($access_token);
-        return $this->sendGetRequest($apiUrl);
+        $res = $this->sendGetRequest($apiUrl);
+        if (!isset($res['ip_list'])) {
+            throw new InvalidArgumentException($res['errmsg'], $res['errcode']);
+        }
+        return (array)$res['ip_list'];
     }
 
 
     /**
+     * 创建带参数微信二维码
+     *
      * @param string $access_token
      * @param string $type
      * @param string|integer $scene
      * @param integer $expired
      * @return array
+     * @throws InvalidArgumentException
      */
     public function createQrCode($access_token, $type, $scene, $expired)
     {
@@ -85,7 +95,7 @@ class Remote
             $post->action_name = 'QR_LIMIT_STR_SCENE';
             $sceneValue->scene_str = (string)$scene;
         } else {
-            return [];
+            throw new InvalidArgumentException('Invalid QRCode type: ' . $type, 9999);
         }
 
         $sceneObj = new \stdClass();
@@ -93,17 +103,31 @@ class Remote
 
         $post->action_info = $sceneObj;
 
-        return $this->sendPostRequest($apiUrl, Json::encode($post, true));
+        $res = $this->sendPostRequest($apiUrl, json_encode($post));
+        if (!isset($res['url']) || !isset($res['ticket'])) {
+            throw new InvalidArgumentException($res['errmsg'], $res['errcode']);
+        }
+
+        return $res;
     }
 
 
     /**
-     * @param $access_token
+     * 用户标签
+     *
+     * @param string $access_token
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getTags($access_token)
     {
-        return $this->sendGetRequest(ApiURL::GetTagUrl($access_token));
+        $result = $this->sendGetRequest(ApiURL::GetTagUrl($access_token));
+
+        if (!isset($result['tags'])) {
+            throw new InvalidArgumentException($result['errmsg'], $result['errcode']);
+        }
+
+        return (array)$result['tags'];
     }
 
 

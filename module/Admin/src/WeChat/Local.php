@@ -87,51 +87,75 @@ class Local
 
 
     /**
-     * @return array|bool
-     * @throws RuntimeException
-     */
-    public function getCallbackHosts()
-    {
-        $token = $this->getAccessToken();
-        $data = $this->remote->getCallbackHosts($token);
-        if (isset($data['ip_list'])) {
-            return $data['ip_list'];
-        } else {
-            throw new RuntimeException('与微信服务器通信错误: ' . $data['errmsg'], $data['errcode']);
-        }
-    }
-
-
-    /**
-     * Get WeChat Tags
+     * 微信服务器 IP 地址
      *
      * @return array
      */
-    public function getTags()
+    public function getCallbackHosts()
     {
-        $token = $this->getAccessToken();
-        $data = $this->remote->getTags($token);
-        return isset($data['tags']) ? $data['tags'] : [];
-    }
+        try {
+            $token = $this->getAccessToken();
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return [];
+        }
 
+        try {
+            return $this->remote->getCallbackHosts($token);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+        }
+
+        return [];
+    }
 
 
     /**
      * @param string $type
      * @param string|integer $scene
      * @param integer $expired
-     * @return array|bool
-     * @throws RuntimeException
+     * @return array
      */
     public function createQrCode($type, $scene, $expired)
     {
-        $token = $this->getAccessToken();
-        $data = $this->remote->createQrCode($token, $type, $scene, $expired);
-        if (isset($data['url'])) {
-            return $data;
-        } else {
-            throw new RuntimeException('与微信服务器通信错误: ' . $data['errmsg'], $data['errcode']);
+        try {
+            $token = $this->getAccessToken();
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return [];
         }
+
+        try {
+            return $this->remote->createQrCode($token, $type, $scene, $expired);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+        }
+
+        return [];
+    }
+
+
+    /**
+     * 微信公众号用户标签
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        try {
+            $token = $this->getAccessToken();
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return [];
+        }
+
+        try {
+            return $this->remote->getTags($token);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+        }
+
+        return [];
     }
 
 

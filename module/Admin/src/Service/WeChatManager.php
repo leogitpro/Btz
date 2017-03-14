@@ -16,6 +16,38 @@ use Admin\Entity\WeChat;
 class WeChatManager extends BaseEntityManager
 {
 
+
+    /**
+     * @return int
+     */
+    public function getWeChatCount()
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.wxId'));
+        $qb->from(WeChat::class, 't');
+
+        return $this->getEntitiesCount();
+    }
+
+
+    /**
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getWeChatLimitByPage($page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(WeChat::class, 't');
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
+        $qb->orderBy('t.wxExpired', 'DESC');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
     /**
      * @param $weChatId
      * @return WeChat

@@ -46,6 +46,7 @@ return [
             Controller\FeedbackController::class => InvokableFactory::class,
 
             Controller\WeChatController::class => InvokableFactory::class,
+            Controller\WeChatAccountController::class => InvokableFactory::class,
             Controller\WeChatClientController::class => InvokableFactory::class,
             Controller\WeChatMenuController::class => InvokableFactory::class,
             Controller\WeChatQrCodeController::class => InvokableFactory::class,
@@ -108,6 +109,7 @@ return [
             Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\WeChatManager::class => Service\Factory\EntityManagerFactory::class,
+            Service\WeChatTagManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatClientManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatMenuManager::class => Service\Factory\EntityManagerFactory::class,
             Service\WeChatQrCodeManager::class => Service\Factory\EntityManagerFactory::class,

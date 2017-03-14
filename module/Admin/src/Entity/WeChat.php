@@ -104,6 +104,14 @@ class WeChat
      */
     private $clients;
 
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Admin\Entity\WeChatTag", mappedBy="weChat")
+     */
+    private $tags;
+
     /**
      * @var ArrayCollection
      *
@@ -287,6 +295,22 @@ class WeChat
     public function setClients($clients)
     {
         $this->clients = $clients;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param ArrayCollection $tags
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
     }
 
     /**

@@ -84,6 +84,8 @@ class WeChatMenuController extends AdminBaseController
             );
         }
 
+        $tags = $this->getWeChatTagManager()->getAllTagsByWeChat($weChat);
+
         if($this->getRequest()->isPost()) {
 
 
@@ -179,19 +181,25 @@ class WeChatMenuController extends AdminBaseController
 
 
             $menuCategory = $this->params()->fromPost('menuCategory');
-            $menuForSex = '';
-            $menuForPlatform = '';
-            $menuForTag = '';
-            $menuForCountry = '';
-            $menuForProvince = '';
-            $menuForCity = '';
-            $menuForLang = '';
+
 
             if (WeChatMenu::TYPE_CONDITIONAL == $menuCategory) {
-                $menuForSex = $this->params()->fromPost('menuForSex');
-                $menuForPlatform = $this->params()->fromPost('menuForPlatform');
+                $menuForSex = (string)$this->params()->fromPost('menuForSex', '');
+                $menuForPlatform = (string)$this->params()->fromPost('menuForPlatform', '');
+                $menuForTag = (string)$this->params()->fromPost('menuForTag', '');
 
-                if (!empty($menuForSex) || !empty($menuForPlatform)) {
+                $menuForCountry = (string)$this->params()->fromPost('menuForCountry', '');
+                $menuForProvince = (string)$this->params()->fromPost('menuForProvince', '');
+                $menuForCity = (string)$this->params()->fromPost('menuForCity', '');
+                $menuForLang = (string)$this->params()->fromPost('menuForLang', '');
+
+                if (!empty($menuForSex) ||
+                    !empty($menuForPlatform) ||
+                    !empty($menuForTag) ||
+                    !empty($menuForCountry) ||
+                    !empty($menuForProvince) ||
+                    !empty($menuForCity) ||
+                    !empty($menuForLang)) {
                     $condObj = new \stdClass();
                     $condObj->tag_id = $menuForTag;
                     $condObj->client_platform_type = $menuForPlatform;
@@ -220,6 +228,7 @@ class WeChatMenuController extends AdminBaseController
 
         return new ViewModel([
             'weChat' => $weChat,
+            'tags' => $tags,
             'activeId' => __METHOD__,
         ]);
     }
@@ -255,6 +264,8 @@ class WeChatMenuController extends AdminBaseController
         if ($myself->getMemberId() != $weChat->getMember()->getMemberId()) {
             throw new \RunException('禁止操作不属于您的公众号的菜单信息!');
         }
+
+        $tags = $this->getWeChatTagManager()->getAllTagsByWeChat($weChat);
 
 
         if($this->getRequest()->isPost()) {
@@ -351,19 +362,25 @@ class WeChatMenuController extends AdminBaseController
 
 
             $menuCategory = $this->params()->fromPost('menuCategory');
-            $menuForSex = '';
-            $menuForPlatform = '';
-            $menuForTag = '';
-            $menuForCountry = '';
-            $menuForProvince = '';
-            $menuForCity = '';
-            $menuForLang = '';
 
             if (WeChatMenu::TYPE_CONDITIONAL == $menuCategory) {
-                $menuForSex = $this->params()->fromPost('menuForSex');
-                $menuForPlatform = $this->params()->fromPost('menuForPlatform');
+                $menuForSex = (string)$this->params()->fromPost('menuForSex', '');
+                $menuForPlatform = (string)$this->params()->fromPost('menuForPlatform', '');
+                $menuForTag = (string)$this->params()->fromPost('menuForTag', '');
 
-                if (!empty($menuForSex) || !empty($menuForPlatform)) {
+                $menuForCountry = (string)$this->params()->fromPost('menuForCountry', '');
+                $menuForProvince = (string)$this->params()->fromPost('menuForProvince', '');
+                $menuForCity = (string)$this->params()->fromPost('menuForCity', '');
+                $menuForLang = (string)$this->params()->fromPost('menuForLang', '');
+
+
+                if (!empty($menuForSex) ||
+                    !empty($menuForPlatform) ||
+                    !empty($menuForTag) ||
+                    !empty($menuForCountry) ||
+                    !empty($menuForProvince) ||
+                    !empty($menuForCity) ||
+                    !empty($menuForLang)) {
                     $condObj = new \stdClass();
                     $condObj->tag_id = $menuForTag;
                     $condObj->client_platform_type = $menuForPlatform;
@@ -397,6 +414,7 @@ class WeChatMenuController extends AdminBaseController
 
         return new ViewModel([
             'menu' => $weChatMenu,
+            'tags' => $tags,
             'activeId' => __CLASS__,
         ]);
 
