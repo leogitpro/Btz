@@ -101,7 +101,20 @@ class WeChatMenuManager extends BaseEntityManager
     /**
      * @param WeChat $weChat
      */
-    public function trashedWeChatMenu($weChat)
+    public function deleteWeChatMenu($weChat)
+    {
+        $qb = $this->resetQb();
+
+        $qb->delete(WeChatMenu::class, 't');
+        $qb->where($qb->expr()->eq('t.weChat', '?1'));
+        $qb->setParameter(1, $weChat);
+        $qb->getQuery()->execute();
+    }
+
+    /**
+     * @param WeChat $weChat
+     */
+    public function resetWeChatMenu($weChat)
     {
         $qb = $this->resetQb();
 
@@ -120,21 +133,23 @@ class WeChatMenuManager extends BaseEntityManager
      * @param string $name
      * @param string $menu
      * @param int $type
+     * @param string $menuid
+     * @param int $status
      */
-    public function createWeChatMenu($weChat, $name, $menu, $type)
+    public function createWeChatMenu($weChat, $name, $menu, $type, $menuid = '', $status = WeChatMenu::STATUS_RETIRED)
     {
         $menuEntity = new WeChatMenu();
         $menuEntity->setId(Uuid::uuid1()->toString());
         $menuEntity->setName($name);
+        $menuEntity->setMenuid($menuid);
         $menuEntity->setMenu($menu);
         $menuEntity->setType($type);
-        $menuEntity->setStatus(WeChatMenu::STATUS_RETIRED);
+        $menuEntity->setStatus($status);
         $menuEntity->setUpdated(new \DateTime());
         $menuEntity->setWeChat($weChat);
 
         $this->saveModifiedEntity($menuEntity);
     }
-
 
 
 }

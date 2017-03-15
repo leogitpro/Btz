@@ -91,6 +91,17 @@ class WeChatService
 
 
     /**
+     * 导出微信菜单
+     *
+     * @return array
+     */
+    public function exportMenu()
+    {
+        return $this->local->exportMenu();
+    }
+
+
+    /**
      * 删除自定义菜单
      *
      * @return bool

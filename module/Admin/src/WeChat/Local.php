@@ -257,6 +257,137 @@ class Local
     }
 
 
+    /**
+     * 导出公众号菜单
+     *
+     * @return array
+     */
+    public function exportMenu()
+    {
+        try {
+            $token = $this->getAccessToken();
+        } catch (RuntimeException $e) {
+            $this->logger->excaption($e);
+            return [];
+        }
+
+        $menuObjects = [];
+
+        try {
+            $menu = $this->remote->exportMenu($token);
+            if (!isset($menu['menu'])) {
+                return $menuObjects;
+            }
+            $defaultMenu = $menu['menu'];
+            if (!isset($defaultMenu['button'])) {
+                return $menuObjects;
+            }
+
+            $defaultMenuObj = new \stdClass();
+            $defaultMenuObj->button = [];
+            foreach ($defaultMenu['button'] as $btn) {
+                if(isset($btn['sub_button']) && !empty($btn['sub_button'])) {
+                    $btnObj = new \stdClass();
+                    $btnObj->name = $btn['name'];
+                    $btnObj->sub_button = [];
+                    foreach ($btn['sub_button'] as $subBtn) {
+                        $subBtnObj = new \stdClass();
+                        $subBtnObj->type = $subBtn['type'];
+                        $subBtnObj->name = $subBtn['name'];
+                        if(in_array($subBtn['type'], ['media_id', 'view_limited'])) {
+                            $subBtnObj->media_id = @$subBtn['media_id'];
+                        } else if('view' == $subBtn['type']) {
+                            $subBtnObj->url = @$subBtn['url'];
+                        } else {
+                            $subBtnObj->key = @$subBtn['key'];
+                        }
+                        $btnObj->sub_button[] = $subBtnObj;
+                    }
+                    $defaultMenuObj->button[] = $btnObj;
+                } else {
+                    $btnObj = new \stdClass();
+                    $btnObj->type = $btn['type'];
+                    $btnObj->name = $btn['name'];
+                    if(in_array($btn['type'], ['media_id', 'view_limited'])) {
+                        $btnObj->media_id = @$btn['media_id'];
+                    } else if('view' == $btn['type']) {
+                        $btnObj->url = @$btn['url'];
+                    } else {
+                        $btnObj->key = @$btn['key'];
+                    }
+                    $defaultMenuObj->button[] = $btnObj;
+                }
+            }
+
+            $menuObjects[0] = $defaultMenuObj;
+
+            if (!isset($menu['conditionalmenu'])) {
+                return $menuObjects;
+            }
+
+            foreach ($menu['conditionalmenu'] as $condMenu) {
+                if (!isset($condMenu['button']) || !isset($condMenu['matchrule']) || !isset($condMenu['menuid'])) {
+                    continue;
+                }
+
+                $condMenuObj = new \stdClass();
+                $condMenuObj->button = [];
+                foreach ($condMenu['button'] as $btn) {
+                    if(isset($btn['sub_button']) && !empty($btn['sub_button'])) {
+                        $btnObj = new \stdClass();
+                        $btnObj->name = $btn['name'];
+                        $btnObj->sub_button = [];
+                        foreach ($btn['sub_button'] as $subBtn) {
+                            $subBtnObj = new \stdClass();
+                            $subBtnObj->type = $subBtn['type'];
+                            $subBtnObj->name = $subBtn['name'];
+                            if(in_array($subBtn['type'], ['media_id', 'view_limited'])) {
+                                $subBtnObj->media_id = @$subBtn['media_id'];
+                            } else if('view' == $subBtn['type']) {
+                                $subBtnObj->url = @$subBtn['url'];
+                            } else {
+                                $subBtnObj->key = @$subBtn['key'];
+                            }
+                            $btnObj->sub_button[] = $subBtnObj;
+                        }
+                        $condMenuObj->button[] = $btnObj;
+                    } else {
+                        $btnObj = new \stdClass();
+                        $btnObj->type = $btn['type'];
+                        $btnObj->name = $btn['name'];
+                        if(in_array($btn['type'], ['media_id', 'view_limited'])) {
+                            $btnObj->media_id = @$btn['media_id'];
+                        } else if('view' == $btn['type']) {
+                            $btnObj->url = @$btn['url'];
+                        } else {
+                            $btnObj->key = @$btn['key'];
+                        }
+                        $condMenuObj->button[] = $btnObj;
+                    }
+                }
+
+                $matchRuleObj = new \stdClass();
+                $fuckId = @$condMenu['matchrule']['tag_id'];
+                $matchRuleObj->tag_id = (int)$fuckId;
+                $matchRuleObj->sex = $condMenu['matchrule']['sex'];
+                $matchRuleObj->country = $condMenu['matchrule']['country'];
+                $matchRuleObj->province = $condMenu['matchrule']['province'];
+                $matchRuleObj->city = $condMenu['matchrule']['city'];
+                $matchRuleObj->client_platform_type = $condMenu['matchrule']['client_platform_type'];
+
+                $condMenuObj->matchrule = $matchRuleObj;
+
+                $menuObjects[$condMenu['menuid']] = $condMenuObj;
+            }
+
+            return $menuObjects;
+
+        } catch (InvalidArgumentException $e) {
+            $this->logger->excaption($e);
+        }
+
+        return [];
+    }
 
 
 }

@@ -28,6 +28,19 @@ class ApiURL
 
 
     /**
+     * 接口地址: 导出菜单
+     *
+     * @param string $access_token
+     * @return string
+     */
+    public static function GetMenuExportUrl($access_token)
+    {
+        $path = 'cgi-bin/menu/get?access_token=' . (string)$access_token;
+        return self::GetHost() . $path;
+    }
+
+
+    /**
      * 接口地址: 创建个性化菜单
      *
      * @param string $access_token

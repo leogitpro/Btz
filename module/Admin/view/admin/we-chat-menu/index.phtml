@@ -23,10 +23,22 @@ $(function () {
         }
         
         if(confirm("导入微信公众号目前的菜单信息后, 本地已有的菜单将被全部删除. 确定要导入么?")) {
+            target.attr("href", "");
+            $.get(url, function(dt) {
+                if(!dt.success) {
+                    target.attr("href", url);
+                    alert(dt.message);
+                } else {
+                    alert(dt.message);
+                    window.location.reload(true);
+                }
+            });
+            
+            $(this).blur();
             return false;
-        } else {
-            return false;
-        }
+        } 
+        $(this).blur();
+        return false;
     });
     
     $(".trash").click(function() {
@@ -93,7 +105,13 @@ $this->inlineScript()->captureEnd();
         <?php if (empty($menus)) { ?>
             <p>
                 <span>您的微信公众号还没有创建自定义菜单, 是否需要现在创建? </span>
-                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加自定义菜单</a>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'add']); ?>">
+                    <i class="fa fa-plus fa-fw"></i> 添加自定义菜单
+                </a>
+                <span> &nbsp;&nbsp; </span>
+                <a class="btn btn-default btn-xs import" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'import']); ?>">
+                    <i class="fa fa-share fa-fw" aria-hidden="true"></i> 导入微信公众号现有菜单
+                </a>
             </p>
         <?php } else { ?>
             <div class="row">
@@ -103,7 +121,7 @@ $this->inlineScript()->captureEnd();
                             <i class="fa fa-plus fa-fw"></i> 添加本地菜单
                         </a>
                         <span> &nbsp;&nbsp; </span>
-                        <a class="btn btn-default btn-sm import" href="#">
+                        <a class="btn btn-default btn-sm import" href="<?php echo $this->url('admin/weChatMenu', ['action'=>'import']); ?>">
                             <i class="fa fa-share fa-fw" aria-hidden="true"></i> 导入微信公众号现有菜单
                         </a>
                         <span> &nbsp;&nbsp; </span>

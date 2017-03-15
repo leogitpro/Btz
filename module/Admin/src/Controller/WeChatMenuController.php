@@ -584,7 +584,7 @@ class WeChatMenuController extends AdminBaseController
             return new JsonModel($result);
         }
 
-        $this->getWeChatMenuManager()->trashedWeChatMenu($weChat);
+        $this->getWeChatMenuManager()->resetWeChatMenu($weChat);
 
         $result['success'] = true;
         $result['message'] = '公众号菜单已经清理完毕.';
@@ -608,16 +608,25 @@ class WeChatMenuController extends AdminBaseController
             return new JsonModel($result);
         }
 
-        //todo
-        if(!$this->getWeChatService($weChat->getWxId())->deleteDefaultMenu()) {
-            $result['message'] = '清空公众号菜单失败!';
-            return new JsonModel($result);
+        $mm = $this->getWeChatMenuManager();
+        $mm->deleteWeChatMenu($weChat);
+
+        $ws = $this->getWeChatService($weChat->getWxId());
+
+        $menus = $ws->exportMenu();
+
+        if(!empty($menus)) {
+            $i = 0;
+            foreach ($menus as $key => $menu) {
+                $name = $i < 1 ? '自定义菜单' : '个性化菜单-' . $i;
+                $type = $i < 1 ? WeChatMenu::TYPE_DEFAULT : WeChatMenu::TYPE_CONDITIONAL;
+                $i++;
+                $mm->createWeChatMenu($weChat, $name, json_encode($menu, JSON_UNESCAPED_UNICODE), $type, $key, WeChatMenu::STATUS_ACTIVATED);
+            }
         }
 
-        $this->getWeChatMenuManager()->trashedWeChatMenu($weChat);
-
         $result['success'] = true;
-        $result['message'] = '公众号菜单已经清理完毕.';
+        $result['message'] = '公众号菜单已经导入完毕.';
 
         return new JsonModel($result);
     }

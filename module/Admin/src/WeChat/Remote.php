@@ -219,6 +219,24 @@ class Remote
         return $res['menuid'];
     }
 
+    /**
+     * 导出公众号菜单
+     *
+     * @param string $access_token
+     * @return array
+     */
+    public function exportMenu($access_token)
+    {
+        $apiUrl = ApiURL::GetMenuExportUrl($access_token);
+        $res = $this->sendGetRequest($apiUrl);
+
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException($res['errmsg'], $res['errcode']);
+        }
+
+        return $res;
+    }
+
 
 
     /**
