@@ -60,6 +60,7 @@ class Menu extends AbstractHelper
         $result .= '<span class="icon-bar"></span>';
         $result .= '<span class="icon-bar"></span>';
         $result .= '</button>';
+        $result .= '<a class="navbar-brand" href="/">Bentuzi</a>';
         $result .= '</div>';
 
         $result .= '<div class="collapse navbar-collapse navbar-ex1-collapse">';
@@ -155,7 +156,7 @@ class Menu extends AbstractHelper
             $link = isset($item['link']) ? $item['link'] : '#';
 
             $result .= $isActive ? '<li class="active">' : '<li>';
-            $result .= '<a href="'.$escapeHtml($link).'" title="'.$title.'">' . $escapeHtml($label) . '</a>';
+            $result .= '<a href="'.$escapeHtml($link).'" title="'.$title.'">' . $label . '</a>';
             $result .= '</li>';
         }
 

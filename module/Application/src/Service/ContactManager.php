@@ -9,36 +9,11 @@ namespace Application\Service;
 
 
 use Application\Entity\Contact;
-use Doctrine\ORM\EntityManager;
-use Zend\Log\Logger;
+use Ramsey\Uuid\Uuid;
 
-class ContactManager
+
+class ContactManager extends BaseEntityManager
 {
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var Logger
-     */
-    private $logger;
-
-
-    /**
-     * ContactManager constructor.
-     *
-     * @param EntityManager $entityManager
-     * @param Logger $logger
-     */
-    public function __construct(EntityManager $entityManager, Logger $logger)
-    {
-        $this->entityManager = $entityManager;
-        $this->logger = $logger;
-    }
-
-
     /**
      * Save new contact data
      *
@@ -46,25 +21,19 @@ class ContactManager
      * @param string $subject
      * @param string $message
      * @param string $ip
-     * @return Contact
      */
-    public function saveNewContact($email, $subject, $message, $ip)
+    public function createContact($email, $subject, $message, $ip)
     {
-        $contact = new Contact();
-        $contact->setContactEmail($email);
-        $contact->setContactSubject($subject);
-        $contact->setContactContent($message);
-        $contact->setContactFromIp($ip);
-        $contact->setContactIsRead(Contact::STATUS_UNREAD);
-        $contact->setContactStatus(Contact::STATUS_NORMAL);
-        $contact->setContactCreated(date('Y-m-d H:i:s'));
+        $entity = new Contact();
+        $entity->setId(Uuid::uuid1()->toString());
+        $entity->setEmail($email);
+        $entity->setSubject($subject);
+        $entity->setContent($message);
+        $entity->setFromIp($ip);
+        $entity->setStatus(Contact::STATUS_UNREAD);
+        $entity->setCreated(new \DateTime());
 
-        $this->entityManager->persist($contact);
-        $this->entityManager->flush();
-
-        $this->logger->debug(__METHOD__ . PHP_EOL . 'New contact message have saved to database.');
-
-        return $contact;
+        $this->saveModifiedEntity($entity);
     }
 
 }

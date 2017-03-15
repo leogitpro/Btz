@@ -26,13 +26,13 @@ return [
         ],
     ],
 
-    'send-mail' => [
+    'service' => [
         'type' => Literal::class,
         'options' => [
-            'route' => '/send-mail.html',
+            'route'    => '/service.html',
             'defaults' => [
                 'controller' => Controller\IndexController::class,
-                'action' => 'send-mail',
+                'action'     => 'service',
             ],
         ],
     ],
@@ -47,6 +47,18 @@ return [
             ],
         ],
     ],
+
+    'send-mail' => [
+        'type' => Literal::class,
+        'options' => [
+            'route' => '/send-mail.html',
+            'defaults' => [
+                'controller' => Controller\IndexController::class,
+                'action' => 'send-mail',
+            ],
+        ],
+    ],
+
 
     'app' => [
         'type'    => Segment::class,

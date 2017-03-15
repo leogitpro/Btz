@@ -130,11 +130,23 @@ class ContactUsForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '请留下您的邮件地址方便我们与您联络!',
+                        ],
+                    ],
+                ],
+                [
                     'name' => 'EmailAddress',
                     'break_chain_on_failure' => true,
                     'options' => [
                         'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
                         'useMxCheck' => false,
+                        'messages' => [
+                            \Zend\Validator\EmailAddress::INVALID_FORMAT => '请留下您的有效的邮件地址方便我们与您联络!',
+                        ],
                     ],
                 ],
             ],
@@ -152,11 +164,24 @@ class ContactUsForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '麻烦您简单的给说明一下联络主题!',
+                        ],
+                    ],
+                ],
+                [
                     'name'    => 'StringLength',
                     'break_chain_on_failure' => true,
                     'options' => [
                         'min' => 2,
-                        'max' => 128
+                        'max' => 128,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '主题太简单了吧!',
+                            \Zend\Validator\StringLength::TOO_LONG => '请勿在主题里填写太多内容, 详细的内容请在内容块留言.',
+                        ],
                     ],
                 ],
             ],
@@ -172,11 +197,24 @@ class ContactUsForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '如果您真心想和我们联络, 请留下具体的内容!',
+                        ],
+                    ],
+                ],
+                [
                     'name'    => 'StringLength',
                     'break_chain_on_failure' => true,
                     'options' => [
                         'min' => 12,
-                        'max' => 4096
+                        'max' => 4096,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '请再具体一点联络的内容. 太简单了我们可能无法理解您的需求.',
+                            \Zend\Validator\StringLength::TOO_LONG => '您的信息太长了. 您这是在写小说呢? 我们可能看到一半就睡着了.',
+                        ],
                     ],
                 ],
             ],

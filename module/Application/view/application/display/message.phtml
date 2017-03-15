@@ -1,6 +1,6 @@
 <?php
 
-$this->headTitle('Message');
+$this->headTitle('提示信息');
 
 
 if($delay > 0) {
@@ -41,7 +41,7 @@ JS;
                 <a class="btn btn-primary" id="reload_url" href="<?php echo $url_href; ?>" role="button"><?php echo $url_title; ?></a>
                 <?php if($delay > 0) { ?>
 
-                    <small><i class="fa fa-spinner fa-spin fa-fw"></i> After <strong id="delay_seconds"><?php echo (int)$delay; ?></strong>s page will be auto reload!</small>
+                    <small><i class="fa fa-spinner fa-spin fa-fw"></i> <strong id="delay_seconds"><?php echo (int)$delay; ?></strong>秒后页面会自动刷新.</small>
                 <?php } ?>
             </p>
             <?php } ?>

@@ -8,10 +8,11 @@
 namespace Application\Service;
 
 
-use Zend\Log\Logger;
 use Zend\Mail\Message;
+use Zend\Mail\Transport\Exception\RuntimeException;
 use Zend\Mail\Transport\Smtp;
 use Zend\Mail\Transport\SmtpOptions;
+
 
 class MailManager
 {
@@ -22,7 +23,7 @@ class MailManager
     private $config;
 
     /**
-     * @var Logger
+     * @var AppLogger
      */
     private $logger;
 
@@ -31,9 +32,9 @@ class MailManager
      * MailManager constructor.
      *
      * @param array $config
-     * @param Logger $logger
+     * @param AppLogger $logger
      */
-    public function __construct($config = array(), Logger $logger)
+    public function __construct($config = array(), AppLogger $logger)
     {
         $this->config = $config;
         $this->logger = $logger;
@@ -76,7 +77,7 @@ class MailManager
 
             $result = true;
 
-        } catch (\Exception $e) {
+        } catch (RuntimeException $e) {
             $this->logger->err('邮件发送失败: ' . PHP_EOL . $e->getMessage());
         }
 

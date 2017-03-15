@@ -16,16 +16,6 @@ class IndexController extends AppBaseController
 {
 
     /**
-     * Home page
-     *
-     * @return ViewModel
-     */
-    public function indexAction()
-    {
-        return new ViewModel();
-    }
-
-    /**
      * Test page
      *
      * @return ViewModel
@@ -37,9 +27,24 @@ class IndexController extends AppBaseController
 
 
     /**
-     * Contact page
-     *
-     * @return ViewModel
+     * 首页
+     */
+    public function indexAction()
+    {
+        return new ViewModel();
+    }
+
+    /**
+     * 产品&服务
+     */
+    public function serviceAction()
+    {
+        return new ViewModel();
+    }
+
+
+    /**
+     * 联络我们
      */
     public function contactAction()
     {
@@ -60,7 +65,7 @@ class IndexController extends AppBaseController
                 $message = $data['message'];
                 $ip = $this->getServerPlugin()->ipAddress();
 
-                $this->getContactManager()->saveNewContact($email, $subject, $message, $ip);
+                $this->getContactManager()->createContact($email, $subject, $message, $ip);
 
                 // Ready send mail
                 $contactMail = $this->getConfigPlugin()->get('mail.contact');
@@ -82,8 +87,11 @@ class IndexController extends AppBaseController
                 $this->getLoggerPlugin()->debug("Finished call async request");
 
                 return $this->getDisplayPlugin()->show(
-                    'Thank You!',
-                    'We will respond to the E-mail address you have provided ASAP.'
+                    '谢谢您!',
+                    '我们已经收到您的联络信息, 我们将在第一时间联络您. 请注意查收我们给你的回复邮件. 再次感谢!',
+                    $this->url()->fromRoute('home'),
+                    '返回',
+                    5
                 );
             }
         }

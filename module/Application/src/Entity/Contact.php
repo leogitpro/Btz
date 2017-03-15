@@ -15,8 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Contact
  *
  * @package Application\Entity
- * @ORM\Entity()
- * @ORM\Table(name="contact")
+ *
+ * @ORM\Entity
+ * @ORM\Table(name="app_contact")
  */
 class Contact
 {
@@ -24,202 +25,172 @@ class Contact
     const STATUS_READ = 1; // Read
     const STATUS_UNREAD = 0; // Unread
 
-    const STATUS_NORMAL = 1; // Message normal status
-    const STATUS_DELETED = 0; // Message was deleted
-
 
     /**
+     * @var string
+     *
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="contact_id")
+     * @ORM\Column(name="id", type="string", length=36, nullable=false)
      */
-    private $contact_id;
+    private $id;
 
     /**
-     * @ORM\Column(name="contact_email")
+     * @var string
+     *
+     * @ORM\Column(name="email", type="string", length=45)
      */
-    private $contact_email = '';
+    private $email = '';
 
     /**
-     * @ORM\Column(name="contact_subject")
+     * @var string
+     *
+     * @ORM\Column(name="subject", type="string", length=128)
      */
-    private $contact_subject = '';
+    private $subject = '';
 
     /**
-     * @ORM\Column(name="contact_content")
+     * @var string
+     *
+     * @ORM\Column(name="content", type="text")
      */
-    private $contact_content = '';
+    private $content = '';
 
     /**
-     * @ORM\Column(name="contact_is_read")
+     * @var int
+     *
+     * @ORM\Column(name="status", type="smallint")
      */
-    private $contact_is_read = 0;
-
-    /**
-     * @ORM\Column(name="contact_status")
-     */
-    private $contact_status = 1;
-
-    /**
-     * @ORM\Column(name="contact_from_ip")
-     */
-    private $contact_from_ip = '';
-
-    /**
-     * @ORM\Column(name="contact_created")
-     */
-    private $contact_created = '';
+    private $status = self::STATUS_UNREAD;
 
 
     /**
-     * @return integer
+     * @var string
+     *
+     * @ORM\Column(name="from_ip", type="string", length=20)
      */
-    public function getContactId()
+    private $fromIp = '';
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created", type="datetime")
+     */
+    private $created;
+
+    /**
+     * @return string
+     */
+    public function getId()
     {
-        return $this->contact_id;
+        return $this->id;
     }
 
     /**
-     * @param integer $contact_id
+     * @param string $id
      */
-    public function setContactId($contact_id)
+    public function setId($id)
     {
-        $this->contact_id = $contact_id;
+        $this->id = $id;
     }
 
     /**
      * @return string
      */
-    public function getContactEmail()
+    public function getEmail()
     {
-        return $this->contact_email;
+        return $this->email;
     }
 
     /**
-     * @param string $contact_email
+     * @param string $email
      */
-    public function setContactEmail($contact_email)
+    public function setEmail($email)
     {
-        $this->contact_email = $contact_email;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContactSubject()
-    {
-        return $this->contact_subject;
-    }
-
-    /**
-     * @param string $contact_subject
-     */
-    public function setContactSubject($contact_subject)
-    {
-        $this->contact_subject = $contact_subject;
+        $this->email = $email;
     }
 
     /**
      * @return string
      */
-    public function getContactContent()
+    public function getSubject()
     {
-        return $this->contact_content;
+        return $this->subject;
     }
 
     /**
-     * @param string $contact_content
+     * @param string $subject
      */
-    public function setContactContent($contact_content)
+    public function setSubject($subject)
     {
-        $this->contact_content = $contact_content;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getContactIsRead()
-    {
-        return $this->contact_is_read;
-    }
-
-    /**
-     * @param integer $contact_is_read
-     */
-    public function setContactIsRead($contact_is_read)
-    {
-        $this->contact_is_read = $contact_is_read;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getContactIsReadList()
-    {
-        return [
-            self::STATUS_UNREAD => 'Unread',
-            self::STATUS_READ => 'Read',
-        ];
+        $this->subject = $subject;
     }
 
     /**
      * @return string
      */
-    public function getContactIsReadAsString()
+    public function getContent()
     {
-        $list = self::getContactIsReadList();
-        if (isset($list[$this->contact_is_read])) {
-            return $list[$this->contact_is_read];
-        }
-        return 'Unknown';
+        return $this->content;
     }
 
     /**
-     * @return integer
+     * @param string $content
      */
-    public function getContactStatus()
+    public function setContent($content)
     {
-        return $this->contact_status;
+        $this->content = $content;
     }
 
     /**
-     * @param integer $contact_status
+     * @return int
      */
-    public function setContactStatus($contact_status)
+    public function getStatus()
     {
-        $this->contact_status = $contact_status;
+        return $this->status;
     }
 
     /**
-     * @return string
+     * @param int $status
      */
-    public function getContactFromIp()
+    public function setStatus($status)
     {
-        return $this->contact_from_ip;
-    }
-
-    /**
-     * @param string $contact_from_ip
-     */
-    public function setContactFromIp($contact_from_ip)
-    {
-        $this->contact_from_ip = $contact_from_ip;
+        $this->status = $status;
     }
 
     /**
      * @return string
      */
-    public function getContactCreated()
+    public function getFromIp()
     {
-        return $this->contact_created;
+        return $this->fromIp;
     }
 
     /**
-     * @param string $contact_created
+     * @param string $fromIp
      */
-    public function setContactCreated($contact_created)
+    public function setFromIp($fromIp)
     {
-        $this->contact_created = $contact_created;
+        $this->fromIp = $fromIp;
     }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+
+
+
 
 }

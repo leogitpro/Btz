@@ -36,8 +36,9 @@ class NavManager
         $this->urlHelper = $urlHelper;
         $this->items = [];
 
-        $this->addItem(['id' => 'home', 'label' => 'Home', 'link' => $urlHelper('home')]);
-        //$this->addItem(['id' => 'contact', 'label' => 'Contact Us', 'link' => $urlHelper('contact')]);
+        //$this->addItem(['id' => 'home', 'label' => '首页', 'link' => $urlHelper('home')]);
+        $this->addItem(['id' => 'service', 'label' => '产品服务', 'link' => $urlHelper('service')]);
+        $this->addItem(['id' => 'contact', 'label' => '联络我们', 'link' => $urlHelper('contact')]);
         //$this->addItem(['id' => 'about', 'label' => 'About', 'link' => $this->urlHelper('about')]);
     }
 
