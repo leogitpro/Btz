@@ -8,6 +8,7 @@
 
 namespace Application\Controller;
 
+use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
 use Zend\View\Model\ViewModel;
 
@@ -40,6 +41,37 @@ class IndexController extends AppBaseController
     public function serviceAction()
     {
         return new ViewModel();
+    }
+
+
+    public function applyAction()
+    {
+        // 验证码配置参数
+        $captchaConfig = $this->getConfigPlugin()->get('captcha');
+        $captchaConfig['imgUrl'] = $this->getRequest()->getBaseUrl() . $captchaConfig['imgUrl'];
+
+        $form = new ApplyForm($captchaConfig);
+
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                echo '<pre>';
+                print_r($data);
+                echo '</pre>';
+
+            }
+        }
+
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
 

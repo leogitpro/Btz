@@ -37,6 +37,17 @@ return [
         ],
     ],
 
+    'apply' => [
+        'type' => Literal::class,
+        'options' => [
+            'route'    => '/apply.html',
+            'defaults' => [
+                'controller' => Controller\IndexController::class,
+                'action'     => 'apply',
+            ],
+        ],
+    ],
+
     'contact' => [
         'type' => Literal::class,
         'options' => [
