@@ -40,6 +40,7 @@ class NavManager
         $this->addItem(['id' => 'service', 'label' => '产品服务', 'link' => $urlHelper('service')]);
         $this->addItem(['id' => 'contact', 'label' => '联络我们', 'link' => $urlHelper('contact')]);
         //$this->addItem(['id' => 'about', 'label' => 'About', 'link' => $this->urlHelper('about')]);
+        $this->addItem(['label' => '<i class="fa fa-user-circle-o fa-fw fa-2x" aria-hidden="true"></i>', 'float' => 'right', 'link' => $urlHelper('admin')]);
     }
 
 
@@ -60,6 +61,7 @@ class NavManager
      */
     public function getMenuItems()
     {
+        /**
         $url = $this->urlHelper;
         $this->items[] = [
             'id' => 'guest',
@@ -74,6 +76,7 @@ class NavManager
                 ],
             ]
         ];
+        //*/
 
 
         return $this->items;

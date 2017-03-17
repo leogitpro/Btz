@@ -26,7 +26,8 @@
         "psr-4": {
             "Application\\": "module/Application/src/",
             "Api\\": "module/Api/src/",
-            "Admin\\": "module/Admin/src/"
+            "Admin\\": "module/Admin/src/",
+            "Mobile\\": "module/Mobile/src/"
         }
     },
     "license": "BSD-3-Clause",

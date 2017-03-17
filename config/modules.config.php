@@ -21,4 +21,5 @@ return [
     'Application',
     'Api',
     'Admin',
+    'Mobile',
 ];
