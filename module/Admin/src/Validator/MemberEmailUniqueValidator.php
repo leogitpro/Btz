@@ -24,7 +24,7 @@ class MemberEmailUniqueValidator extends AbstractValidator
     ];
 
     protected $messageTemplates = [
-        self::EMAIL_EXISTED => 'Another administrator with such an email already exists',
+        self::EMAIL_EXISTED => '该电子邮件地址已经被使用',
     ];
 
 

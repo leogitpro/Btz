@@ -74,13 +74,8 @@ return [
     'service_manager' => [
         'factories' => [
             Service\ContactManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\MailManager::class => Service\Factory\MailManagerFactory::class,
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
-            Service\AppLogger::class => Service\Factory\AppLoggerFactory::class,
             Service\DoctrineSqlLogger::class => Service\Factory\DoctrineSqlLoggerFactory::class,
-        ],
-        'aliases' => [
-            'Logger' => Service\AppLogger::class,
         ],
     ],
 
@@ -103,61 +98,4 @@ return [
         ],
     ],
 
-    'logger' => [
-        'writers' => [
-            'default' => [
-                'name' => \Zend\Log\Writer\Stream::class,
-                'storage' => 'file', // Only for stream is save to file. needless for other writers.
-                'options' => [
-                    'stream' => rtrim(sys_get_temp_dir(), "/\\") . DIRECTORY_SEPARATOR . 'php-log-' . date('Ymd') . '.txt',
-                    'mode' => 'a',
-                    'log_separator' => PHP_EOL,
-                    'chmod' => null,
-                ],
-                'filters' => [
-                    'priority' => [
-                        'name' => \Zend\Log\Filter\Priority::class,
-                        'options' => [
-                            'priority' => \Zend\Log\Logger::ERR,
-                            'operator' => '<=',
-                        ],
-                    ],
-                    /**
-                    'regex' => [
-                        'name' => \Zend\Log\Filter\Regex::class,
-                        'options' => [
-                            'regex' => '/.+/i', // Make sure execute: preg_match($regex, '') no error.
-                        ],
-                    ],
-                    //*/
-                    // ... other filter
-                ],
-                'formatter' => [ // Every writer only own one formatter!
-                    'name' => \Zend\Log\Formatter\Simple::class,
-                    'options' => [
-                        'format' => '%priorityName%(%priority%) => %message% %extra%' . PHP_EOL . '%timestamp%' . PHP_EOL . PHP_EOL,
-                        'dateTimeFormat' => 'Y-m-d H:i:s A D',
-                    ],
-                ],
-            ],
-            // ... other writer
-        ],
-    ],
-
-    // Mail service configuration
-    'mail' => [
-        'smtp' => [
-            'name' => 'MailService',
-            'host' => '',
-            'port' => 465,
-            'connection_class' => 'login',
-            'connection_config' => [
-                'username' => '',
-                'password' => '',
-                'ssl' => 'ssl',
-            ],
-        ],
-        'contact' => 'name@example.com',
-        'template' => require __DIR__ . '/module.config.mail_tpl.php',
-    ],
 ];

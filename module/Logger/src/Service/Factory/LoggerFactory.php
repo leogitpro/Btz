@@ -1,32 +1,30 @@
 <?php
 /**
- * AppLoggerFactory.php
+ * LoggerFactory.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
  */
 
-namespace Application\Service\Factory;
+
+namespace Logger\Service\Factory;
 
 
-use Application\Service\AppLogger;
 use Interop\Container\ContainerInterface;
+use Logger\Service\LoggerService;
 use Zend\Log\Logger;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AppLoggerFactory implements FactoryInterface
-{
 
+class LoggerFactory implements FactoryInterface
+{
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
-        //if (empty($config['logger']['writers'])) {
-            //throw new \Exception('无法配置系统 Logger 记录器, 系统宕机!');
-        //}
-
         $logger = new Logger();
 
-        foreach ((array)$config['logger']['writers'] as $writerConfig) {
+        $config = $container->get('config');
+        $writers = @$config['logger']['writers'];
+        foreach ((array)$writers as $writerConfig) {
 
             $options = $writerConfig['options'];
             if (isset($writerConfig['storage']) && 'file' == $writerConfig['storage']) {
@@ -56,7 +54,6 @@ class AppLoggerFactory implements FactoryInterface
             $logger->addWriter($writer);
         }
 
-        return new AppLogger($logger);
+        return new LoggerService($logger);
     }
-
 }

@@ -10,6 +10,12 @@ namespace Application\Form;
 
 
 
+use Admin\Service\MemberManager;
+use Admin\Validator\MemberEmailUniqueValidator;
+use Admin\Validator\WeChatAppIdValidator;
+use Admin\WeChat\Remote;
+
+
 class ApplyForm extends BaseForm
 {
 
@@ -18,10 +24,23 @@ class ApplyForm extends BaseForm
      */
     private $captchaConfig;
 
+    /**
+     * @var MemberManager
+     */
+    private $memberManager;
 
-    public function __construct($captcha_config)
+    /**
+     * @var Remote
+     */
+    private $remote;
+
+
+    public function __construct(MemberManager $memberManager, Remote $remote, $captcha_config)
     {
         $this->captchaConfig = $captcha_config;
+        $this->memberManager = $memberManager;
+        $this->remote = $remote;
+
         parent::__construct();
     }
 
@@ -72,6 +91,17 @@ class ApplyForm extends BaseForm
                             \Zend\Validator\EmailAddress::INVALID_FORMAT => '请留下您的有效的邮件地址接收试用激活码!',
                         ],
                     ],
+                ],
+                [
+                    'name' => MemberEmailUniqueValidator::class,
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'memberManager' => $this->memberManager,
+                        'messages' => [
+                            MemberEmailUniqueValidator::EMAIL_EXISTED => '该邮件地址已经申请过, 不可重复申请试用.',
+                        ],
+                    ],
+
                 ],
             ],
         ]);
@@ -175,6 +205,16 @@ class ApplyForm extends BaseForm
                         ],
                     ],
                 ],
+                [
+                    'name' => WeChatAppIdValidator::class,
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'weChatRemote' => $this->remote,
+                        'messages' => [
+                            WeChatAppIdValidator::APP_ID_INVALID => '我们跟微信服务平台打听了一下无此 AppID 的公众号!',
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
@@ -193,18 +233,33 @@ class ApplyForm extends BaseForm
                 'captcha' => $this->captchaConfig,
             ],
         ]);
+
+        $this->getInputFilter()->add([
+            'name'     => 'captcha',
+            'break_on_failure' => true,
+            'validators' => [
+                [
+                    'name' => \Zend\Captcha\Image::class,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Captcha\Image::BAD_CAPTCHA => '请输入正确的验证码!',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
 
 
     protected function addElements()
     {
-        $this->addCsrfElement();
+        $this->addCaptchaElement();
 
+        $this->addCsrfElement();
         $this->addEmailElement();
         $this->addNameElement();
         $this->addWxIdElement();
-        $this->addCaptchaElement();
 
         $this->addSubmitElement();
     }

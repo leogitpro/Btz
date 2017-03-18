@@ -29,7 +29,10 @@ class BaseForm extends Form
     }
 
 
-    protected function addElements() {}
+    protected function addElements() {
+        $this->addCsrfElement();
+        $this->addSubmitElement();
+    }
 
 
     protected function addCsrfElement()

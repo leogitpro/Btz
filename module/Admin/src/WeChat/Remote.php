@@ -30,6 +30,14 @@ class Remote
 
 
     /**
+     * @return AppLogger
+     */
+    public function getLogger() {
+        return $this->logger;
+    }
+
+
+    /**
      * 提取公众号 AccessToken
      *
      * @param string $appId
@@ -253,7 +261,12 @@ class Remote
             return [];
         }
 
-        return Json::decode($response, Json::TYPE_ARRAY);
+        if('{' != substr($response, 0, 1) || '}' != substr($response, -1)) {
+            $this->logger->err('Response error:' . $response);
+            return [];
+        }
+
+        return json_decode($response, true);
     }
 
 
@@ -271,7 +284,12 @@ class Remote
             return [];
         }
 
-        return Json::decode($response, Json::TYPE_ARRAY);
+        if('{' != substr($response, 0, 1) || '}' != substr($response, -1)) {
+            $this->logger->err('Response error:' . $response);
+            return [];
+        }
+
+        return json_decode($response, true);
     }
 
 }

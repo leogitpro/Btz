@@ -8,8 +8,13 @@
 
 namespace Application\Controller;
 
+use Admin\Service\MemberManager;
+use Admin\WeChat\Remote;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
+use Mail\Exception\InvalidArgumentException;
+use Mail\Exception\RuntimeException;
+use WeChat\Service\NetworkManager;
 use Zend\View\Model\ViewModel;
 
 
@@ -50,7 +55,11 @@ class IndexController extends AppBaseController
         $captchaConfig = $this->getConfigPlugin()->get('captcha');
         $captchaConfig['imgUrl'] = $this->getRequest()->getBaseUrl() . $captchaConfig['imgUrl'];
 
-        $form = new ApplyForm($captchaConfig);
+
+        $memberManager = $this->getSm(MemberManager::class);
+        $weChatRemote = $this->getSm(Remote::class);
+
+        $form = new ApplyForm($memberManager, $weChatRemote, $captchaConfig);
 
 
         if($this->getRequest()->isPost()) {
@@ -61,9 +70,12 @@ class IndexController extends AppBaseController
 
                 $data = $form->getData();
 
+
                 echo '<pre>';
                 print_r($data);
+                print_r($_SESSION);
                 echo '</pre>';
+                //echo '<pre>';print_r($captchaConfig);echo '</pre>';
 
             }
         }
@@ -114,9 +126,7 @@ class IndexController extends AppBaseController
                 ];
 
                 $asyncUrl = $this->url()->fromRoute('send-mail');
-                $this->getLoggerPlugin()->debug("Start call async request:" . $asyncUrl);
                 $this->getAsyncRequestPlugin()->post($this->getServerPlugin()->domain() . $asyncUrl, $postData);
-                $this->getLoggerPlugin()->debug("Finished call async request");
 
                 return $this->getDisplayPlugin()->show(
                     '谢谢您!',
@@ -136,8 +146,6 @@ class IndexController extends AppBaseController
 
     /**
      * 发送邮件
-     *
-     * @return \Zend\Stdlib\ResponseInterface
      */
     public function sendMailAction()
     {
@@ -149,13 +157,17 @@ class IndexController extends AppBaseController
         $recipient = $this->params()->fromPost('mail_recipient');
 
         if (empty($subject) || empty($content) || empty($recipient)) {
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '邮件发送参数非法! 取消发送.');
+            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '邮件发送参数不全');
             return $this->getResponse();
         }
 
-        $this->getLoggerPlugin()->debug("开始发送邮件: " . $subject);
-        $this->getMailManager()->sendMail($recipient, $subject, $content);
-        $this->getLoggerPlugin()->debug("邮件发送完毕: " . $subject);
+        try {
+            $this->getMailService()->sendMail($recipient, $subject, $content);
+        } catch (InvalidArgumentException $e) {
+            $this->getLoggerPlugin()->exception($e);
+        } catch (RuntimeException $e) {
+            $this->getLoggerPlugin()->exception($e);
+        }
 
         return $this->getResponse();
     }

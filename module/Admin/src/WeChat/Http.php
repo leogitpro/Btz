@@ -26,11 +26,18 @@ class Http
      */
     public static function Get($url)
     {
-        $curl = new Curl();
+        try {
+            $curl = new Curl();
+        } catch (\ErrorException $e) {
+            throw new NetworkRequestException($e->getMessage());
+        }
+
         $curl->get($url);
+
         if ($curl->error) {
             throw new NetworkRequestException($curl->error_message, $curl->error_code);
         } else {
+            //todo
             return $curl->response;
         }
     }

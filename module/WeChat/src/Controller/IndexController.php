@@ -7,16 +7,16 @@
  */
 
 
-namespace Api\Controller;
+namespace WeChat\Controller;
 
 
-class IndexController extends ApiBaseController
+class IndexController extends BaseController
 {
+
 
     public function indexAction()
     {
-
-        echo date('c');
+        return false;
     }
 
 }

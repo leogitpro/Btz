@@ -10,7 +10,7 @@ namespace Application\Controller;
 
 
 use Application\Service\ContactManager;
-use Application\Service\MailManager;
+use Mail\Service\MailService;
 use Zend\Mvc\Controller\AbstractActionController;
 
 
@@ -50,11 +50,11 @@ class AppBaseController extends AbstractActionController
 
 
     /**
-     * @return MailManager
+     * @return MailService
      */
-    protected function getMailManager()
+    protected function getMailService()
     {
-        return $this->getSm(MailManager::class);
+        return $this->getSm(MailService::class);
     }
 
 

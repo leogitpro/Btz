@@ -24,10 +24,13 @@
     },
     "autoload": {
         "psr-4": {
+            "Logger\\": "module/Logger/src",
+            "Mail\\": "module/Mail/src",
             "Application\\": "module/Application/src/",
             "Api\\": "module/Api/src/",
             "Admin\\": "module/Admin/src/",
-            "Mobile\\": "module/Mobile/src/"
+            "Mobile\\": "module/Mobile/src/",
+            "WeChat\\": "module/WeChat/src/"
         }
     },
     "license": "BSD-3-Clause",

@@ -18,8 +18,11 @@ return [
     'DoctrineModule',
     'DoctrineORMModule',
     'Zend\Session',
+    'Logger',
+    'Mail',
     'Application',
     'Api',
     'Admin',
     'Mobile',
+    'WeChat',
 ];

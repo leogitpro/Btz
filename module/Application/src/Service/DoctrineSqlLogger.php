@@ -10,17 +10,18 @@ namespace Application\Service;
 
 
 use Doctrine\DBAL\Logging\SQLLogger;
+use Logger\Service\LoggerService;
 
 
 class DoctrineSqlLogger implements SQLLogger
 {
 
     /**
-     * @var AppLogger
+     * @var LoggerService
      */
     private $logger;
 
-    public function __construct(AppLogger $logger)
+    public function __construct(LoggerService $logger)
     {
         $this->logger = $logger;
     }
