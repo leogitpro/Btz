@@ -13,4 +13,5 @@ namespace WeChat\Service;
 class WeChatManager
 {
 
+
 }

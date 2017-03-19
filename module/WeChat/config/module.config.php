@@ -55,7 +55,7 @@ return [
 
     'service_manager' => [
         'factories' => [
-            Service\NetworkManager::class => Service\Factory\BaseFactory::class,
+            Service\NetworkManager::class => InvokableFactory::class,
         ],
     ],
 ];
