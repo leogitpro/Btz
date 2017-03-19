@@ -16,6 +16,39 @@ $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $form->prepare();
 
+$alert = '';
+if(!empty($error)) {
+    $alert = 'alert("' . $error . '");';
+}
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $("form").submit(function () {
+        var appid = $("#appid").val();
+        if(appid.length < 3) {
+            $(":submit", this).attr("disabled", false);
+            return false;
+        }
+        var appsecret = $("#appsecret").val();
+        if(appsecret.length < 3) {
+            $(":submit", this).attr("disabled", false);
+            return false;
+        }
+        if(confirm("请确认您的公众号 AppID 为:\\n" + appid + "\\n接下来系统建和微信平台确认此 ID, 一旦确认 AppID 合法, 您将不能再修改您的 AppID. \\n是否需要继续?")) {
+            alert("接下来将和微信平台进行信息验证, 可能需要一点时间, 请勿离开此页, 我们会通知您验证结果.");
+            return true;
+        } else {
+            return false;
+        }
+    });
+    $alert
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+
 ?>
 
 

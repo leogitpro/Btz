@@ -9,27 +9,26 @@
 namespace Admin\Form;
 
 
-use Admin\Entity\WeChat;
-use Admin\Service\WeChatManager;
-use Admin\Validator\WechatAppIdUniqueValidator;
-
+use Admin\Validator\WeChatAppIdUniqueValidator;
+use WeChat\Entity\Account;
+use WeChat\Service\AccountService;
 
 
 class WeChatForm extends BaseForm
 {
 
     /**
-     * @var WeChatManager
+     * @var AccountService
      */
     private $wm;
 
     /**
-     * @var WeChat
+     * @var Account
      */
     private $weChat;
 
 
-    public function __construct(WeChatManager $wm, $weChat = null)
+    public function __construct(AccountService $wm, $weChat = null)
     {
         $this->wm = $wm;
         $this->weChat = $weChat;
@@ -37,10 +36,14 @@ class WeChatForm extends BaseForm
         parent::__construct();
     }
 
-
+    /**
+     * 表单: AppID
+     *
+     * @param string $value
+     */
     private function addAppIdElement($value = '')
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'appid',
             'attributes' => [
@@ -48,8 +51,14 @@ class WeChatForm extends BaseForm
                 'value' => $value,
             ],
         ]);
+    }
 
-        $this->getInputFilter()->add([
+    /**
+     * 验证规则: AppID
+     */
+    private function addAppIdFilter()
+    {
+        $this->addFilter([
             'name' => 'appid',
             'required' => true,
             'break_on_failure' => true,
@@ -68,14 +77,12 @@ class WeChatForm extends BaseForm
                     ],
                 ],
                 [
-                    'name' => 'StringLength',
+                    'name'    => 'Regex',
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'min' => 18,
-                        'max' => 45,
+                        'pattern' => "/^wx[0-9a-z]+$/",
                         'messages' => [
-                            \Zend\Validator\StringLength::TOO_SHORT => '微信的 AppID 不止这么短吧. 你确定是从公众后台号复制过来的?',
-                            \Zend\Validator\StringLength::TOO_LONG => '微信的 AppID 有这么长? 你确定是从公众后台号复制过来的?',
+                            \Zend\Validator\Regex::NOT_MATCH=> '请填写正确的 AppID, 请注意大小写!',
                         ],
                     ],
                 ],
@@ -83,7 +90,7 @@ class WeChatForm extends BaseForm
                     'name' => WeChatAppIdUniqueValidator::class,
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'weChatManager' => $this->wm,
+                        'weChatAccountService' => $this->wm,
                         'weChat' => $this->weChat,
                     ],
                 ],
@@ -92,9 +99,14 @@ class WeChatForm extends BaseForm
     }
 
 
+    /**
+     * 表单: AppSecret
+     *
+     * @param string $value
+     */
     private function addAppSecretElement($value = '')
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'appsecret',
             'attributes' => [
@@ -102,8 +114,14 @@ class WeChatForm extends BaseForm
                 'value' => $value,
             ],
         ]);
+    }
 
-        $this->getInputFilter()->add([
+    /**
+     * 验证规则: AppSecret
+     */
+    private function addAppSecretFilter()
+    {
+        $this->addFilter([
             'name' => 'appsecret',
             'required' => true,
             'break_on_failure' => true,
@@ -118,6 +136,16 @@ class WeChatForm extends BaseForm
                     'options' => [
                         'messages' => [
                             \Zend\Validator\NotEmpty::IS_EMPTY => '微信的 AppSecret 不填写后面没法继续愉快的玩耍了哦!',
+                        ],
+                    ],
+                ],
+                [
+                    'name'    => 'Regex',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'pattern' => "/^[0-9a-z]+$/",
+                        'messages' => [
+                            \Zend\Validator\Regex::NOT_MATCH=> '请填写正确的 AppSecret, 请注意大小写!',
                         ],
                     ],
                 ],
@@ -138,20 +166,24 @@ class WeChatForm extends BaseForm
     }
 
 
+
     public function addElements()
     {
-        $this->addCsrfElement();
-
-        if(!$this->weChat instanceof WeChat || $this->weChat->getWxChecked() != WeChat::STATUS_CHECKED) {
-            $appId = ($this->weChat instanceof Wechat) ? $this->weChat->getWxAppId() : '';
+        if(!$this->weChat instanceof Account || $this->weChat->getWxChecked() != Account::STATUS_CHECKED) {
+            $appId = ($this->weChat instanceof Account) ? $this->weChat->getWxAppId() : '';
             $this->addAppIdElement($appId);
         }
 
-        $appSecret = ($this->weChat instanceof Wechat) ? $this->weChat->getWxAppSecret() : '';
+        $appSecret = ($this->weChat instanceof Account) ? $this->weChat->getWxAppSecret() : '';
         $this->addAppSecretElement($appSecret);
-
-        $this->addSubmitElement();
-
     }
+
+
+    public function addFilters()
+    {
+        $this->addAppIdFilter();
+        $this->addAppSecretFilter();
+    }
+
 
 }

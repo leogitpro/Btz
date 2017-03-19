@@ -9,8 +9,8 @@
 namespace Admin\Validator;
 
 
-use Admin\Entity\WeChat;
-use Admin\Service\WeChatManager;
+use WeChat\Entity\Account;
+use WeChat\Service\AccountService;
 use Zend\Validator\AbstractValidator;
 
 
@@ -20,20 +20,20 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
     const APPID_EXISTED = 'appIdExisted';
 
     protected $options = [
-        'weChatManager' => null,
+        'weChatAccountService' => null,
         'weChat' => null,
     ];
 
     protected $messageTemplates = [
-        self::APPID_EXISTED => '此微信 AppID 已经被使用了. 请确认输入正确.',
+        self::APPID_EXISTED => '此微信 AppID 已经被使用了.',
     ];
 
 
     public function __construct($options = null)
     {
         if (is_array($options)) {
-            if (isset($options['weChatManager'])) {
-                $this->options['weChatManager'] = $options['weChatManager'];
+            if (isset($options['weChatAccountService'])) {
+                $this->options['weChatAccountService'] = $options['weChatAccountService'];
             }
             if (isset($options['weChat'])) {
                 $this->options['weChat'] = $options['weChat'];
@@ -52,17 +52,17 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
     public function isValid($value)
     {
 
-        $wm = $this->options['weChatManager'];
+        $wm = $this->options['weChatAccountService'];
         $weChat = $this->options['weChat'];
 
-        if (!$wm instanceof WeChatManager) {
+        if (!$wm instanceof AccountService) {
             $this->error(self::APPID_EXISTED);
             return false;
         }
 
         $count = $wm->getWeChatCountByAppId($value);
 
-        if (!$weChat instanceof WeChat) { // Created validate
+        if (!$weChat instanceof Account) { // Created validate
             if ($count > 0) {
                 $this->error(self::APPID_EXISTED);
                 return false;

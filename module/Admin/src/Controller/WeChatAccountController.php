@@ -11,6 +11,9 @@ namespace Admin\Controller;
 
 use Admin\Entity\WeChat;
 use Admin\Form\WeChatForm;
+use WeChat\Exception\InvalidArgumentException;
+use WeChat\Exception\RuntimeException;
+use WeChat\Service\NetworkService;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -25,9 +28,12 @@ class WeChatAccountController extends AdminBaseController
     {
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wm = $this->getWeChatManager();
-
-        $weChat = $wm->getWeChatByMember($myself);
+        try {
+            $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+        } catch (InvalidArgumentException $e) {
+            $this->getLoggerPlugin()->exception($e);
+            $weChat = null;
+        }
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -41,8 +47,10 @@ class WeChatAccountController extends AdminBaseController
      */
     public function addAction()
     {
-        $wm = $this->getWeChatManager();
+        $wm = $this->getWeChatAccountService();
         $form = new WeChatForm($wm);
+
+        $error = null;
 
         if($this->getRequest()->isPost()) {
 
@@ -50,21 +58,38 @@ class WeChatAccountController extends AdminBaseController
             if ($form->isValid()) {
 
                 $data = $form->getData();
-                $appid = $data['appid'];
-                $appsecret = $data['appsecret'];
+                $appId = $data['appid'];
+                $appSecret = $data['appsecret'];
 
-                $wm->createMemberWeChat($this->getMemberManager()->getCurrentMember(), $appid, $appsecret);
+                try {
 
-                return $this->go(
-                    '公众号已经创建',
-                    '您的微信公众号: ' . $appid . ' 已经创建成功!',
-                    $this->url()->fromRoute('admin/weChat')
-                );
+                    $res = NetworkService::getAccessToken($appId, $appSecret);
+
+                    $accessToken = $res['access_token'];
+                    $expiredIn = $res['expires_in'] + time() - 300;
+
+                    $wm->createMemberWeChat($this->getMemberManager()->getCurrentMember(), $appId, $appSecret, $accessToken, $expiredIn);
+
+                    return $this->go(
+                        '公众号已经创建',
+                        '您的微信公众号: ' . $appId . ' 已经创建成功!',
+                        $this->url()->fromRoute('admin/weChatAccount')
+                    );
+
+                } catch (InvalidArgumentException $e) {
+                    $this->getLoggerPlugin()->exception($e);
+                    $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
+                } catch (RuntimeException $e) {
+                    $this->getLoggerPlugin()->exception($e);
+                    $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
+                }
+
             }
         }
 
         return new ViewModel([
             'form' => $form,
+            'error' => $error,
             'activeId' => __CLASS__,
         ]);
     }

@@ -1,0 +1,108 @@
+<?php
+
+namespace Migrations;
+
+use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\Schema\Schema;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+class Version20170319043717 extends AbstractMigration
+{
+    /**
+     * @param Schema $schema
+     */
+    public function up(Schema $schema)
+    {
+        $account = $schema->createTable('wechat_account');
+        $account->addColumn('wx_id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+        $account->addColumn('member', 'string', ['fixed' => true, 'length' => 36]);
+        $account->addColumn('wx_appid', 'string', ['length' => 45]);
+        $account->addColumn('wx_appsecret', 'string', ['length' => 255]);
+        $account->addColumn('wx_access_token', 'string', ['length' => 512]);
+        $account->addColumn('wx_access_token_expired', 'integer', ['unsigned' => true]);
+        $account->addColumn('wx_expired', 'integer', ['unsigned' => true]);
+        $account->addColumn('wx_checked', 'smallint');
+        $account->addColumn('wx_created', 'datetime');
+        $account->setPrimaryKey(['wx_id']);
+        $account->addUniqueIndex(['wx_appid']);
+        $account->addIndex(['member']);
+        $account->addIndex(['wx_expired']);
+        $account->addIndex(['wx_created']);
+
+
+        $client = $schema->createTable('wechat_client');
+        $client->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $client->addColumn('wx', 'integer', ['unsigned' => true]);
+        $client->addColumn('name', 'string', ['length' => 45]);
+        $client->addColumn('active_time', 'integer', ['unsigned' => true]);
+        $client->addColumn('expire_time', 'integer', ['unsigned' => true]);
+        $client->addColumn('domain', 'string', ['length' => 255]);
+        $client->addColumn('ip', 'string', ['length' => 255]);
+        $client->addColumn('created', 'datetime');
+        $client->setPrimaryKey(['id']);
+        $client->addIndex(['wx']);
+        $client->addIndex(['expire_time']);
+
+
+        $qrcode = $schema->createTable('wechat_qrcode');
+        $qrcode->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $qrcode->addColumn('wx', 'integer', ['unsigned' => true]);
+        $qrcode->addColumn('name', 'string', ['length' => 45]);
+        $qrcode->addColumn('type', 'string', ['fixed' => true, 'length' => 18]);
+        $qrcode->addColumn('expired', 'integer', ['unsigned' => true]);
+        $qrcode->addColumn('scene', 'string', ['length' => 64]);
+        $qrcode->addColumn('url', 'string', ['length' => 255]);
+        $qrcode->addColumn('created', 'datetime');
+        $qrcode->setPrimaryKey(['id']);
+        $qrcode->addIndex(['wx']);
+        $qrcode->addIndex(['expired']);
+        $qrcode->addIndex(['created']);
+
+
+        $menu = $schema->createTable('wechat_menu');
+        $menu->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $menu->addColumn('wx', 'integer', ['unsigned' => true]);
+        $menu->addColumn('name', 'string', ['length' => 45]);
+        $menu->addColumn('menuid', 'string', ['length' => 45]);
+        $menu->addColumn('menu', 'text');
+        $menu->addColumn('type', 'smallint', ['unsigned' => true]);
+        $menu->addColumn('status', 'smallint', ['unsigned' => true]);
+        $menu->addColumn('updated', 'datetime');
+        $menu->setPrimaryKey(['id']);
+        $menu->addIndex(['wx']);
+        $menu->addIndex(['status', 'type', 'updated']);
+
+
+        $tag = $schema->createTable('wechat_tag');
+        $tag->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $tag->addColumn('wx', 'integer', ['unsigned' => true]);
+        $tag->addColumn('tagid', 'integer', ['unsigned' => true]);
+        $tag->addColumn('tagname', 'string', ['length' => 45]);
+        $tag->addColumn('tagcount', 'integer', ['unsigned' => true]);
+        $tag->setPrimaryKey(['id']);
+        $tag->addIndex(['wx']);
+        $tag->addIndex(['tagid']);
+    }
+
+    public function postUp(Schema $schema)
+    {
+        parent::postUp($schema);
+
+        $this->connection->exec("ALTER TABLE `wechat_account` AUTO_INCREMENT=9525");
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public function down(Schema $schema)
+    {
+        $schema->dropTable('wechat_account');
+        $schema->dropTable('wechat_client');
+        $schema->dropTable('wechat_qrcode');
+        $schema->dropTable('wechat_menu');
+        $schema->dropTable('wechat_tag');
+
+    }
+}

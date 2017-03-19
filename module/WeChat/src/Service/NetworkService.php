@@ -1,6 +1,6 @@
 <?php
 /**
- * NetworkManager.php
+ * NetworkService.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -22,7 +22,7 @@ use Zend\Http\Request;
 use Zend\Stdlib\Parameters;
 
 
-class NetworkManager
+class NetworkService
 {
 
     const WX_API_HOST = 'https://api.weixin.qq.com';
@@ -39,7 +39,7 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function QrCodeCreate($access_token, $type, $scene, $expired)
+    public static function QrCodeCreate($access_token, $type, $scene, $expired)
     {
         $path = '/cgi-bin/qrcode/create?access_token=' . (string)$access_token;
 
@@ -66,7 +66,7 @@ class NetworkManager
 
         $post->action_info = $sceneObj;
 
-        $res = $this->sendPostRequest(self::WX_API_HOST . $path, json_encode($post));
+        $res = self::sendPostRequest(self::WX_API_HOST . $path, json_encode($post));
         if (!isset($res['ticket']) || !isset($res['expire_seconds']) || !isset($res['url'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
@@ -85,11 +85,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function menuRemoveDefault($access_token)
+    public static function menuRemoveDefault($access_token)
     {
         $path = '/cgi-bin/menu/delete?access_token=' . (string)$access_token;
 
-        $res = $this->sendGetRequest(self::WX_API_HOST . $path);
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
         $errCode = @$res['errcode'];
         if (0 != $errCode) {
             throw new InvalidArgumentException(@$res['errmsg'], $errCode);
@@ -107,14 +107,14 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function menuRemoveConditional($access_token, $menuid)
+    public static function menuRemoveConditional($access_token, $menuid)
     {
         $path = '/cgi-bin/menu/delconditional?access_token=' . (string)$access_token;
 
         $post = new \stdClass();
         $post->menuid = (string)$menuid;
 
-        $res = $this->sendPostRequest(self::WX_API_HOST . $path, json_encode($post));
+        $res = self::sendPostRequest(self::WX_API_HOST . $path, json_encode($post));
         $errCode = @$res['errcode'];
         if (0 != $errCode) {
             throw new InvalidArgumentException(@$res['errmsg'], $errCode);
@@ -132,11 +132,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function menuCreateDefault($access_token, $menu)
+    public static function menuCreateDefault($access_token, $menu)
     {
         $path = '/cgi-bin/menu/create?access_token=' . (string)$access_token;
 
-        $res = $this->sendPostRequest(self::WX_API_HOST . $path, $menu);
+        $res = self::sendPostRequest(self::WX_API_HOST . $path, $menu);
         $errCode = @$res['errcode'];
         if (0 != $errCode) {
             throw new InvalidArgumentException(@$res['errmsg'], $errCode);
@@ -154,11 +154,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function menuCreateConditional($access_token, $menu)
+    public static function menuCreateConditional($access_token, $menu)
     {
         $path = '/cgi-bin/menu/addconditional?access_token=' . (string)$access_token;
 
-        $res = $this->sendPostRequest(self::WX_API_HOST . $path, $menu);
+        $res = self::sendPostRequest(self::WX_API_HOST . $path, $menu);
         if (!isset($res['menuid'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
@@ -174,11 +174,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function menuExport($access_token)
+    public static function menuExport($access_token)
     {
         $path = '/cgi-bin/menu/get?access_token=' . (string)$access_token;
 
-        $res = $this->sendGetRequest(self::WX_API_HOST . $path);
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
 
         if (isset($res['errcode'])) {
             throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
@@ -197,11 +197,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function userTags($access_token)
+    public static function userTags($access_token)
     {
         $path = '/cgi-bin/tags/get?access_token=' . (string)$access_token;
 
-        $res = $this->sendGetRequest(self::WX_API_HOST . $path);
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
         if (!isset($res['tags'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
@@ -218,11 +218,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getCallbackHosts($access_token)
+    public static function getCallbackHosts($access_token)
     {
         $path = '/cgi-bin/getcallbackip?access_token=' . (string)$access_token ;
 
-        $res = $this->sendGetRequest(self::WX_API_HOST . $path);
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
         if (!isset($res['ip_list'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
@@ -239,11 +239,11 @@ class NetworkManager
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getAccessToken($appId, $appSecret)
+    public static function getAccessToken($appId, $appSecret)
     {
         $path = '/cgi-bin/token?grant_type=client_credential&appid=' . (string)$appId . '&secret=' . (string)$appSecret;
 
-        $res = $this->sendGetRequest(self::WX_API_HOST . $path);
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
         if (!isset($res['access_token']) || !isset($res['expires_in'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
@@ -260,9 +260,9 @@ class NetworkManager
      * @return array
      * @throws RuntimeException
      */
-    private function sendPostRequest($url, $data)
+    private static function sendPostRequest($url, $data)
     {
-        $res = $this->sendRequest($url, $data, 'POST');
+        $res = self::sendRequest($url, $data, 'POST');
         if('{' != substr($res, 0, 1) || '}' != substr($res, -1)) {
             throw new RuntimeException('无效的 JSON 数据' . PHP_EOL . $res);
         }
@@ -276,9 +276,9 @@ class NetworkManager
      * @return array
      * @throws RuntimeException
      */
-    private function sendGetRequest($url)
+    private static function sendGetRequest($url)
     {
-        $res = $this->sendRequest($url);
+        $res = self::sendRequest($url);
         if('{' != substr($res, 0, 1) || '}' != substr($res, -1)) {
             throw new RuntimeException('无效的 JSON 数据' . PHP_EOL . $res);
         }
@@ -305,7 +305,7 @@ class NetworkManager
      * @return string
      * @throws RuntimeException
      */
-    private function sendRequest($url, $data = null, $method = 'GET', $headers = [], $cookies = [])
+    private static function sendRequest($url, $data = null, $method = 'GET', $headers = [], $cookies = [])
     {
         $headerContentType = new ContentType();
         $headerContentType->setMediaType('GET' == strtoupper($method) ? 'text/html' : 'application/x-www-form-urlencoded');
@@ -363,11 +363,11 @@ class NetworkManager
             'timeout' => 30,
         ]);
 
-        $this->logger->debug('Request: ' . PHP_EOL . $request->toString());
+        //$this->logger->debug('Request: ' . PHP_EOL . $request->toString());
 
         $response = $client->send();
 
-        $this->logger->debug('Response: ' . PHP_EOL . $response->toString());
+        //$this->logger->debug('Response: ' . PHP_EOL . $response->toString());
 
         if(!$response->isSuccess()) {
             throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());

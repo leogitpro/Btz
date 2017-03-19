@@ -46,6 +46,23 @@ return [
         ],
     ],
 
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_driver' => [
+                'class' => \Doctrine\ORM\Mapping\Driver\AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [
+                    __DIR__ . '/../src/Entity',
+                ],
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver',
+                ],
+            ],
+        ],
+    ],
+
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
@@ -55,7 +72,8 @@ return [
 
     'service_manager' => [
         'factories' => [
-            Service\NetworkManager::class => InvokableFactory::class,
+            Service\AccountService::class => Service\Factory\BaseEntityFactory::class,
+            Service\WeChatService::class => InvokableFactory::class,
         ],
     ],
 ];

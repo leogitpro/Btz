@@ -13,8 +13,8 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Member;
-use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
+use Logger\Service\LoggerService;
 use Ramsey\Uuid\Uuid;
 
 
@@ -33,7 +33,7 @@ class MemberManager extends BaseEntityManager
     private $currentMember = null;
 
 
-    public function __construct(AuthService $authService, EntityManager $entityManager, AppLogger $logger)
+    public function __construct(AuthService $authService, EntityManager $entityManager, LoggerService $logger)
     {
         parent::__construct($entityManager, $logger);
 

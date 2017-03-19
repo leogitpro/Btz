@@ -16,24 +16,53 @@ use Zend\InputFilter\InputFilter;
 class BaseForm extends Form
 {
 
+    private $_elements;
+    private $_filters;
+
     public function __construct()
     {
         parent::__construct('form_' . rand(1111, 9999));
 
-        $this->setInputFilter(new InputFilter());
+        $this->_elements = [];
+        $this->_filters = [];
 
+        $this->setInputFilter(new InputFilter());
         $this->setAttributes(['method' => 'post', 'role' => 'form']);
 
+        $this->addCsrfElement();
         $this->addElements();
+        $this->addSubmitElement();
+        foreach ($this->_elements as $element) {
+            $this->add($element);
+        }
+
+        $this->addFilters();
+        $inputFilter = new InputFilter();
+        foreach ($this->_filters as $filter) {
+            $inputFilter->add($filter);
+        }
+        $this->setInputFilter($inputFilter);
+    }
+
+
+    public function addElement($element)
+    {
+        $this->_elements[] = $element;
+    }
+
+    public function addFilter($filter)
+    {
+        $this->_filters[] = $filter;
     }
 
 
     public function addElements() {}
+    public function addFilters() {}
 
 
-    protected function addCsrfElement()
+    private function addCsrfElement()
     {
-        $this->add([
+        $this->addElement([
             'type'  => 'csrf',
             'name' => 'csrf',
             'options' => [
@@ -45,9 +74,9 @@ class BaseForm extends Form
     }
 
 
-    protected function addSubmitElement()
+    private function addSubmitElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'submit',
             'name' => 'submit',
             'attributes' => [

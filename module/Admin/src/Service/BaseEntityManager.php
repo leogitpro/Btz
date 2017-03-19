@@ -8,13 +8,13 @@
 namespace Admin\Service;
 
 
-use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\ORMInvalidArgumentException;
+use Logger\Service\LoggerService;
 
 
 class BaseEntityManager
@@ -26,7 +26,7 @@ class BaseEntityManager
     protected $entityManager;
 
     /**
-     * @var AppLogger
+     * @var LoggerService
      */
     protected $logger;
 
@@ -41,9 +41,9 @@ class BaseEntityManager
      * BaseEntityManager constructor.
      *
      * @param EntityManager $entityManager
-     * @param AppLogger $logger
+     * @param LoggerService $logger
      */
-    public function __construct(EntityManager $entityManager, AppLogger $logger)
+    public function __construct(EntityManager $entityManager, LoggerService $logger)
     {
         $this->entityManager = $entityManager;
         $this->logger = $logger;

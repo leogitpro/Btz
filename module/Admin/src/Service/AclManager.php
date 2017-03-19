@@ -16,8 +16,8 @@ use Admin\Entity\Action;
 use Admin\Entity\Component;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
-use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
+use Logger\Service\LoggerService;
 
 
 class AclManager extends BaseEntityManager
@@ -38,7 +38,7 @@ class AclManager extends BaseEntityManager
         MemberManager $memberManager,
         ComponentManager $componentManager,
         EntityManager $entityManager,
-        AppLogger $logger
+        LoggerService $logger
     )
     {
         parent::__construct($entityManager, $logger);
