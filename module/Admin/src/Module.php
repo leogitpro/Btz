@@ -43,6 +43,9 @@ class Module
         // if want response all module event handler, use AbstractActionController::class instead __NAMESPACE__
         //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_ROUTE, [$this, 'onRouteListener'], 100);
         $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatchListener'], 100);
+        $sharedEventManager->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
+        //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
+        //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_RENDER_ERROR, [$this, 'onDispatchErrorListener'], 100);
     }
 
 
@@ -70,6 +73,37 @@ class Module
             return $response;
         }
         //*/
+    }
+
+
+    public function onDispatchErrorListener(MvcEvent $event)
+    {
+        $sm = $event->getApplication()->getServiceManager();
+
+        $logger = $sm->get('Logger');
+
+        $error = $event->getError();
+        $exception = $event->getParam('exception');
+        //die($error);
+        $logger->err($error . '=>' . $exception->getMessage());
+
+        return true;
+
+        /**
+        $response = $event->getApplication()->getResponse();
+
+        $request = $event->getApplication()->getRequest();
+
+        if ($request instanceof \Zend\Http\Request) {
+            if ($request->isXmlHttpRequest()) {
+                $exception = $event->getError();
+                $logger->info("AJAX call error: " . $exception);
+            } else {
+                $logger->info("html call error");
+            }
+        }
+        //*/
+
     }
 
 

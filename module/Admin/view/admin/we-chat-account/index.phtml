@@ -6,20 +6,60 @@ $this->sideTreeMenu()->setActiveId($activeId);
 $this->inlineScript()->captureStart();
 echo <<<JS
     $(function () {
-       $("#validateWeChat").click(function () {
-           var url = $(this).attr("href");
-           if(url.length < 2) {
-               return false;
-           }
-           $(this).blur().attr("disabled", true).attr("href", "#");
-           $.get(url, function (dt) {
-               if(!dt.success) {
-                   alert("当前公众号配置未能通过微信验证. 请确认公众号配置是否正确. 或者还有其他的平台授权操作公众号 Token?");
+        
+        function displayTimer(seconds) {
+            var lastHours = parseInt(seconds / 3600 % 24) + "";
+            if(lastHours.length < 2) {
+                lastHours = "0" + lastHours;
+            }
+            
+            var lastMins = parseInt(seconds / 60 % 60) + "";
+            if(lastMins.length < 2) {
+                lastMins = "0" + lastMins;
+            }
+            
+            var lastSeconds = parseInt(seconds % 60) + "";
+            if(lastSeconds.length < 2) {
+                lastSeconds = "0" + lastSeconds;
+            }
+            
+            $("#tokenTimer").text(lastHours + ":" + lastMins + ":" + lastSeconds);
+        }
+        
+        var seconds = parseInt($("#tokenTimer").attr("name"));
+        displayTimer(seconds);
+        if(seconds > 0) {
+            var timer = window.setInterval(function(){
+                seconds--;
+                displayTimer(seconds);
+                if(seconds < 1) {
+                    window.clearInterval(timer);
+                }
+            }, 1000);
+        }
+        
+        
+       $("#refreshToken").click(function () {
+           if(confirm("刷新公众号 AccessToken 需要和微信平台进行数据通讯, 这个过程需要一点时间, 请勿关闭当前页面, 确定要刷新么?")) {  
+               var url = $(this).attr("href");
+               if(url.length < 2) {
+                   return false;
                }
-               window.location.reload(true);
-           }, "json");
+               $(this).blur().attr("disabled", true).attr("href", "#");
+               $.get(url, function (dt) {
+                   if(!dt.success) {
+                       alert("刷新公众号 AccessToken 失败, 请稍后重试.");
+                   } else {
+                       alert("已经成功刷新公众号 AccessToken");
+                   }
+                   window.location.reload(true);
+               }, "json");
+           }
+           $(this).blur();
            return false;
        });
+       
+       
     });
 JS;
 $this->inlineScript()->captureEnd();
@@ -36,31 +76,29 @@ $this->inlineScript()->captureEnd();
             </p>
         <?php } else { ?>
             <div class="row">
-                <div class="col-lg-7">
+                <div class="col-lg-6">
                     <p>AppID: <?php echo $weChat->getWxAppId(); ?></p>
                     <p>
                         AppSecret: <?php echo substr($weChat->getWxAppSecret(), 0, 5) . '*********' . substr($weChat->getWxAppSecret(), -5); ?>
                         <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatAccount', ['action' => 'edit', 'suffix' => '.html']); ?>">修改配置</a>
                     </p>
                 </div>
-                <div class="col-lg-2 text-center">
-                    <p>运行状态</p>
+                <div class="col-lg-3">
+                    <p>公众号状态:
                     <?php if(time() < $weChat->getWxExpired()) { ?>
-                        <p class="text-success"><i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>运行中</strong></p>
+                        <span class="text-success"><strong>运行中</strong> <i class="fa fa-check fa-fw" aria-hidden="true"></i></span>
                     <?php } else { ?>
-                        <p class="text-muted"><i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>已过期</strong></p>
+                        <span class="text-muted"><strong>已过期</strong> <i class="fa fa-close fa-fw" aria-hidden="true"></i></span>
                     <?php } ?>
+                    </p>
+                    <p>过期时间: <?php echo date('Y-m-d', $weChat->getWxExpired()); ?></p>
                 </div>
-                <div class="col-lg-3 text-center">
-                    <p>验证状态</p>
-                    <?php if(\WeChat\Entity\Account::STATUS_CHECKED == $weChat->getWxChecked()) { ?>
-                    <p class="text-success">
-                        <i class="fa fa-check fa-fw" aria-hidden="true"></i> <strong>已验证</strong>
-                        <?php } else { ?>
-                    <p class="text-muted">
-                        <i class="fa fa-close fa-fw" aria-hidden="true"></i> <strong>未验证</strong>
-                        <?php } ?>
-                        <a id="validateWeChat" class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatAccount', ['action'=>'validate']); ?>">验证</a>
+                <div class="col-lg-3">
+                    <p>当前<strong>Token</strong>剩余时间:
+                        <strong name="<?php $seconds = $weChat->getWxAccessTokenExpired() - time(); echo $seconds > 0 ? $seconds : 0; ?>" id="tokenTimer"></strong>
+                    </p>
+                    <p>强制刷新<strong>Token</strong>:
+                        <a id="refreshToken" class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatAccount', ['action'=>'refresh-token']); ?>">立即刷新</a>
                     </p>
                 </div>
             </div>

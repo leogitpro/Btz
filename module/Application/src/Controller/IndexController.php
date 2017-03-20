@@ -37,6 +37,7 @@ class IndexController extends AppBaseController
      */
     public function indexAction()
     {
+        throw new \Exception('test index');
         return new ViewModel();
     }
 

@@ -11,6 +11,7 @@ namespace Admin\Controller;
 
 use Admin\Entity\WeChat;
 use Admin\Form\WeChatForm;
+use WeChat\Entity\Account;
 use WeChat\Exception\InvalidArgumentException;
 use WeChat\Exception\RuntimeException;
 use WeChat\Service\NetworkService;
@@ -101,15 +102,16 @@ class WeChatAccountController extends AdminBaseController
     public function editAction()
     {
         $myself = $this->getMemberManager()->getCurrentMember();
-        $wm = $this->getWeChatManager();
+
+        $wm = $this->getWeChatAccountService();
 
         $weChat = $wm->getWeChatByMember($myself);
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             throw new \Exception('这个公众号已经失效了好像! 查无此人!');
         }
 
         $form = new WeChatForm($wm, $weChat);
-
+        $error = null;
         if($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
@@ -117,26 +119,42 @@ class WeChatAccountController extends AdminBaseController
 
                 $data = $form->getData();
 
-                if ($weChat->getWxChecked() != WeChat::STATUS_CHECKED) {
-                    $appid = $data['appid'];
-                    $weChat->setWxAppId($data['appid']);
-                } else {
-                    $appid = $weChat->getWxAppId();
+                $appId = $weChat->getWxAppId();
+                $appSecret = $data['appsecret'];
+
+                try {
+
+                    $res = NetworkService::getAccessToken($appId, $appSecret);
+
+                    $accessToken = $res['access_token'];
+                    $expiredIn = $res['expires_in'] + time() - 300;
+
+                    $weChat->setWxAppSecret($appSecret);
+                    $weChat->setWxChecked(Account::STATUS_CHECKED);
+                    $weChat->setWxAccessToken($accessToken);
+                    $weChat->setWxAccessTokenExpired($expiredIn);
+
+                    $wm->saveModifiedEntity($weChat);
+
+                    return $this->go(
+                        '公众号已经修改',
+                        '您的微信公众号 ' . $appId . ' 信息已经创建成功!',
+                        $this->url()->fromRoute('admin/weChatAccount')
+                    );
+
+                } catch (InvalidArgumentException $e) {
+                    $this->getLoggerPlugin()->exception($e);
+                    $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
+                } catch (RuntimeException $e) {
+                    $this->getLoggerPlugin()->exception($e);
+                    $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
                 }
-
-                $weChat->setWxAppSecret($data['appsecret']);
-                $wm->saveModifiedEntity($weChat);
-
-                return $this->go(
-                    '公众号已经修改',
-                    '您的微信公众号 ' . $appid . ' 信息已经创建成功!',
-                    $this->url()->fromRoute('admin/weChat')
-                );
             }
         }
 
         return new ViewModel([
             'form' => $form,
+            'error' => $error,
             'weChat' => $weChat,
             'activeId' => __CLASS__,
         ]);
@@ -144,35 +162,39 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
-     * 验证当前用户的公众号
+     * 刷新 AccessToken
+     *
+     * @return JsonModel
+     * @throws \Exception
      */
-    public function validateAction()
+    public function refreshTokenAction()
     {
-        $result = ['success' => false, 'message' => 'Invalid weChat', 'hosts' => []];
-
+        $result = ['success' => false, 'message' => 'Invalid weChat'];
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wm = $this->getWeChatManager();
+        $wm = $this->getWeChatAccountService();
         $weChat = $wm->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return new JsonModel($result);
+        if ($weChat instanceof Account) {
+            //return $this->getResponse()->setStatusCode(404)->setContent('test');
+            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
         }
 
-        if (WeChat::STATUS_CHECKED == $weChat->getWxChecked()) {
-            $result['success'] = true;
-            return new JsonModel($result);
-        }
+        $appId = $weChat->getWxAppId();
+        $appSecret = $weChat->getWxAppSecret();
 
-        $ws = $this->getWeChatService($weChat->getWxId());
-        $hosts = $ws->getCallbackHosts();
+        $res = NetworkService::getAccessToken($appId, $appSecret);
 
-        if(!empty($hosts)) {
-            $weChat->setWxChecked(WeChat::STATUS_CHECKED);
-            $wm->saveModifiedEntity($weChat);
-            $result['success'] = true;
-            $result['hosts'] = $hosts;
-        }
+        $accessToken = $res['access_token'];
+        $expiredIn = $res['expires_in'] + time() - 300;
+
+        $weChat->setWxAccessToken($accessToken);
+        $weChat->setWxAccessTokenExpired($expiredIn);
+        $weChat->setWxChecked(Account::STATUS_CHECKED);
+
+        $wm->saveModifiedEntity($weChat);
+
+        $result['success'] = true;
+        $result['message'] = '已经成功刷新公众号 AccessToken';
 
         return new JsonModel($result);
     }
@@ -272,7 +294,7 @@ class WeChatAccountController extends AdminBaseController
 
         $item['actions']['add'] = self::CreateActionRegistry('add', '创建公众号');
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑公众号');
-        $item['actions']['validate'] = self::CreateActionRegistry('validate', '验证公众号');
+        $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '刷新AccessToken');
 
         $item['actions']['asynctag'] = self::CreateActionRegistry('asynctag', '同步用户标签');
 

@@ -12,8 +12,8 @@ namespace Admin\Service;
 use Admin\Entity\Member;
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
-use Application\Service\AppLogger;
 use Doctrine\ORM\EntityManager;
+use Logger\Service\LoggerService;
 use Ramsey\Uuid\Uuid;
 
 
@@ -36,7 +36,7 @@ class MessageManager extends BaseEntityManager
         MemberManager $memberManager,
         DepartmentManager $departmentManager,
         EntityManager $entityManager,
-        AppLogger $logger)
+        LoggerService $logger)
     {
         parent::__construct($entityManager, $logger);
 

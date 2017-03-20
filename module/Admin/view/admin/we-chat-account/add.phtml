@@ -28,11 +28,13 @@ $(function () {
     $("form").submit(function () {
         var appid = $("#appid").val();
         if(appid.length < 3) {
+            $("#appid").focus();
             $(":submit", this).attr("disabled", false);
             return false;
         }
         var appsecret = $("#appsecret").val();
         if(appsecret.length < 3) {
+            $("#appsecret").focus();
             $(":submit", this).attr("disabled", false);
             return false;
         }
@@ -40,6 +42,7 @@ $(function () {
             alert("接下来将和微信平台进行信息验证, 可能需要一点时间, 请勿离开此页, 我们会通知您验证结果.");
             return true;
         } else {
+            $(":submit", this).attr("disabled", false);
             return false;
         }
     });
@@ -48,14 +51,21 @@ $(function () {
 JS;
 $this->inlineScript()->captureEnd();
 
-
 ?>
 
 
 <div class="row">
     <div class="col-lg-6">
 
-        <div class="alert alert-warning" role="alert"><strong>请注意:</strong> 公众号经过验证可用后 <strong>AppID</strong> 将不再被允许修改!</div>
+        <div class="alert alert-danger">
+            <strong>如果使用本平台, 请勿将 AppSecret 授权给其他平台. 否则全部功能将受影响.</strong>
+        </div>
+
+        <div class="form-group alert alert-warning" role="alert">
+            <strong>请注意:</strong> 提交创建的公众号会与微信平台进行验证. <br>
+            公众号经过验证可用后 <strong>AppID</strong> 将不再被允许修改! <br>
+            验证过程可能需要点时间, 请勿关闭本页. 验证完毕会自动刷新页面.
+        </div>
 
         <?php echo $this->form()->openTag($form); ?>
 

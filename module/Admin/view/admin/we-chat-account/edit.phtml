@@ -2,14 +2,6 @@
 $this->pageTitleBar('更新公众号信息');
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$isIncludeAppId = \Admin\Entity\WeChat::STATUS_CHECKED != $weChat->getWxChecked();
-
-if ($isIncludeAppId) {
-    $form->get('appid')->setAttributes([
-        'class' => 'form-control',
-        'placeholder' => '这里请填写 AppID'
-    ]);
-}
 
 $form->get('appsecret')->setAttributes([
     'class' => 'form-control',
@@ -20,25 +12,56 @@ $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $form->prepare();
 
+$alert = '';
+if(!empty($error)) {
+    $alert = 'alert("' . $error . '");';
+}
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $("form").submit(function () {
+
+        var appsecret = $("#appsecret").val();
+        if(appsecret.length < 3) {
+            $("#appsecret").focus();
+            $(":submit", this).attr("disabled", false);
+            return false;
+        }
+        if(confirm("请确认您的填写的信息, 接下来系统建和微信平台确认此 Secret, 是否需要继续?")) {
+            alert("接下来将和微信平台进行信息验证, 可能需要一点时间, 请勿离开此页, 我们会通知您验证结果.");
+            return true;
+        } else {
+            $(":submit", this).attr("disabled", false);
+            return false;
+        }
+    });
+    $alert
+});
+JS;
+$this->inlineScript()->captureEnd();
+
 ?>
 
 
 <div class="row">
     <div class="col-lg-6">
 
+        <div class="alert alert-danger">
+            <strong>如果使用本平台, 请勿将 AppSecret 授权给其他平台. 否则全部功能将受影响.</strong>
+        </div>
+
+        <div class="form-group alert alert-warning" role="alert">
+            <strong>请注意:</strong> 提交修改的<strong>AppSecret</strong>会与微信平台进行验证. <br>
+            验证过程可能需要点时间, 请勿关闭本页. 验证完毕会自动刷新页面.
+        </div>
+
         <?php echo $this->form()->openTag($form); ?>
 
         <div class="form-group">
             <?php echo $this->formElement($form->get('csrf')); ?>
         </div>
-
-        <?php if($isIncludeAppId) { ?>
-            <div class="form-group">
-                <?php echo $this->formLabel($form->get('appid'), '微信公众号 AppID'); ?>
-                <?php echo $this->formElement($form->get('appid')); ?>
-                <?php echo $this->formElementErrors($form->get('appid')); ?>
-            </div>
-        <?php } ?>
 
         <div class="form-group">
             <?php echo $this->formLabel($form->get('appsecret'), '微信公众号 AppSecret'); ?>

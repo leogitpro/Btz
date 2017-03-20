@@ -181,7 +181,10 @@ class WeChatForm extends BaseForm
 
     public function addFilters()
     {
-        $this->addAppIdFilter();
+        if(!$this->weChat instanceof Account || $this->weChat->getWxChecked() != Account::STATUS_CHECKED) {
+            $this->addAppIdFilter();
+        }
+
         $this->addAppSecretFilter();
     }
 
