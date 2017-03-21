@@ -172,8 +172,7 @@ class WeChatAccountController extends AdminBaseController
         $result = ['success' => false, 'message' => 'Invalid weChat'];
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wm = $this->getWeChatAccountService();
-        $weChat = $wm->getWeChatByMember($myself);
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
         if (!$weChat instanceof Account) {
             throw new \Exception('这个公众号已经失效了好像! 查无此人!');
         }
@@ -190,7 +189,7 @@ class WeChatAccountController extends AdminBaseController
         $weChat->setWxAccessTokenExpired($expiredIn);
         $weChat->setWxChecked(Account::STATUS_CHECKED);
 
-        $wm->saveModifiedEntity($weChat);
+        $this->getWeChatAccountService()->saveModifiedEntity($weChat);
 
         $result['success'] = true;
         $result['message'] = '已经成功刷新公众号 AccessToken';
@@ -245,26 +244,32 @@ class WeChatAccountController extends AdminBaseController
 
     }
 
+
     /**
      * 同步用户标签
      */
-    public function asyncTagAction()
+    public function asyncTagsAction()
     {
         $result = ['success' => false, 'code' => 0, 'message' => '公众号无效'];
 
         $myself = $this->getMemberManager()->getCurrentMember();
 
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-
         if (!$weChat instanceof Account) {
-            return new JsonModel($result);
+            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
         }
 
-        $ws = $this->getWeChatService($weChat->getWxId());
-        $tags = $ws->getTags();
+        $insert = 0;
 
-        if(!empty($tags)) {
-            $insert = $this->getWeChatTagManager()->resetTags($tags, $weChat);
+        try {
+            $tags = $this->getWeChatService()->getTags($weChat);
+            if(count($tags)) {
+                $insert = $this->getWeChatTagService()->resetTags($tags, $weChat);
+            }
+        } catch (InvalidArgumentException $e) {
+            throw new \Exception($e->getMessage());
+        } catch (RuntimeException $e) {
+            throw new \Exception($e->getMessage());
         }
 
         $result['success'] = true;
@@ -292,7 +297,7 @@ class WeChatAccountController extends AdminBaseController
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑公众号');
         $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '刷新AccessToken');
 
-        $item['actions']['asynctag'] = self::CreateActionRegistry('asynctag', '同步用户标签');
+        $item['actions']['async-tags'] = self::CreateActionRegistry('async-tags', '同步用户标签');
 
         return $item;
     }

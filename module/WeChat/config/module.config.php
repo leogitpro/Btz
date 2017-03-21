@@ -74,7 +74,7 @@ return [
         'factories' => [
             Service\AccountService::class => Service\Factory\BaseEntityFactory::class,
             Service\TagService::class => Service\Factory\BaseEntityFactory::class,
-            Service\WeChatService::class => InvokableFactory::class,
+            Service\WeChatService::class => Service\Factory\WeChatFactory::class,
         ],
     ],
 ];
