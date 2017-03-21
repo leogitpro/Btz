@@ -24,7 +24,7 @@ return [
     //**
     // Session configuration.
     'session_config' => [
-        'cookie_lifetime' => 3600, // Session cookie will expire in 1 hour.
+        'cookie_lifetime' => 3600 * 24, // Session cookie will expire in 1 hour.
         'gc_maxlifetime' => 60 * 60 * 24 * 30, // Session data stored on server time: 30days.
 
         /** Default php config

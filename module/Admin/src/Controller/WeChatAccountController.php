@@ -174,8 +174,7 @@ class WeChatAccountController extends AdminBaseController
 
         $wm = $this->getWeChatAccountService();
         $weChat = $wm->getWeChatByMember($myself);
-        if ($weChat instanceof Account) {
-            //return $this->getResponse()->setStatusCode(404)->setContent('test');
+        if (!$weChat instanceof Account) {
             throw new \Exception('这个公众号已经失效了好像! 查无此人!');
         }
 
@@ -208,9 +207,9 @@ class WeChatAccountController extends AdminBaseController
 
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             return $this->go(
                 '没有配置公众号',
                 '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
@@ -223,9 +222,7 @@ class WeChatAccountController extends AdminBaseController
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $tm = $this->getWeChatTagManager();
-
-        $count = $tm->getTagsCountByWeChat($weChat);
+        $count = $this->getWeChatTagService()->getTagsCountByWeChat($weChat);
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -238,7 +235,7 @@ class WeChatAccountController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChatAccount', ['action' => 'tags', 'key' => '%d']));
 
         // List data
-        $rows = $tm->getTagsWithLimitPageByWeChat($weChat, $page, $size);
+        $rows = $this->getWeChatTagService()->getTagsWithLimitPageByWeChat($weChat, $page, $size);
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -251,16 +248,15 @@ class WeChatAccountController extends AdminBaseController
     /**
      * 同步用户标签
      */
-    public function asynctagAction()
+    public function asyncTagAction()
     {
         $result = ['success' => false, 'code' => 0, 'message' => '公众号无效'];
 
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wm = $this->getWeChatManager();
-        $weChat = $wm->getWeChatByMember($myself);
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             return new JsonModel($result);
         }
 

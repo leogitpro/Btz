@@ -23,11 +23,10 @@ class IndexController extends AppBaseController
 
     /**
      * Test page
-     *
-     * @return ViewModel
      */
     public function testAction()
     {
+        throw new \Exception('test exception');
         return new ViewModel();
     }
 
@@ -37,7 +36,7 @@ class IndexController extends AppBaseController
      */
     public function indexAction()
     {
-        throw new \Exception('test index');
+        //echo '<pre>';$v = $this->getConfigPlugin()->get('view_manager');print_r($v);echo '</pre>';
         return new ViewModel();
     }
 

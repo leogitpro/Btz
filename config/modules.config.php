@@ -12,12 +12,12 @@
  */
 return [
     'Zend\Router',
+    'Zend\Session',
     'Zend\Validator',
     'Zend\I18n',
     'Zend\Form',
     'DoctrineModule',
     'DoctrineORMModule',
-    'Zend\Session',
     'Logger',
     'Mail',
     'Application',

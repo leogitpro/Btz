@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "631903ed45ed9c0ccaa42aa6c4976bd8",
-    "content-hash": "d189db31b070cfb549c489131862c064",
+    "hash": "20c2d2791581d96c4068e37196184407",
+    "content-hash": "f3bd4f378724aa0041dfa0349724eca0",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -17,7 +17,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/Bacon/BaconQrCode/031a2ce68c5794064b49d11775b2daf45c96e21c.zip",
+                "url": "https://files.phpcomposer.com/files/Bacon/BaconQrCode/031a2ce68c5794064b49d11775b2daf45c96e21c.zip",
                 "reference": "031a2ce68c5794064b49d11775b2daf45c96e21c",
                 "shasum": ""
             },
@@ -50,49 +50,6 @@
             "time": "2016-01-09 22:55:35"
         },
         {
-            "name": "ccampbell/chromephp",
-            "version": "4.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ccampbell/chromephp.git",
-                "reference": "c3c297615d48ae5b2a86a82311152d1ed095fcef"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/ccampbell/chromephp/c3c297615d48ae5b2a86a82311152d1ed095fcef.zip",
-                "reference": "c3c297615d48ae5b2a86a82311152d1ed095fcef",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "ChromePhp": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Craig Campbell",
-                    "email": "iamcraigcampbell@gmail.com",
-                    "homepage": "http://craig.is",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Log variables to the Chrome console (via Chrome Logger Google Chrome extension).",
-            "homepage": "http://github.com/ccampbell/chromephp",
-            "keywords": [
-                "log",
-                "logging"
-            ],
-            "time": "2013-06-26 03:44:33"
-        },
-        {
             "name": "container-interop/container-interop",
             "version": "1.2.0",
             "source": {
@@ -102,7 +59,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/container-interop/container-interop/79cbf1341c22ec75643d841642dd5d6acd83bdb8.zip",
+                "url": "https://files.phpcomposer.com/files/container-interop/container-interop/79cbf1341c22ec75643d841642dd5d6acd83bdb8.zip",
                 "reference": "79cbf1341c22ec75643d841642dd5d6acd83bdb8",
                 "shasum": ""
             },
@@ -133,7 +90,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/php-mod/curl/213d0cc23a4a305f5d7a153d98f2db644a6ca909.zip",
+                "url": "https://files.phpcomposer.com/files/php-mod/curl/213d0cc23a4a305f5d7a153d98f2db644a6ca909.zip",
                 "reference": "213d0cc23a4a305f5d7a153d98f2db644a6ca909",
                 "shasum": ""
             },
@@ -256,7 +213,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/cache/b6f544a20f4807e81f7044d31e679ccbb1866dc3.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/cache/b6f544a20f4807e81f7044d31e679ccbb1866dc3.zip",
                 "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
                 "shasum": ""
             },
@@ -326,7 +283,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/collections/1a4fb7e902202c33cce8c55989b945612943c2ba.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/collections/1a4fb7e902202c33cce8c55989b945612943c2ba.zip",
                 "reference": "1a4fb7e902202c33cce8c55989b945612943c2ba",
                 "shasum": ""
             },
@@ -393,7 +350,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/common/930297026c8009a567ac051fd545bf6124150347.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/common/930297026c8009a567ac051fd545bf6124150347.zip",
                 "reference": "930297026c8009a567ac051fd545bf6124150347",
                 "shasum": ""
             },
@@ -466,7 +423,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/dbal/7b9e911f9d8b30d43b96853dab26898c710d8f44.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/dbal/7b9e911f9d8b30d43b96853dab26898c710d8f44.zip",
                 "reference": "7b9e911f9d8b30d43b96853dab26898c710d8f44",
                 "shasum": ""
             },
@@ -537,7 +494,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/DoctrineModule/9407d04d0b08e7071dab05c9d068cefda9dc5a6f.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/DoctrineModule/9407d04d0b08e7071dab05c9d068cefda9dc5a6f.zip",
                 "reference": "9407d04d0b08e7071dab05c9d068cefda9dc5a6f",
                 "shasum": ""
             },
@@ -629,7 +586,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/DoctrineORMModule/928a65786c2cc6e0e4004b3760823f5fa9c8f320.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/DoctrineORMModule/928a65786c2cc6e0e4004b3760823f5fa9c8f320.zip",
                 "reference": "928a65786c2cc6e0e4004b3760823f5fa9c8f320",
                 "shasum": ""
             },
@@ -717,7 +674,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/inflector/90b2128806bfde671b6952ab8bea493942c1fdae.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/inflector/90b2128806bfde671b6952ab8bea493942c1fdae.zip",
                 "reference": "90b2128806bfde671b6952ab8bea493942c1fdae",
                 "shasum": ""
             },
@@ -784,7 +741,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/instantiator/8e884e78f9f0eb1329e445619e04456e64d8051d.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/instantiator/8e884e78f9f0eb1329e445619e04456e64d8051d.zip",
                 "reference": "8e884e78f9f0eb1329e445619e04456e64d8051d",
                 "shasum": ""
             },
@@ -838,7 +795,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/lexer/83893c552fd2045dd78aef794c31e694c37c0b8c.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/lexer/83893c552fd2045dd78aef794c31e694c37c0b8c.zip",
                 "reference": "83893c552fd2045dd78aef794c31e694c37c0b8c",
                 "shasum": ""
             },
@@ -892,7 +849,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/migrations/c81147c0f2938a6566594455367e095150547f72.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/migrations/c81147c0f2938a6566594455367e095150547f72.zip",
                 "reference": "c81147c0f2938a6566594455367e095150547f72",
                 "shasum": ""
             },
@@ -966,7 +923,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/doctrine/doctrine2/e6c434196c8ef058239aaa0724b4aadb0107940b.zip",
+                "url": "https://files.phpcomposer.com/files/doctrine/doctrine2/e6c434196c8ef058239aaa0724b4aadb0107940b.zip",
                 "reference": "e6c434196c8ef058239aaa0724b4aadb0107940b",
                 "shasum": ""
             },
@@ -1031,42 +988,6 @@
                 "orm"
             ],
             "time": "2016-12-18 15:42:34"
-        },
-        {
-            "name": "firephp/firephp-core",
-            "version": "v0.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/firephp/firephp-core.git",
-                "reference": "fabad0f2503f9577fe8dd2cb1d1c7cd73ed2aacf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/firephp/firephp-core/fabad0f2503f9577fe8dd2cb1d1c7cd73ed2aacf.zip",
-                "reference": "fabad0f2503f9577fe8dd2cb1d1c7cd73ed2aacf",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "lib/FirePHPCore/FirePHP.class.php",
-                    "lib/FirePHPCore/fb.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christoph Dorn",
-                    "email": "christoph@christophdorn.com",
-                    "homepage": "http://christophdorn.com"
-                }
-            ],
-            "description": "Traditional FirePHPCore library for sending PHP variables to the browser.",
-            "homepage": "https://github.com/firephp/firephp-core",
-            "time": "2013-04-23 15:28:20"
         },
         {
             "name": "illuminate/contracts",
@@ -1177,7 +1098,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/Ocramius/PackageVersions/51e867c70f0799790b3e82276875414ce13daaca.zip",
+                "url": "https://files.phpcomposer.com/files/Ocramius/PackageVersions/51e867c70f0799790b3e82276875414ce13daaca.zip",
                 "reference": "51e867c70f0799790b3e82276875414ce13daaca",
                 "shasum": ""
             },
@@ -1225,7 +1146,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/Ocramius/ProxyManager/a55d08229f4f614bf335759ed0cf63378feeb2e6.zip",
+                "url": "https://files.phpcomposer.com/files/Ocramius/ProxyManager/a55d08229f4f614bf335759ed0cf63378feeb2e6.zip",
                 "reference": "a55d08229f4f614bf335759ed0cf63378feeb2e6",
                 "shasum": ""
             },
@@ -1338,7 +1259,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/php-fig/container/b7ce3b176482dbbc1245ebf52b181af44c2cf55f.zip",
+                "url": "https://files.phpcomposer.com/files/php-fig/container/b7ce3b176482dbbc1245ebf52b181af44c2cf55f.zip",
                 "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
                 "shasum": ""
             },
@@ -1387,7 +1308,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/php-fig/log/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d.zip",
+                "url": "https://files.phpcomposer.com/files/php-fig/log/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d.zip",
                 "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
                 "shasum": ""
             },
@@ -1516,7 +1437,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/SimpleSoftwareIO/simple-qrcode/0d8fbf73f7adc166ec5aabbf898b7327f6c69600.zip",
+                "url": "https://files.phpcomposer.com/files/SimpleSoftwareIO/simple-qrcode/0d8fbf73f7adc166ec5aabbf898b7327f6c69600.zip",
                 "reference": "0d8fbf73f7adc166ec5aabbf898b7327f6c69600",
                 "shasum": ""
             },
@@ -1687,7 +1608,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/symfony/polyfill-mbstring/e79d363049d1c2128f133a2667e4f4190904f7f4.zip",
+                "url": "https://files.phpcomposer.com/files/symfony/polyfill-mbstring/e79d363049d1c2128f133a2667e4f4190904f7f4.zip",
                 "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
                 "shasum": ""
             },
@@ -1801,7 +1722,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-authentication/1422dec160eb769c719cad2229847fcbf20a1405.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-authentication/1422dec160eb769c719cad2229847fcbf20a1405.zip",
                 "reference": "1422dec160eb769c719cad2229847fcbf20a1405",
                 "shasum": ""
             },
@@ -1863,7 +1784,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-cache/c98331b96d3b9d9b24cf32d02660602edb34d039.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-cache/c98331b96d3b9d9b24cf32d02660602edb34d039.zip",
                 "reference": "c98331b96d3b9d9b24cf32d02660602edb34d039",
                 "shasum": ""
             },
@@ -1989,7 +1910,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-code/2899c17f83a7207f2d7f53ec2f421204d3beea27.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-code/2899c17f83a7207f2d7f53ec2f421204d3beea27.zip",
                 "reference": "2899c17f83a7207f2d7f53ec2f421204d3beea27",
                 "shasum": ""
             },
@@ -2042,7 +1963,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-config/2920e877a9f6dca9fa8f6bd3b1ffc2e19bb1e30d.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-config/2920e877a9f6dca9fa8f6bd3b1ffc2e19bb1e30d.zip",
                 "reference": "2920e877a9f6dca9fa8f6bd3b1ffc2e19bb1e30d",
                 "shasum": ""
             },
@@ -2098,7 +2019,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-escaper/2dcd14b61a72d8b8e27d579c6344e12c26141d4e.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-escaper/2dcd14b61a72d8b8e27d579c6344e12c26141d4e.zip",
                 "reference": "2dcd14b61a72d8b8e27d579c6344e12c26141d4e",
                 "shasum": ""
             },
@@ -2142,7 +2063,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-eventmanager/c3bce7b7d47c54040b9ae51bc55491c72513b75d.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-eventmanager/c3bce7b7d47c54040b9ae51bc55491c72513b75d.zip",
                 "reference": "c3bce7b7d47c54040b9ae51bc55491c72513b75d",
                 "shasum": ""
             },
@@ -2196,7 +2117,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-filter/84c50246428efb0a1e52868e162dab3e149d5b80.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-filter/84c50246428efb0a1e52868e162dab3e149d5b80.zip",
                 "reference": "84c50246428efb0a1e52868e162dab3e149d5b80",
                 "shasum": ""
             },
@@ -2333,7 +2254,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-http/09f4d279f46d86be63171ff62ee0f79eca878678.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-http/09f4d279f46d86be63171ff62ee0f79eca878678.zip",
                 "reference": "09f4d279f46d86be63171ff62ee0f79eca878678",
                 "shasum": ""
             },
@@ -2383,7 +2304,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-hydrator/0ac0d3e569781f1895670b0c8d0dc7f25b8a3182.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-hydrator/0ac0d3e569781f1895670b0c8d0dc7f25b8a3182.zip",
                 "reference": "0ac0d3e569781f1895670b0c8d0dc7f25b8a3182",
                 "shasum": ""
             },
@@ -2445,7 +2366,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-i18n/b2db0d8246a865c659f93199f90f5fc2cd2f3cd8.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-i18n/b2db0d8246a865c659f93199f90f5fc2cd2f3cd8.zip",
                 "reference": "b2db0d8246a865c659f93199f90f5fc2cd2f3cd8",
                 "shasum": ""
             },
@@ -2512,7 +2433,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-inputfilter/0cf1bdcd8858a8583965310a7dae63ad75bd1237.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-inputfilter/0cf1bdcd8858a8583965310a7dae63ad75bd1237.zip",
                 "reference": "0cf1bdcd8858a8583965310a7dae63ad75bd1237",
                 "shasum": ""
             },
@@ -2567,7 +2488,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-json/f42a1588e75c2a3e338cd94c37906231e616daab.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-json/f42a1588e75c2a3e338cd94c37906231e616daab.zip",
                 "reference": "f42a1588e75c2a3e338cd94c37906231e616daab",
                 "shasum": ""
             },
@@ -2617,7 +2538,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-loader/c5fd2f071bde071f4363def7dea8dec7393e135c.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-loader/c5fd2f071bde071f4363def7dea8dec7393e135c.zip",
                 "reference": "c5fd2f071bde071f4363def7dea8dec7393e135c",
                 "shasum": ""
             },
@@ -2661,7 +2582,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-log/115d75db1f8fb29efbf1b9a49cb91c662b7195dc.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-log/115d75db1f8fb29efbf1b9a49cb91c662b7195dc.zip",
                 "reference": "115d75db1f8fb29efbf1b9a49cb91c662b7195dc",
                 "shasum": ""
             },
@@ -2732,7 +2653,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-mail/e92b4bc1cf6fe0fdad571bd7b4af2762414d58ff.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-mail/e92b4bc1cf6fe0fdad571bd7b4af2762414d58ff.zip",
                 "reference": "e92b4bc1cf6fe0fdad571bd7b4af2762414d58ff",
                 "shasum": ""
             },
@@ -2792,7 +2713,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-math/fda3b4e6c3bb15c35adc6db38b2eacabaa243e65.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-math/fda3b4e6c3bb15c35adc6db38b2eacabaa243e65.zip",
                 "reference": "fda3b4e6c3bb15c35adc6db38b2eacabaa243e65",
                 "shasum": ""
             },
@@ -2842,7 +2763,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-mime/9e53a97a3c190d45cc5d584daaaf487d509a9285.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-mime/9e53a97a3c190d45cc5d584daaaf487d509a9285.zip",
                 "reference": "9e53a97a3c190d45cc5d584daaaf487d509a9285",
                 "shasum": ""
             },
@@ -2891,7 +2812,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-modulemanager/2a59ab9a0dd7699a55050dff659ab0f28272b46e.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-modulemanager/2a59ab9a0dd7699a55050dff659ab0f28272b46e.zip",
                 "reference": "2a59ab9a0dd7699a55050dff659ab0f28272b46e",
                 "shasum": ""
             },
@@ -2950,7 +2871,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-mvc/e25f04a71b70985620f5ff3e762475848d049025.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-mvc/e25f04a71b70985620f5ff3e762475848d049025.zip",
                 "reference": "e25f04a71b70985620f5ff3e762475848d049025",
                 "shasum": ""
             },
@@ -3015,7 +2936,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-paginator/42211f3e1e8230953c641e91fec5aa9fe964eb95.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-paginator/42211f3e1e8230953c641e91fec5aa9fe964eb95.zip",
                 "reference": "42211f3e1e8230953c641e91fec5aa9fe964eb95",
                 "shasum": ""
             },
@@ -3079,7 +3000,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-router/03763610632a9022aff22a0e8f340852e68392a1.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-router/03763610632a9022aff22a0e8f340852e68392a1.zip",
                 "reference": "03763610632a9022aff22a0e8f340852e68392a1",
                 "shasum": ""
             },
@@ -3203,7 +3124,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-session/346e9709657b81a5d53d70ce754730a26d1f02f2.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-session/346e9709657b81a5d53d70ce754730a26d1f02f2.zip",
                 "reference": "346e9709657b81a5d53d70ce754730a26d1f02f2",
                 "shasum": ""
             },
@@ -3269,7 +3190,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-stdlib/debedcfc373a293f9250cc9aa03cf121428c8e78.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-stdlib/debedcfc373a293f9250cc9aa03cf121428c8e78.zip",
                 "reference": "debedcfc373a293f9250cc9aa03cf121428c8e78",
                 "shasum": ""
             },
@@ -3314,7 +3235,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-uri/0bf717a239432b1a1675ae314f7c4acd742749ed.zip",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-uri/0bf717a239432b1a1675ae314f7c4acd742749ed.zip",
                 "reference": "0bf717a239432b1a1675ae314f7c4acd742749ed",
                 "shasum": ""
             },
@@ -3424,16 +3345,16 @@
         },
         {
             "name": "zendframework/zend-view",
-            "version": "2.8.1",
+            "version": "2.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-view.git",
-                "reference": "71b4ebd0c4c9a2d0e0438f9d3a435e08dd769ff8"
+                "reference": "3eed53e41ff8fb95b41b495021e293c4ae725ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://packagist.phpcomposer.com/files/zendframework/zend-view/71b4ebd0c4c9a2d0e0438f9d3a435e08dd769ff8.zip",
-                "reference": "71b4ebd0c4c9a2d0e0438f9d3a435e08dd769ff8",
+                "url": "https://files.phpcomposer.com/files/zendframework/zend-view/3eed53e41ff8fb95b41b495021e293c4ae725ee5.zip",
+                "reference": "3eed53e41ff8fb95b41b495021e293c4ae725ee5",
                 "shasum": ""
             },
             "require": {
@@ -3443,10 +3364,10 @@
                 "zendframework/zend-stdlib": "^2.7 || ^3.0"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "1.7.*",
-                "phpunit/phpunit": "^4.5",
+                "phpunit/phpunit": "^4.6",
                 "zendframework/zend-authentication": "^2.5",
                 "zendframework/zend-cache": "^2.6.1",
+                "zendframework/zend-coding-standard": "~1.0.0",
                 "zendframework/zend-config": "^2.6",
                 "zendframework/zend-console": "^2.6",
                 "zendframework/zend-escaper": "^2.5",
@@ -3507,7 +3428,7 @@
                 "view",
                 "zf2"
             ],
-            "time": "2016-06-30 22:28:07"
+            "time": "2017-03-20 19:57:11"
         }
     ],
     "packages-dev": [],

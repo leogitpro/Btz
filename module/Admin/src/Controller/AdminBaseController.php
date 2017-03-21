@@ -25,6 +25,7 @@ use Admin\Service\WeChatTagManager;
 use Admin\WeChat\WeChatService;
 use Application\Controller\AppBaseController;
 use WeChat\Service\AccountService;
+use WeChat\Service\TagService;
 
 
 /**
@@ -43,6 +44,14 @@ class AdminBaseController extends AppBaseController
     protected function getWeChatAccountService()
     {
         return $this->getSm(AccountService::class);
+    }
+
+    /**
+     * @return TagService
+     */
+    protected function getWeChatTagService()
+    {
+        return $this->getSm(TagService::class);
     }
 
     ///

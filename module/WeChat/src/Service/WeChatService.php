@@ -10,28 +10,27 @@
 namespace WeChat\Service;
 
 
-use Logger\Service\LoggerService;
 
 
 class WeChatService
 {
 
-    /**
-     * @var LoggerService
-     */
-    private $loggerService;
+    private $accountService;
 
 
-    public function __construct(LoggerService $loggerService)
+    public function __construct(AccountService $accountService)
     {
-        $this->loggerService = $loggerService;
+        $this->accountService = $accountService;
     }
 
 
 
     public function getAccessToken($wxId)
     {
-        //todo
+
     }
+
+
+    //todo
 
 }

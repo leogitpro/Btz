@@ -43,7 +43,7 @@ class Module
         // if want response all module event handler, use AbstractActionController::class instead __NAMESPACE__
         //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_ROUTE, [$this, 'onRouteListener'], 100);
         $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatchListener'], 100);
-        $sharedEventManager->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
+        //$sharedEventManager->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
         //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
         //$sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_RENDER_ERROR, [$this, 'onDispatchErrorListener'], 100);
     }
