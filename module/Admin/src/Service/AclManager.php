@@ -17,7 +17,6 @@ use Admin\Entity\Component;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
 use Doctrine\ORM\EntityManager;
-use Logger\Service\LoggerService;
 
 
 class AclManager extends BaseEntityManager
@@ -37,11 +36,10 @@ class AclManager extends BaseEntityManager
     public function __construct(
         MemberManager $memberManager,
         ComponentManager $componentManager,
-        EntityManager $entityManager,
-        LoggerService $logger
+        EntityManager $entityManager
     )
     {
-        parent::__construct($entityManager, $logger);
+        parent::__construct($entityManager);
 
         $this->componentManager = $componentManager;
         $this->memberManager = $memberManager;
@@ -56,13 +54,13 @@ class AclManager extends BaseEntityManager
      */
     public function getMemberAndActionAllAclByAction($action)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclMember::class, 't');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.action', '?1'));
-        $this->getQb()->setParameter(1, $action);
+        $qb->select('t')->from(AclMember::class, 't');
+        $qb->where($qb->expr()->eq('t.action', '?1'));
+        $qb->setParameter(1, $action);
 
-        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+        $qb->setMaxResults(200)->setFirstResult(0);
 
         return $this->getEntitiesFromPersistence();
     }
@@ -77,13 +75,13 @@ class AclManager extends BaseEntityManager
      */
     public function getMemberAndActionAllAclByMember($member_id)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclMember::class, 't');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.member', '?1'));
-        $this->getQb()->setParameter(1, $member_id);
+        $qb->select('t')->from(AclMember::class, 't');
+        $qb->where($qb->expr()->eq('t.member', '?1'));
+        $qb->setParameter(1, $member_id);
 
-        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+        $qb->setMaxResults(200)->setFirstResult(0);
 
         return $this->getEntitiesFromPersistence();
     }
@@ -98,16 +96,16 @@ class AclManager extends BaseEntityManager
      */
     public function getMemberAndActionAcl($member, $action)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclMember::class, 't');
-        $this->getQb()->where(
-            $this->getQb()->expr()->andX(
-                $this->getQb()->expr()->eq('t.member', '?1'),
-                $this->getQb()->expr()->eq('t.action', '?2')
+        $qb->select('t')->from(AclMember::class, 't');
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.member', '?1'),
+                $qb->expr()->eq('t.action', '?2')
             )
         );
-        $this->getQb()->setParameter(1, $member)->setParameter(2, $action);
+        $qb->setParameter(1, $member)->setParameter(2, $action);
 
         return $this->getEntityFromPersistence();
     }
@@ -155,13 +153,13 @@ class AclManager extends BaseEntityManager
      */
     public function getDepartmentAndActionAllAclByAction($action)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclDepartment::class, 't');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.action', '?1'));
-        $this->getQb()->setParameter(1, $action);
+        $qb->select('t')->from(AclDepartment::class, 't');
+        $qb->where($qb->expr()->eq('t.action', '?1'));
+        $qb->setParameter(1, $action);
 
-        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+        $qb->setMaxResults(200)->setFirstResult(0);
 
         return $this->getEntitiesFromPersistence();
     }
@@ -175,13 +173,13 @@ class AclManager extends BaseEntityManager
      */
     public function getDepartmentAndActionAllAclByDepartment($dept_id)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclDepartment::class, 't');
-        $this->getQb()->where($this->getQb()->expr()->eq('t.dept', '?1'));
-        $this->getQb()->setParameter(1, $dept_id);
+        $qb->select('t')->from(AclDepartment::class, 't');
+        $qb->where($qb->expr()->eq('t.dept', '?1'));
+        $qb->setParameter(1, $dept_id);
 
-        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+        $qb->setMaxResults(200)->setFirstResult(0);
 
         return $this->getEntitiesFromPersistence();
     }
@@ -195,12 +193,12 @@ class AclManager extends BaseEntityManager
      */
     public function getDepartmentAndActionAllAclByDepartmentIds($dept_ids)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclDepartment::class, 't');
-        $this->getQb()->where($this->getQb()->expr()->in('t.dept', $dept_ids));
+        $qb->select('t')->from(AclDepartment::class, 't');
+        $qb->where($qb->expr()->in('t.dept', $dept_ids));
 
-        $this->getQb()->setMaxResults(200)->setFirstResult(0);
+        $qb->setMaxResults(200)->setFirstResult(0);
 
         return $this->getEntitiesFromPersistence();
     }
@@ -216,16 +214,16 @@ class AclManager extends BaseEntityManager
      */
     public function getDepartmentAndActionAcl($dept, $action)
     {
-        $this->resetQb();
+        $qb = $this->resetQb();
 
-        $this->getQb()->select('t')->from(AclDepartment::class, 't');
-        $this->getQb()->where(
-            $this->getQb()->expr()->andX(
-                $this->getQb()->expr()->eq('t.dept', '?1'),
-                $this->getQb()->expr()->eq('t.action', '?2')
+        $qb->select('t')->from(AclDepartment::class, 't');
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('t.dept', '?1'),
+                $qb->expr()->eq('t.action', '?2')
             )
         );
-        $this->getQb()->setParameter(1, $dept)->setParameter(2, $action);
+        $qb->setParameter(1, $dept)->setParameter(2, $action);
 
         return $this->getEntityFromPersistence();
     }

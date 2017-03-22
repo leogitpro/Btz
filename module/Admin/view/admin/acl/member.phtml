@@ -3,7 +3,23 @@ $this->pageTitleBar('权限配置', '个人权限: ' . $member->getMemberName())
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$this->headScript()->appendFile($this->basePath('js/admin/acl.js'));
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function () {
+    $(".action-status").change(function () {
+        var url = $(this).val();
+        $(this).blur();
+        $.get(url, function (dt) {
+            if(!dt.success) {
+                alert('System error!' + "\\n" + dt.message);
+            }
+        }, 'json');
+    });
+});
+
+JS;
+$this->inlineScript()->captureEnd();
 
 ?>
 

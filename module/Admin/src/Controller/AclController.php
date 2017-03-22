@@ -13,6 +13,7 @@ use Admin\Entity\AclDepartment;
 use Admin\Entity\AclMember;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -21,9 +22,7 @@ class AclController extends AdminBaseController
 {
 
     /**
-     * List grant members
-     *
-     * @return ViewModel
+     * 可授权用户列表
      */
     public function membersAction()
     {
@@ -54,9 +53,7 @@ class AclController extends AdminBaseController
 
 
     /**
-     * Member acl resources list
-     *
-     * @return ViewModel
+     * 个人权限配置
      */
     public function memberAction()
     {
@@ -65,16 +62,12 @@ class AclController extends AdminBaseController
         $member_id = (string)array_shift($params);
 
         if ($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止查看超级管理员进行权限配置');
-            return ;
+            throw new InvalidArgumentException('禁止操作该成员');
         }
 
         $member = $this->getMemberManager()->getMember($member_id);
-        if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
-            return ;
+        if (Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
+            throw new InvalidArgumentException('该成员账号已经失效');
         }
 
         // Page information
@@ -127,32 +120,21 @@ class AclController extends AdminBaseController
         $member_id = (string)array_shift($params);
 
         if ($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止对超级管理员进行权限配置');
-            return ;
+            throw new InvalidArgumentException('禁止操作该成员');
         }
 
         $member = $this->getMemberManager()->getMember($member_id);
-        if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
+        if (Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
+            throw new InvalidArgumentException('该成员账号已经失效');
         }
 
         $action_id = (string)array_shift($params);
-        $action = $this->getComponentManager()->getAction($action_id);
-        if (null == $action) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能编号: ' . $action_id);
-            return ;
-        }
+        $this->getComponentManager()->getAction($action_id);
 
         $status = (int)array_shift($params);
         $list = AclMember::getAclStatusList();
         if (!array_key_exists($status, $list)) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '非法的授权类型: ' . $status);
-            return ;
+            throw new InvalidArgumentException('非法的授权类型');
         }
 
         $this->getAclManager()->setMemberAndActionAcl($member_id, $action_id, $status);
@@ -217,10 +199,8 @@ class AclController extends AdminBaseController
         //*/
 
         $dept = $this->getDeptManager()->getDepartment($dept_id);
-        if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
-            return ;
+        if (Department::STATUS_VALID != $dept->getDeptStatus()) {
+            throw new InvalidArgumentException('该分组已经无效');
         }
 
         // Page information
@@ -279,26 +259,17 @@ class AclController extends AdminBaseController
         //*/
 
         $dept = $this->getDeptManager()->getDepartment($dept_id);
-        if (null == $dept || Department::STATUS_VALID != $dept->getDeptStatus()) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID:' . $dept_id);
-            return ;
+        if (Department::STATUS_VALID != $dept->getDeptStatus()) {
+            throw new InvalidArgumentException('该分组已经无效');
         }
 
         $action_id = (string)array_shift($params);
-        $action = $this->getComponentManager()->getAction($action_id);
-        if (null == $action) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的功能:' . $action_id);
-            return ;
-        }
+        $this->getComponentManager()->getAction($action_id);
 
         $status = (int)array_shift($params);
         $list = AclDepartment::getAclStatusList();
         if (!array_key_exists($status, $list)) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '非法的权限配置信息:' . $status);
-            return ;
+            throw new InvalidArgumentException('非法的授权类型');
         }
 
         $this->getAclManager()->setDepartmentAndActionAcl($dept_id, $action_id, $status);
