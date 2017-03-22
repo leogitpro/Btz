@@ -10,7 +10,10 @@
 namespace Admin\Validator;
 
 
+use Admin\Entity\Department;
+use Admin\Service\DepartmentManager;
 use Zend\Validator\AbstractValidator;
+
 
 class DeptNameUniqueValidator extends AbstractValidator
 {
@@ -23,7 +26,7 @@ class DeptNameUniqueValidator extends AbstractValidator
     ];
 
     protected $messageTemplates = [
-        self::DEPT_EXISTED => 'The department name already exists.',
+        self::DEPT_EXISTED => '这个名称已经被使用了',
     ];
 
 
@@ -59,10 +62,15 @@ class DeptNameUniqueValidator extends AbstractValidator
         $deptManager = $this->options['departmentManager'];
         $dept = $this->options['department'];
 
+        if (!$deptManager instanceof DepartmentManager) {
+            $this->error(self::DEPT_EXISTED);
+            return false;
+        }
+
+
         $existedDept = $deptManager->getDepartmentByName($value);
 
-        if (null == $dept) { // Created
-
+        if (!$dept instanceof Department) { // Created
             if (null == $existedDept) {
                 return true;
             } else {

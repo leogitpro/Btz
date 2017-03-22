@@ -13,10 +13,9 @@ namespace Admin\Form;
 use Admin\Entity\Department;
 use Admin\Service\DepartmentManager;
 use Admin\Validator\DeptNameUniqueValidator;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
-class DepartmentForm extends Form
+
+class DepartmentForm extends BaseForm
 {
 
     /**
@@ -32,59 +31,37 @@ class DepartmentForm extends Form
 
     public function __construct(DepartmentManager $departmentManager, $dept = null)
     {
-        parent::__construct('dept_form');
 
         $this->deptManager = $departmentManager;
         $this->dept = $dept;
 
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-
-        $this->setInputFilter(new InputFilter());
-
-        $this->addElements();
-        $this->addFilters();
+        parent::__construct();
     }
 
 
-    public function addElements()
+    /**
+     * 表单: 部门名称
+     */
+    private function addNameElement()
     {
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
+        $value = '';
+        if($this->dept instanceof Department) {
+            $value = $this->dept->getDeptName();
+        }
 
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
                 'id' => 'name',
-                'value' => (null == $this->dept) ? '' : $this->dept->getDeptName(),
+                'value' => $value,
             ],
             'options' => [
                 'label' => '部门名称',
             ],
         ]);
 
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Submit',
-            ],
-        ]);
-    }
-
-
-    public function addFilters()
-    {
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'name',
             'required' => true,
             'break_on_failure' => true,
@@ -113,4 +90,9 @@ class DepartmentForm extends Form
         ]);
     }
 
+
+    public function addElements()
+    {
+        $this->addNameElement();
+    }
 }

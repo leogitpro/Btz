@@ -18,11 +18,6 @@ $form->get('name')->setAttributes([
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
-$helper = $this->formElementErrors();
-$helper->setMessageOpenFormat('<p class="text-danger">');
-$helper->setMessageSeparatorString('</p><p class="text-danger">');
-$helper->setMessageCloseString('</p>');
-
 $form->prepare();
 
 ?>

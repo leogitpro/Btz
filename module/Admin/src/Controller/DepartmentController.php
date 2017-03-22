@@ -12,6 +12,7 @@ namespace Admin\Controller;
 
 use Admin\Entity\Department;
 use Admin\Entity\Member;
+use Admin\Exception\RuntimeException;
 use Admin\Form\DepartmentForm;
 use Ramsey\Uuid\Uuid;
 use Zend\View\Model\JsonModel;
@@ -100,12 +101,10 @@ class DepartmentController extends AdminBaseController
 
                 $deptManager->saveModifiedEntity($dept);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '部门已经创建',
                     '新的部门: ' . $data['name'] . ' 已经创建成功!',
-                    $this->url()->fromRoute('admin/dept'),
-                    '查看部门列表',
-                    3
+                    $this->url()->fromRoute('admin/dept')
                 );
             }
         }
@@ -125,18 +124,11 @@ class DepartmentController extends AdminBaseController
     {
         $dept_id = $this->params()->fromRoute('key');
         if($dept_id == Department::DEFAULT_DEPT_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新基础部门');
-            return ;
+            throw new RuntimeException('禁止操作此数据');
         }
 
         $deptManager = $this->getDeptManager();
         $department = $deptManager->getDepartment($dept_id);
-        if (null == $department) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
-            return ;
-        }
 
         if ($department->getDeptStatus() == Department::STATUS_VALID) { // to be invalid
 
@@ -156,12 +148,10 @@ class DepartmentController extends AdminBaseController
 
         $deptManager->saveModifiedEntity($department);
 
-        return $this->getMessagePlugin()->show(
+        return $this->go(
             '部门已更新',
             '部门: ' . $department->getDeptName() . ' 状态已经更新!',
-            $this->url()->fromRoute('admin/dept'),
-            '返回',
-            3
+            $this->url()->fromRoute('admin/dept')
         );
     }
 
@@ -175,18 +165,11 @@ class DepartmentController extends AdminBaseController
     {
         $dept_id = $this->params()->fromRoute('key');
         if($dept_id == Department::DEFAULT_DEPT_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改默认分组');
-            return ;
+            throw new RuntimeException('禁止操作此数据');
         }
 
         $deptManager = $this->getDeptManager();
         $department = $deptManager->getDepartment($dept_id);
-        if (null == $department) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组ID: ' . $dept_id);
-            return ;
-        }
 
         $form = new DepartmentForm($deptManager, $department);
 
@@ -201,12 +184,10 @@ class DepartmentController extends AdminBaseController
                 $department->setDeptName($data['name']);
                 $deptManager->saveModifiedEntity($department);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '部门已更新',
                     '部门: ' . $data['name'] . ' 的信息已经更新!',
-                    $this->url()->fromRoute('admin/dept'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/dept')
                 );
             }
         }
@@ -229,11 +210,6 @@ class DepartmentController extends AdminBaseController
     {
         $dept_id = $this->params()->fromRoute('key');
         $dept = $this->getDeptManager()->getDepartment($dept_id);
-        if (null == $dept) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的部门ID: ' . $dept_id);
-            return ;
-        }
 
         $data = [
             'inner' => [],
@@ -279,18 +255,13 @@ class DepartmentController extends AdminBaseController
 
         $dept_id = $this->params()->fromRoute('key');
         if ($dept_id == Department::DEFAULT_DEPT_ID) {
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新基础分组信息');
-            return new JsonModel($json);
+            throw new RuntimeException('禁止操作此数据');
         }
 
         if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
 
             $deptManager = $this->getDeptManager();
             $dept = $deptManager->getDepartment($dept_id);
-            if (null == $dept) {
-                $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的分组编号:' . $dept_id);
-                return new JsonModel($json);
-            }
 
             $selected = (array)$this->params()->fromPost('selected');
 

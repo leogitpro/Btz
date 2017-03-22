@@ -11,6 +11,7 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Department;
+use Admin\Exception\InvalidArgumentException;
 
 
 class DepartmentManager extends BaseEntityManager
@@ -56,11 +57,12 @@ class DepartmentManager extends BaseEntityManager
      *
      * @param string $dept_id
      * @return Department
+     * @throws InvalidArgumentException
      */
     public function getDepartment($dept_id = null)
     {
         if (empty($dept_id)) {
-            return null;
+            throw new InvalidArgumentException('不能查询空的编号');
         }
 
         $qb = $this->resetQb();
@@ -69,7 +71,11 @@ class DepartmentManager extends BaseEntityManager
         $qb->where($qb->expr()->eq('t.deptId', '?1'));
         $qb->setParameter(1, $dept_id);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Department) {
+            throw new InvalidArgumentException('无效的编号');
+        }
+        return $obj;
     }
 
 
