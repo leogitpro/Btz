@@ -1,12 +1,12 @@
 <?php
 /**
- * WeChatAppIdUniqueValidator.php
+ * AppIdUniqueValidator.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
  */
 
-namespace Admin\Validator;
+namespace WeChat\Validator;
 
 
 use WeChat\Entity\Account;
@@ -14,14 +14,14 @@ use WeChat\Service\AccountService;
 use Zend\Validator\AbstractValidator;
 
 
-class WeChatAppIdUniqueValidator extends AbstractValidator
+class AppIdUniqueValidator extends AbstractValidator
 {
 
     const APPID_EXISTED = 'appIdExisted';
 
     protected $options = [
-        'weChatAccountService' => null,
-        'weChat' => null,
+        'accountService' => null,
+        'account' => null,
     ];
 
     protected $messageTemplates = [
@@ -32,11 +32,11 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
     public function __construct($options = null)
     {
         if (is_array($options)) {
-            if (isset($options['weChatAccountService'])) {
-                $this->options['weChatAccountService'] = $options['weChatAccountService'];
+            if (isset($options['accountService'])) {
+                $this->options['accountService'] = $options['accountService'];
             }
-            if (isset($options['weChat'])) {
-                $this->options['weChat'] = $options['weChat'];
+            if (isset($options['account'])) {
+                $this->options['account'] = $options['account'];
             }
         }
 
@@ -52,17 +52,17 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
     public function isValid($value)
     {
 
-        $wm = $this->options['weChatAccountService'];
-        $weChat = $this->options['weChat'];
+        $accountService = $this->options['accountService'];
+        $account = $this->options['account'];
 
-        if (!$wm instanceof AccountService) {
+        if (!$accountService instanceof AccountService) {
             $this->error(self::APPID_EXISTED);
             return false;
         }
 
-        $count = $wm->getWeChatCountByAppId($value);
+        $count = $accountService->getWeChatCountByAppId($value);
 
-        if (!$weChat instanceof Account) { // Created validate
+        if (!$account instanceof Account) { // Created validate
             if ($count > 0) {
                 $this->error(self::APPID_EXISTED);
                 return false;
@@ -77,7 +77,7 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
                     $this->error(self::APPID_EXISTED);
                     return false;
                 } else {
-                    if($value == $weChat->getWxAppId()) {
+                    if($value == $account->getWxAppId()) {
                         return true;
                     } else {
                         $this->error(self::APPID_EXISTED);
@@ -87,6 +87,5 @@ class WeChatAppIdUniqueValidator extends AbstractValidator
             }
         }
     }
-
 
 }

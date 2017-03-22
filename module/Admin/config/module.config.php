@@ -108,19 +108,9 @@ return [
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
 
-            Service\WeChatManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\WeChatTagManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\WeChatClientManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\WeChatMenuManager::class => Service\Factory\EntityManagerFactory::class,
-            Service\WeChatQrCodeManager::class => Service\Factory\EntityManagerFactory::class,
-
             Service\MessageManager::class => Service\Factory\MessageManagerFactory::class,
 
             Service\AclManager::class => Service\Factory\AclManagerFactory::class,
-
-            WeChat\WeChatService::class => WeChat\Factory\WeChatServiceFactory::class,
-            WeChat\Local::class => WeChat\Factory\LocalFactory::class,
-            WeChat\Remote::class => WeChat\Factory\BaseFactory::class,
 
         ],
     ],

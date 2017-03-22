@@ -9,9 +9,9 @@
 namespace Admin\Form;
 
 
-use Admin\Validator\WeChatAppIdUniqueValidator;
 use WeChat\Entity\Account;
 use WeChat\Service\AccountService;
+use WeChat\Validator\AppIdUniqueValidator;
 
 
 class WeChatForm extends BaseForm
@@ -81,11 +81,11 @@ class WeChatForm extends BaseForm
                     ],
                 ],
                 [
-                    'name' => WeChatAppIdUniqueValidator::class,
+                    'name' => AppIdUniqueValidator::class,
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'weChatAccountService' => $this->wm,
-                        'weChat' => $this->weChat,
+                        'accountService' => $this->wm,
+                        'account' => $this->weChat,
                     ],
                 ],
             ],

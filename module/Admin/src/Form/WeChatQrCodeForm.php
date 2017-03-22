@@ -10,7 +10,7 @@
 namespace Admin\Form;
 
 
-use Admin\Entity\WeChatQrCode;
+use WeChat\Entity\QrCode;
 
 
 class WeChatQrCodeForm extends BaseForm
@@ -76,7 +76,7 @@ class WeChatQrCodeForm extends BaseForm
                 'id' => 'type',
             ],
             'options' => [
-                'value_options' => WeChatQrCode::getTypeList(),
+                'value_options' => QrCode::getTypeList(),
             ],
         ]);
 

@@ -90,7 +90,7 @@ class Version20170319043717 extends AbstractMigration
     {
         parent::postUp($schema);
 
-        $this->connection->exec("ALTER TABLE `wechat_account` AUTO_INCREMENT=9525");
+        $this->connection->exec("ALTER TABLE `wechat_account` AUTO_INCREMENT=9526");
     }
 
     /**
