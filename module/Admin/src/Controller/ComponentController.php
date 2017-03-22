@@ -11,7 +11,6 @@ namespace Admin\Controller;
 
 
 use Admin\Entity\Action;
-use Admin\Entity\Component;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -44,19 +43,6 @@ class ComponentController extends AdminBaseController
 
         // Render view data
         $rows = $componentManager->getComponentsByLimitPage($page, $size);
-
-        /**
-        foreach ($rows as $row) {
-            if ($row instanceof Component) {
-                $actions = $row->getActions();
-                foreach ($actions as $action) {
-                    if ($action instanceof Action) {
-                        $this->getLoggerPlugin()->debug('action: ' . $action->getActionName());
-                    }
-                }
-            }
-        }
-        //*/
 
         return new ViewModel([
             'rows' => $rows,
@@ -104,16 +90,9 @@ class ComponentController extends AdminBaseController
      */
     public function deleteAction()
     {
-        $componentManager = $this->getComponentManager();
-
         $component_class = urldecode($this->params()->fromRoute('key'));
-
+        $componentManager = $this->getComponentManager();
         $component = $componentManager->getComponent($component_class);
-        if (!($component instanceof Component)) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
-            return ;
-        }
 
         // Clean the acl
         $actions = $component->getActions();
@@ -146,13 +125,7 @@ class ComponentController extends AdminBaseController
     public function actionsAction()
     {
         $component_class = urldecode($this->params()->fromRoute('key'));
-
         $component = $this->getComponentManager()->getComponent($component_class);
-        if (!($component instanceof Component)) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的模块识别:' . $component_class);
-            return ;
-        }
 
 
         $viewModel = new ViewModel();
@@ -169,14 +142,9 @@ class ComponentController extends AdminBaseController
      */
     public function removeAction()
     {
-        $componentManager = $this->getComponentManager();
         $action_id = $this->params()->fromRoute('key');
+        $componentManager = $this->getComponentManager();
         $action = $componentManager->getAction($action_id);
-        if (!($action instanceof Action)) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的接口编号:' . $action_id);
-            return ;
-        }
 
         // Clean the acl
         $this->getAclManager()->removeAction($action_id);

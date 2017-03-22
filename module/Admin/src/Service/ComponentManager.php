@@ -12,6 +12,7 @@ namespace Admin\Service;
 
 use Admin\Entity\Action;
 use Admin\Entity\Component;
+use Admin\Exception\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
 
@@ -40,6 +41,7 @@ class ComponentManager extends BaseEntityManager
      *
      * @param string $component_class
      * @return Component
+     * @throws InvalidArgumentException
      */
     public function getComponent($component_class)
     {
@@ -49,7 +51,11 @@ class ComponentManager extends BaseEntityManager
         $this->getQb()->where($this->getQb()->expr()->eq('t.comClass', '?1'));
         $this->getQb()->setParameter(1, $component_class);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Component) {
+            throw new InvalidArgumentException('无效的组件名');
+        }
+        return $obj;
     }
 
 
@@ -89,6 +95,7 @@ class ComponentManager extends BaseEntityManager
      *
      * @param string $action_id
      * @return Action
+     * @throws InvalidArgumentException
      */
     public function getAction($action_id)
     {
@@ -98,7 +105,11 @@ class ComponentManager extends BaseEntityManager
         $this->getQb()->where($this->getQb()->expr()->eq('t.actionId', '?1'));
         $this->getQb()->setParameter(1, $action_id);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Action) {
+            throw new InvalidArgumentException('无效的接口编号');
+        }
+        return $obj;
     }
 
 
