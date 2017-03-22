@@ -11,10 +11,10 @@ namespace WeChat\Service;
 
 
 
-
 use WeChat\Entity\Account;
 use WeChat\Exception\InvalidArgumentException;
 use WeChat\Exception\RuntimeException;
+
 
 class WeChatService
 {
@@ -75,6 +75,25 @@ class WeChatService
         $token = $this->getAccessToken($account);
 
         return NetworkService::userTags($token);
+    }
+
+
+    /**
+     * 创建公众号二维码
+     *
+     * @param Account $account
+     * @param string $type
+     * @param string $scene
+     * @param int $expired
+     * @return array
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function qrCodeCreate(Account $account, $type, $scene, $expired)
+    {
+        $token = $this->getAccessToken($account);
+
+        return NetworkService::QrCodeCreate($token, $type, $scene, $expired);
     }
 
 }

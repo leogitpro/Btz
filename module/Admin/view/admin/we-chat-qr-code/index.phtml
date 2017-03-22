@@ -41,7 +41,7 @@ $this->inlineScript()->captureEnd();
                         </tr>
                         <?php
                         foreach ($qrCodes as $qrCode) {
-                            if ($qrCode instanceof \Admin\Entity\WeChatQrCode) {
+                            if ($qrCode instanceof \WeChat\Entity\QrCode) {
                                 ?>
                                 <tr>
                                     <td><i class="fa fa-qrcode fa-fw"></i><?php echo $qrCode->getName(); ?></td>
@@ -49,7 +49,7 @@ $this->inlineScript()->captureEnd();
                                     <td>
                                         <?php
                                         $forever = '永久';
-                                        if (\Admin\Entity\WechatQrcode::TYPE_TEMP == $qrCode->getType()) {
+                                        if (\WeChat\Entity\QrCode::TYPE_TEMP == $qrCode->getType()) {
                                             $expired = date('Y-m-d H:i:s', $qrCode->getExpired());
                                         } else {
                                             $expired = $forever;

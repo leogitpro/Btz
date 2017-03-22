@@ -12,6 +12,7 @@ namespace WeChat\Service;
 use Ramsey\Uuid\Uuid;
 use WeChat\Entity\Account;
 use WeChat\Entity\Client;
+use WeChat\Exception\InvalidArgumentException;
 
 
 class ClientService extends BaseEntityService
@@ -20,6 +21,7 @@ class ClientService extends BaseEntityService
     /**
      * @param string $clientId
      * @return Client
+     * @throws InvalidArgumentException
      */
     public function getWeChatClient($clientId)
     {
@@ -29,7 +31,11 @@ class ClientService extends BaseEntityService
         $qb->where($qb->expr()->eq('t.id', '?1'));
         $qb->setParameter(1, $clientId);
 
-        return $this->getEntityFromPersistence();
+        $client = $this->getEntityFromPersistence();
+        if (!$client instanceof Client) {
+            throw new InvalidArgumentException("无效的客户端 ID: " . $clientId);
+        }
+        return $client;
     }
 
 

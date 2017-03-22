@@ -14,7 +14,7 @@ $this->sideTreeMenu()->setActiveId($activeId);
                         <th>过期时间</th>
                         <th>操作</th>
                     </tr>
-                    <?php foreach ($rows as $row) { if ($row instanceof \Admin\Entity\WeChat) { ?>
+                    <?php foreach ($rows as $row) { if ($row instanceof \WeChat\Entity\Account) { ?>
                         <tr>
                             <td><?php echo $row->getWxAppId(); ?></td>
                             <td><?php echo date('Y-m-d H:i:s', $row->getWxExpired()); ?></td>

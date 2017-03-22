@@ -9,10 +9,9 @@
 namespace Admin\Controller;
 
 
-use Admin\Entity\WeChat;
-use Admin\Entity\WeChatQrCode;
 use Admin\Form\WeChatQrCodeForm;
 use SimpleSoftwareIO\QrCode\BaconQrCodeGenerator;
+use WeChat\Entity\QrCode;
 use Zend\View\Model\ViewModel;
 
 
@@ -25,25 +24,14 @@ class WeChatQrCodeController extends AdminBaseController
     public function indexAction()
     {
         $myself = $this->getMemberManager()->getCurrentMember();
-
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
         // Page configuration
         $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $qm = $this->getWeChatQrCodeManager();
-
-        $count = $qm->getQrCodeCountByWeChat($weChat);
+        $count = $this->getWeChatQrCodeService()->getQrCodeCountByWeChat($weChat);
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -56,7 +44,7 @@ class WeChatQrCodeController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChatQrCode', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $qm->getQrCodesWithLimitPageByWeChat($weChat, $page, $size);
+        $rows = $this->getWeChatQrCodeService()->getQrCodesWithLimitPageByWeChat($weChat, $page, $size);
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -65,21 +53,14 @@ class WeChatQrCodeController extends AdminBaseController
         ]);
     }
 
+
     /**
      * 申请二维码
      */
     public function addAction()
     {
         $myself = $this->getMemberManager()->getCurrentMember();
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
         $form = new WeChatQrCodeForm();
 
@@ -90,9 +71,9 @@ class WeChatQrCodeController extends AdminBaseController
                 $data = $form->getData();
 
                 $name = $data['name']; //二维码名称
-                $type = array_key_exists($data['type'], WeChatQrCode::getTypeList()) ? $data['type'] : WeChatQrCode::TYPE_TEMP;
+                $type = array_key_exists($data['type'], QrCode::getTypeList()) ? $data['type'] : QrCode::TYPE_TEMP;
 
-                if (WeChatQrCode::TYPE_TEMP == $type) {
+                if (QrCode::TYPE_TEMP == $type) {
                     $scene = intval($data['scene']);
                 } else {
                     if(strlen($data['scene']) > 6 && strlen($data['scene']) <= 64) {
@@ -118,24 +99,19 @@ class WeChatQrCodeController extends AdminBaseController
                     throw new \Exception('二维码参数不合适, 无法进行申请!');
                 }
 
-                if (WeChatQrCode::TYPE_TEMP != $type) {
+                if (QrCode::TYPE_TEMP != $type) {
                     $expired = 0;
                 } else {
                     $expired = (int)$data['expired'];
                     if ($expired < 30) { $expired = 30; }
                 }
 
-                $ws = $this->getWeChatService($weChat->getWxId());
-                $result = $ws->getQrCode($type, $scene, $expired);
+                $res = $this->getWeChatService()->qrCodeCreate($weChat, $type, $scene, $expired);
 
-                if (!empty($result) && isset($result['url'])) {
-                    $this->getWeChatQrCodeManager()->createWeChatQrCode($weChat, $name, $type, $expired, $scene, $result['url']);
-                    $title = '二维码创建成功';
-                    $message = '您申请的二维码已经创建成功!';
-                } else {
-                    $title = '二维码创建失败';
-                    $message = '您申请的二维码已经创建失败, 请重新再试!';
-                }
+                $this->getWeChatQrCodeService()->createWeChatQrCode($weChat, $name, $type, $expired, $scene, $res['url']);
+
+                $title = '二维码创建成功';
+                $message = '您申请的二维码已经创建成功!';
 
                 return $this->go($title, $message, $this->url()->fromRoute('admin/weChatQrCode'));
             }
@@ -155,10 +131,7 @@ class WeChatQrCodeController extends AdminBaseController
     {
         $qrCodeId = (string)$this->params()->fromRoute('key');
 
-        $qrCode = $this->getWeChatQrCodeManager()->getWeChatQrCode($qrCodeId);
-        if (!$qrCode instanceof  WeChatQrCode) {
-            throw new \Exception('无法查询到此二维码信息!');
-        }
+        $qrCode = $this->getWeChatQrCodeService()->getWeChatQrCode($qrCodeId);
 
         $myself = $this->getMemberManager()->getCurrentMember();
         if ($myself->getMemberId() != $qrCode->getWechat()->getMember()->getMemberId()) {
@@ -167,7 +140,7 @@ class WeChatQrCodeController extends AdminBaseController
 
         $name = $qrCode->getName();
 
-        $this->getWeChatQrCodeManager()->removeEntity($qrCode);
+        $this->getWeChatQrCodeService()->removeEntity($qrCode);
 
         return $this->go(
             '二维码已经删除',
@@ -183,11 +156,7 @@ class WeChatQrCodeController extends AdminBaseController
     public function makeAction()
     {
         $qrCodeId = (string)$this->params()->fromRoute('key');
-
-        $qrCode = $this->getWeChatQrCodeManager()->getWeChatQrCode($qrCodeId);
-        if (!$qrCode instanceof  WeChatQrCode) {
-            throw new \Exception('无法查询到此二维码信息!');
-        }
+        $qrCode = $this->getWeChatQrCodeService()->getWeChatQrCode($qrCodeId);
 
         $myself = $this->getMemberManager()->getCurrentMember();
         if ($myself->getMemberId() != $qrCode->getWechat()->getMember()->getMemberId()) {
@@ -282,11 +251,10 @@ class WeChatQrCodeController extends AdminBaseController
 
                 $data = $qrCodeMaker->generate($url);
 
-
                 $response = $this->getResponse();
                 $headers = $response->getHeaders();
                 $response->setContent($data);
-                $headers->addHeaderLine('content-type', $mimes[$type]);
+                $headers->addHeaderLine('Content-Type', $mimes[$type]);
                 $headers->addHeaderLine('Content-Disposition', 'attachment; filename="qrCode.' . $type . '"');
                 $headers->addHeaderLine('Content-Length', strlen($data));
 

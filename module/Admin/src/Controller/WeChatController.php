@@ -12,7 +12,6 @@ namespace Admin\Controller;
 use Zend\View\Model\ViewModel;
 
 
-
 class WeChatController extends AdminBaseController
 {
 
@@ -26,9 +25,7 @@ class WeChatController extends AdminBaseController
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $wm = $this->getWeChatManager();
-
-        $count = $wm->getWeChatCount();
+        $count = $this->getWeChatAccountService()->getWeChatCount();
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -41,7 +38,7 @@ class WeChatController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChat', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $wm->getWeChatLimitByPage($page, $size);
+        $rows = $this->getWeChatAccountService()->getWeChatLimitByPage($page, $size);
 
         return new ViewModel([
             'rows' => $rows,

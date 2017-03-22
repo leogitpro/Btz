@@ -17,18 +17,19 @@ class WeChatQrCodeForm extends BaseForm
 {
 
     /**
-     * 二维码名字
+     * 表单: 二维码名字
      */
     private function addNameElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
                 'id' => 'name',
             ],
         ]);
-        $this->getInputFilter()->add([
+
+        $this->addFilter([
             'name' => 'name',
             'required' => true,
             'break_on_failure' => true,
@@ -64,11 +65,11 @@ class WeChatQrCodeForm extends BaseForm
 
 
     /**
-     * 二维码类型
+     * 表单: 二维码类型
      */
     private function addTypeElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'select',
             'name' => 'type',
             'attributes' => [
@@ -79,7 +80,7 @@ class WeChatQrCodeForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'type',
             'filters'  => [
                 ['name' => 'StringTrim'],
@@ -93,14 +94,15 @@ class WeChatQrCodeForm extends BaseForm
      */
     private function addExpiredElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'expired',
             'attributes' => [
                 'id' => 'expired',
             ],
         ]);
-        $this->getInputFilter()->add([
+
+        $this->addFilter([
             'name' => 'expired',
             'filters'  => [
                 ['name' => 'StringTrim'],
@@ -115,14 +117,15 @@ class WeChatQrCodeForm extends BaseForm
      */
     private function addSceneElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'scene',
             'attributes' => [
                 'id' => 'scene',
             ],
         ]);
-        $this->getInputFilter()->add([
+
+        $this->addFilter([
             'name' => 'scene',
             'required' => true,
             'break_on_failure' => true,
@@ -155,15 +158,12 @@ class WeChatQrCodeForm extends BaseForm
     }
 
 
-
     public function addElements()
     {
-        $this->addCsrfElement();
         $this->addNameElement();
         $this->addTypeElement();
         $this->addExpiredElement();
         $this->addSceneElement();
-        $this->addSubmitElement();
     }
 
 }

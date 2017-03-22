@@ -9,11 +9,7 @@
 namespace Admin\Controller;
 
 
-use Admin\Entity\WeChat;
-use Admin\Entity\WeChatClient;
 use Admin\Form\WeChatClientForm;
-use WeChat\Entity\Account;
-use WeChat\Entity\Client;
 use Zend\View\Model\ViewModel;
 
 
@@ -27,9 +23,6 @@ class WeChatClientController extends AdminBaseController
     {
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-        if (!$weChat instanceof Account) {
-            throw new \Exception('您还没创建公众号, 请先创建好公众号再操作!');
-        }
 
         // Page configuration
         $size = 10;
@@ -67,9 +60,6 @@ class WeChatClientController extends AdminBaseController
 
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-        if (!$weChat instanceof Account) {
-            throw new \Exception('您还没创建公众号, 请先创建好公众号再操作!');
-        }
 
         $form = new WeChatClientForm();
 
@@ -119,9 +109,6 @@ class WeChatClientController extends AdminBaseController
         $clientId = (string)$this->params()->fromRoute('key');
 
         $client = $this->getWeChatClientService()->getWeChatClient($clientId);
-        if (!$client instanceof Client) {
-            throw new \Exception('无法查询到此客户端信息!');
-        }
 
         $myself = $this->getMemberManager()->getCurrentMember();
         if ($myself->getMemberId() != $client->getWechat()->getMember()->getMemberId()) {

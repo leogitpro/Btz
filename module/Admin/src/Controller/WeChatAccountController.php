@@ -102,14 +102,9 @@ class WeChatAccountController extends AdminBaseController
     {
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $wm = $this->getWeChatAccountService();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        $weChat = $wm->getWeChatByMember($myself);
-        if (!$weChat instanceof Account) {
-            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
-        }
-
-        $form = new WeChatForm($wm, $weChat);
+        $form = new WeChatForm($this->getWeChatAccountService(), $weChat);
         $error = null;
         if($this->getRequest()->isPost()) {
 
@@ -133,7 +128,7 @@ class WeChatAccountController extends AdminBaseController
                     $weChat->setWxAccessToken($accessToken);
                     $weChat->setWxAccessTokenExpired($expiredIn);
 
-                    $wm->saveModifiedEntity($weChat);
+                    $this->getWeChatAccountService()->saveModifiedEntity($weChat);
 
                     return $this->go(
                         '公众号已经修改',
@@ -172,9 +167,6 @@ class WeChatAccountController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
 
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-        if (!$weChat instanceof Account) {
-            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
-        }
 
         $appId = $weChat->getWxAppId();
         $appSecret = $weChat->getWxAppSecret();
@@ -205,9 +197,9 @@ class WeChatAccountController extends AdminBaseController
 
         $myself = $this->getMemberManager()->getCurrentMember();
 
-        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof Account) {
+        try {
+            $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+        } catch (InvalidArgumentException $e) {
             return $this->go(
                 '没有配置公众号',
                 '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
@@ -254,21 +246,11 @@ class WeChatAccountController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
 
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-        if (!$weChat instanceof Account) {
-            throw new \Exception('这个公众号已经失效了好像! 查无此人!');
-        }
 
         $insert = 0;
-
-        try {
-            $tags = $this->getWeChatService()->getTags($weChat);
-            if(count($tags)) {
-                $insert = $this->getWeChatTagService()->resetTags($tags, $weChat);
-            }
-        } catch (InvalidArgumentException $e) {
-            throw new \Exception($e->getMessage());
-        } catch (RuntimeException $e) {
-            throw new \Exception($e->getMessage());
+        $tags = $this->getWeChatService()->getTags($weChat);
+        if(count($tags)) {
+            $insert = $this->getWeChatTagService()->resetTags($tags, $weChat);
         }
 
         $result['success'] = true;

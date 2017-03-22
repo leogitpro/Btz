@@ -125,7 +125,7 @@ class AccountService extends BaseEntityService
 
         $weChat = $this->getEntityFromPersistence();
         if (!$weChat instanceof Account) {
-            throw new InvalidArgumentException('无此Member的微信公众号帐号信息: ' . $member->getMemberId());
+            throw new InvalidArgumentException('该用户无微信公众号帐号信息');
         }
         return $weChat;
     }
