@@ -1,5 +1,5 @@
 <?php
-$this->headTitle('Administrator login');
+$this->headTitle('登入系统');
 
 $form = $this->form;
 
@@ -12,12 +12,7 @@ $form->get('password')->setAttributes([
     'placeholder'=>'在这里输入您的登录密码',
 ]);
 
-$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
-
-$helper = $this->formElementErrors();
-$helper->setMessageOpenFormat('<p class="text-danger">');
-$helper->setMessageSeparatorString('</p><p class="text-danger">');
-$helper->setMessageCloseString('</p>');
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary', 'value' => '登入系统']);
 
 $form->prepare();
 

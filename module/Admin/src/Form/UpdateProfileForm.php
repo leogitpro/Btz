@@ -5,10 +5,9 @@ namespace Admin\Form;
 
 
 use Admin\Entity\Member;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
-class UpdateProfileForm extends Form
+
+class UpdateProfileForm extends BaseForm
 {
 
     /**
@@ -19,30 +18,18 @@ class UpdateProfileForm extends Form
 
     public function __construct(Member $member)
     {
-        parent::__construct('update_profile_form');
-
         $this->member = $member;
 
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-        $this->setInputFilter(new InputFilter());
-        $this->addElements();
-        $this->addInputFilters();
+        parent::__construct();
     }
 
 
-    public function addElements()
+    /**
+     * 表单: 用户名字
+     */
+    private function addNameElements()
     {
-        $this->add([ // CSRF Safe
-            'type' => 'csrf',
-            'name' => 'csrf',
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600, // 10 minutes
-                ],
-            ],
-        ]);
-
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
@@ -54,21 +41,7 @@ class UpdateProfileForm extends Form
             ],
         ]);
 
-
-        $this->add([ // Submit
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Update Profile',
-            ],
-        ]);
-    }
-
-
-    public function addInputFilters()
-    {
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'name',
             'required' => true,
             'break_on_failure' => true,
@@ -87,6 +60,12 @@ class UpdateProfileForm extends Form
                 ],
             ],
         ]);
+    }
+
+
+    public function addElements()
+    {
+        $this->addNameElements();
     }
 
 }

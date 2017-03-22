@@ -22,9 +22,8 @@ class AuthManagerFactory implements FactoryInterface
     {
         $authService = $serviceManager->get(AuthService::class);
         $sessionManager = $serviceManager->get(SessionManager::class);
-        $logger = $serviceManager->get('Logger');
 
-        return new AuthManager($authService, $sessionManager, $logger);
+        return new AuthManager($authService, $sessionManager);
     }
 
 }

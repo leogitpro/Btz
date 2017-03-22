@@ -13,8 +13,9 @@ namespace Admin\Service;
 
 
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException;
+use Admin\Exception\RuntimeException;
 use Doctrine\ORM\EntityManager;
-use Logger\Service\LoggerService;
 use Ramsey\Uuid\Uuid;
 
 
@@ -33,9 +34,9 @@ class MemberManager extends BaseEntityManager
     private $currentMember = null;
 
 
-    public function __construct(AuthService $authService, EntityManager $entityManager, LoggerService $logger)
+    public function __construct(AuthService $authService, EntityManager $entityManager)
     {
-        parent::__construct($entityManager, $logger);
+        parent::__construct($entityManager);
 
         $this->authService = $authService;
 
@@ -83,12 +84,12 @@ class MemberManager extends BaseEntityManager
      *
      * @param string $member_id
      * @return Member
-     * @throws \Exception
+     * @throws InvalidArgumentException
      */
     public function getMember($member_id = null)
     {
         if (empty($member_id)) {
-            throw new \Exception('没有成员的编号, 我们无法为您查询信息哦!');
+            throw new InvalidArgumentException('不能查询空的成员编号');
         }
 
         $qb = $this->resetQb();
@@ -99,7 +100,7 @@ class MemberManager extends BaseEntityManager
 
         $obj = $this->getEntityFromPersistence();
         if (!$obj instanceof Member) {
-            throw new \Exception('这个成员编号失效了哦!');
+            throw new InvalidArgumentException('无效的成员编号');
         }
         return $obj;
     }
@@ -107,12 +108,12 @@ class MemberManager extends BaseEntityManager
 
     /**
      * @return Member
-     * @throws \Exception
+     * @throws RuntimeException
      */
     public function getCurrentMember()
     {
         if(!$this->authService->hasIdentity()) {
-            throw new \Exception('您需要重新登录一下更新状态哦!');
+            throw new RuntimeException('您需要重新登录一下更新状态哦!');
         }
 
         if (null === $this->currentMember) {

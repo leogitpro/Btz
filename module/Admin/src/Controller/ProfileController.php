@@ -17,34 +17,23 @@ class ProfileController extends AdminBaseController
 {
 
     /**
-     * Show administrator summary information page.
-     *
-     * @return ViewModel
+     * 个人资料
      */
     public function indexAction()
     {
         $member = $this->getMemberManager()->getCurrentMember();
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
 
         return new ViewModel(['member' => $member]);
     }
 
     /**
-     * Update administrator password.
+     * 个人密码
      *
-     * @return ViewModel
      */
     public function passwordAction()
     {
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getCurrentMember();
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
 
         $form = new UpdatePasswordForm($memberManager);
 
@@ -61,34 +50,25 @@ class ProfileController extends AdminBaseController
                 $member->setMemberPassword($encryptedPassword);
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '密码已更新',
                     '您的密码已经更新, 请在下次使用新的密码登入!',
-                    $this->url()->fromRoute('admin/profile', ['suffix' => '.html']),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/profile', ['suffix' => '.html'])
                 );
             }
         }
 
         return new ViewModel(['form' => $form]);
-
     }
 
 
     /**
-     * Update administrator information page.
-     *
-     * @return ViewModel
+     * 个人资料
      */
     public function updateAction()
     {
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getCurrentMember();
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            return ;
-        }
 
         $form = new UpdateProfileForm($member);
 
@@ -104,12 +84,10 @@ class ProfileController extends AdminBaseController
 
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '资料已更新',
                     '您的个人资料已经更新!',
-                    $this->url()->fromRoute('admin/profile'),
-                    '返回',
-                    1
+                    $this->url()->fromRoute('admin/profile')
                 );
             }
         }

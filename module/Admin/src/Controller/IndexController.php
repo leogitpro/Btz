@@ -61,12 +61,11 @@ class IndexController extends AdminBaseController
                 $result = $this->getAuthManager()->login($data['email'], md5($data['password']));
 
                 if (Result::SUCCESS == $result->getCode()) {
-                    return $this->getMessagePlugin()->show(
+                    return $this->go(
                         '欢迎登入',
                         '欢迎你再次登入管理平台, 祝您发现更多惊喜!',
                         $this->url()->fromRoute('admin'),
-                        '立即进入',
-                        3
+                        '立即进入'
                     );
                 } else {
                     $login_code = $result->getCode();

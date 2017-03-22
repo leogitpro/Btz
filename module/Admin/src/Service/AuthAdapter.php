@@ -8,7 +8,7 @@
 namespace Admin\Service;
 
 use Admin\Entity\Member;
-use Doctrine\ORM\NonUniqueResultException;
+use Admin\Exception\InvalidArgumentException;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -64,21 +64,21 @@ class AuthAdapter extends BaseEntityManager implements AdapterInterface
     /**
      * @param string $email
      * @return Member
+     * @throws InvalidArgumentException
      */
     public function getMemberByEmail($email)
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->resetQb();
 
         $qb->from(Member::class, 't')->select('t');
         $qb->where($qb->expr()->eq('t.memberEmail', '?1'));
         $qb->setParameter(1, $email);
 
-        try {
-            return $qb->getQuery()->getOneOrNullResult();
-        } catch (NonUniqueResultException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            return null;
+        $member = $qb->getQuery()->getOneOrNullResult();
+        if (!$member instanceof Member) {
+            throw new InvalidArgumentException('无效的账号信息: ' . $email);
         }
+        return $member;
     }
 
 
@@ -89,8 +89,9 @@ class AuthAdapter extends BaseEntityManager implements AdapterInterface
      */
     public function authenticate()
     {
-        $member = $this->getMemberByEmail($this->getEmail());
-        if (null == $member) {
+        try {
+            $member = $this->getMemberByEmail($this->getEmail());
+        } catch (InvalidArgumentException $e) {
             return new Result(
                 Result::FAILURE_IDENTITY_NOT_FOUND,
                 null,

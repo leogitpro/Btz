@@ -8,7 +8,7 @@
 namespace Admin\Service;
 
 
-use Logger\Service\LoggerService;
+use Admin\Exception\RuntimeException;
 use Zend\Authentication\Result;
 use Zend\Session\SessionManager;
 
@@ -26,17 +26,11 @@ class AuthManager
      */
     private $authService;
 
-    /**
-     * @var LoggerService
-     */
-    private $logger;
 
-
-    public function __construct(AuthService $authService, SessionManager $sessionManager, LoggerService $logger)
+    public function __construct(AuthService $authService, SessionManager $sessionManager)
     {
         $this->authService = $authService;
         $this->sessionManager = $sessionManager;
-        $this->logger = $logger;
     }
 
 
@@ -46,12 +40,12 @@ class AuthManager
      * @param string $email
      * @param string $password
      * @return Result
+     * @throws RuntimeException
      */
     public function login($email, $password)
     {
         if($this->authService->hasIdentity()) {
-            $this->logger->err(__METHOD__ . PHP_EOL . 'Member['. $email .'] has login. no need login again');
-            return false;
+            throw new RuntimeException('不允许重复登录!');
         }
 
         // Authentication with login/password
@@ -69,7 +63,6 @@ class AuthManager
     {
         if ($this->authService->hasIdentity()) {
             $this->authService->clearIdentity();
-            $this->logger->debug(__METHOD__ . PHP_EOL . 'Cleaned administrator login identity!');
         }
     }
 

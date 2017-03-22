@@ -4,6 +4,9 @@
 namespace Admin\Validator;
 
 
+use Admin\Exception\InvalidArgumentException;
+use Admin\Exception\RuntimeException;
+use Admin\Service\MemberManager;
 use Zend\Validator\AbstractValidator;
 
 
@@ -29,7 +32,7 @@ class OldPasswordValidator extends AbstractValidator
      * @var array
      */
     protected $messageTemplates = [
-        self::OLD_PWD_INVALID => 'The old password not matched.',
+        self::OLD_PWD_INVALID => '您的当前密码输入不正确',
     ];
 
 
@@ -59,9 +62,17 @@ class OldPasswordValidator extends AbstractValidator
     public function isValid($value)
     {
         $memberManager = $this->options['memberManager'];
+        if (!$memberManager instanceof MemberManager) {
+            $this->error(self::OLD_PWD_INVALID);
+            return false;
+        }
 
-        $member = $memberManager->getCurrentMember();
-        if (null == $member) {
+        try {
+            $member = $memberManager->getCurrentMember();
+        } catch (RuntimeException $e) {
+            $this->error(self::OLD_PWD_INVALID);
+            return false;
+        } catch (InvalidArgumentException $e) {
             $this->error(self::OLD_PWD_INVALID);
             return false;
         }

@@ -20,9 +20,8 @@ class MemberManagerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
-        $logger = $container->get('Logger');
         $authService = $container->get(AuthService::class);
 
-        return new MemberManager($authService, $entityManager, $logger);
+        return new MemberManager($authService, $entityManager);
     }
 }

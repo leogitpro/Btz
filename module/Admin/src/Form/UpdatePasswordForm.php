@@ -6,11 +6,9 @@ namespace Admin\Form;
 
 use Admin\Service\MemberManager;
 use Admin\Validator\OldPasswordValidator;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
 
-class UpdatePasswordForm extends Form
+class UpdatePasswordForm extends BaseForm
 {
 
     /**
@@ -21,34 +19,16 @@ class UpdatePasswordForm extends Form
 
     public function __construct(MemberManager $memberManager)
     {
-
-        parent::__construct('update_password_form');
-
         $this->memberManager = $memberManager;
-
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-
-        $this->setInputFilter(new InputFilter());
-
-        $this->addElements();
-        $this->addFilters();
-
+        parent::__construct();
     }
 
-    public function addElements()
+    /**
+     * 表单: 用户旧密码
+     */
+    private function addOldPasswordElement()
     {
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
-
-        $this->add([
+        $this->addElement([
             'type' => 'password',
             'name' => 'old_password',
             'attributes' => [
@@ -59,41 +39,7 @@ class UpdatePasswordForm extends Form
             ],
         ]);
 
-        $this->add([
-            'type' => 'password',
-            'name' => 'new_password',
-            'attributes' => [
-                'id' => 'new_password',
-            ],
-            'options' => [
-                'label' => 'New password',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'password',
-            'name' => 're_new_password',
-            'attributes' => [
-                'id' => 're_new_password',
-            ],
-            'options' => [
-                'label' => 'Confirm Password',
-            ],
-        ]);
-
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Update password',
-            ],
-        ]);
-    }
-
-    public function addFilters()
-    {
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name'     => 'old_password',
             'required' => true,
             'break_on_failure' => true,
@@ -123,8 +69,26 @@ class UpdatePasswordForm extends Form
                 ],
             ],
         ]);
+    }
 
-        $this->getInputFilter()->add([
+
+    /**
+     * 表单: 用户新密码
+     */
+    private function addNewPasswordElement()
+    {
+        $this->addElement([
+            'type' => 'password',
+            'name' => 'new_password',
+            'attributes' => [
+                'id' => 'new_password',
+            ],
+            'options' => [
+                'label' => 'New password',
+            ],
+        ]);
+
+        $this->addFilter([
             'name'     => 'new_password',
             'required' => true,
             'break_on_failure' => true,
@@ -146,8 +110,25 @@ class UpdatePasswordForm extends Form
                 ],
             ],
         ]);
+    }
 
-        $this->getInputFilter()->add([
+    /**
+     * 表单: 用户确认密码
+     */
+    private function addConfirmPasswordElement()
+    {
+        $this->addElement([
+            'type' => 'password',
+            'name' => 're_new_password',
+            'attributes' => [
+                'id' => 're_new_password',
+            ],
+            'options' => [
+                'label' => 'Confirm Password',
+            ],
+        ]);
+
+        $this->addFilter([
             'name'     => 're_new_password',
             'required' => true,
             'break_on_failure' => true,
@@ -162,6 +143,14 @@ class UpdatePasswordForm extends Form
                 ],
             ],
         ]);
+    }
+
+
+    public function addElements()
+    {
+        $this->addOldPasswordElement();
+        $this->addNewPasswordElement();
+        $this->addConfirmPasswordElement();
     }
 
 }

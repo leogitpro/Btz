@@ -1,50 +1,20 @@
 <?php
 /**
- * Administrator login form generator
+ * Member login form generator
  */
 
 namespace Admin\Form;
 
 
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
-
-
-class LoginForm extends Form
+class LoginForm extends BaseForm
 {
 
-    public function __construct()
-    {
-        parent::__construct('login_form');
-
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-
-        $this->setInputFilter(new InputFilter());
-
-        $this->addElements();
-        $this->addInputFilters();
-    }
-
-
     /**
-     * Add the form fields
+     * 表单: 登录帐号
      */
-    public function addElements()
+    private function addAccountElement()
     {
-        // CSRF field
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
-
-        // Email account field
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'email',
             'attributes' => [
@@ -55,38 +25,7 @@ class LoginForm extends Form
             ],
         ]);
 
-        // Password field
-        $this->add([
-            'type' => 'password',
-            'name' => 'password',
-            'attributes' => [
-                'id' => 'password',
-            ],
-            'options' => [
-                'label' => '登录密码',
-            ],
-        ]);
-
-        // Submit field
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => '现在登入',
-            ],
-        ]);
-    }
-
-
-    /**
-     * Add the form field filters and validators
-     */
-    public function addInputFilters()
-    {
-
-        // E-mail filter and validators
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'email',
             'required' => true,
             'break_on_failure' => true,
@@ -116,9 +55,25 @@ class LoginForm extends Form
                 ],
             ],
         ]);
+    }
 
-        // Password field filters and validators
-        $this->getInputFilter()->add([
+    /**
+     * 表单: 登录密码
+     */
+    private function addPasswordElement()
+    {
+        $this->addElement([
+            'type' => 'password',
+            'name' => 'password',
+            'attributes' => [
+                'id' => 'password',
+            ],
+            'options' => [
+                'label' => '登录密码',
+            ],
+        ]);
+
+        $this->addFilter([
             'name'     => 'password',
             'required' => true,
             'break_on_failure' => true,
@@ -155,4 +110,10 @@ class LoginForm extends Form
         ]);
     }
 
+
+    public function addElements()
+    {
+        $this->addAccountElement();
+        $this->addPasswordElement();
+    }
 }

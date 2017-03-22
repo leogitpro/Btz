@@ -9,12 +9,6 @@ namespace Admin\Service;
 
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\ORMInvalidArgumentException;
-use Logger\Service\LoggerService;
 
 
 class BaseEntityManager
@@ -26,12 +20,6 @@ class BaseEntityManager
     protected $entityManager;
 
     /**
-     * @var LoggerService
-     */
-    protected $logger;
-
-
-    /**
      * @var \Doctrine\ORM\QueryBuilder
      */
     private $qb = null;
@@ -41,12 +29,10 @@ class BaseEntityManager
      * BaseEntityManager constructor.
      *
      * @param EntityManager $entityManager
-     * @param LoggerService $logger
      */
-    public function __construct(EntityManager $entityManager, LoggerService $logger)
+    public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->logger = $logger;
 
         $this->qb = $this->entityManager->createQueryBuilder();
     }
@@ -80,15 +66,7 @@ class BaseEntityManager
      */
     protected function getEntitiesCount()
     {
-        try {
-            return $this->getQb()->getQuery()->getSingleScalarResult();
-        } catch (NoResultException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        } catch (NonUniqueResultException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        }
-
-        return 0;
+        return $this->getQb()->getQuery()->getSingleScalarResult();
     }
 
 
@@ -106,12 +84,7 @@ class BaseEntityManager
      */
     protected function getEntityFromPersistence()
     {
-        try {
-            return $this->getQb()->getQuery()->getOneOrNullResult();
-        } catch (NonUniqueResultException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            return null;
-        }
+        return $this->getQb()->getQuery()->getOneOrNullResult();
     }
 
 
@@ -120,14 +93,8 @@ class BaseEntityManager
      */
     public function saveModifiedEntity($entity)
     {
-        try {
-            $this->entityManager->persist($entity);
-            $this->entityManager->flush();
-        } catch (ORMInvalidArgumentException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        } catch (ORMException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        }
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
     }
 
 
@@ -137,20 +104,9 @@ class BaseEntityManager
     public function saveModifiedEntities($entities)
     {
         foreach ($entities as $entity) {
-            try {
-                $this->entityManager->persist($entity);
-            } catch (ORMInvalidArgumentException $e) {
-                $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            } catch (ORMException $e) {
-                $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            }
+            $this->entityManager->persist($entity);
         }
-
-        try {
-            $this->entityManager->flush();
-        } catch (OptimisticLockException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        }
+        $this->entityManager->flush();
     }
 
 
@@ -159,14 +115,8 @@ class BaseEntityManager
      */
     public function removeEntity($entity)
     {
-        try {
-            $this->entityManager->remove($entity);
-            $this->entityManager->flush();
-        } catch (ORMInvalidArgumentException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        } catch (ORMException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        }
+        $this->entityManager->remove($entity);
+        $this->entityManager->flush();
     }
 
 
@@ -176,20 +126,10 @@ class BaseEntityManager
     public function removeEntities($entities)
     {
         foreach ($entities as $entity) {
-            try {
-                $this->entityManager->remove($entity);
-            } catch (ORMInvalidArgumentException $e) {
-                $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            } catch (ORMException $e) {
-                $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-            }
+            $this->entityManager->remove($entity);
         }
 
-        try {
-            $this->entityManager->flush();
-        } catch (OptimisticLockException $e) {
-            $this->logger->err(__METHOD__ . PHP_EOL . $e->getMessage());
-        }
+        $this->entityManager->flush();
     }
 
 

@@ -105,6 +105,7 @@ return [
             Service\DepartmentManager::class => Service\Factory\EntityManagerFactory::class,
 
             Service\AuthAdapter::class => Service\Factory\EntityManagerFactory::class,
+
             Service\ComponentManager::class => Service\Factory\EntityManagerFactory::class,
             Service\FeedbackManager::class => Service\Factory\EntityManagerFactory::class,
 

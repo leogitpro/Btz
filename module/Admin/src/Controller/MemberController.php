@@ -12,8 +12,8 @@ namespace Admin\Controller;
 
 use Admin\Entity\Department;
 use Admin\Entity\Member;
+use Admin\Exception\RuntimeException;
 use Admin\Form\MemberForm;
-use Ramsey\Uuid\Uuid;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -22,9 +22,7 @@ class MemberController extends AdminBaseController
 {
 
     /**
-     * Show administrator list page
-     *
-     * @return ViewModel
+     * 成员列表
      */
     public function indexAction()
     {
@@ -103,18 +101,11 @@ class MemberController extends AdminBaseController
     {
         $member_id = $this->params()->fromRoute('key', 0);
         if($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员账号!');
-            return ;
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
-        }
 
         if ($member->getMemberStatus() == Member::STATUS_ACTIVATED) { // to be retried
             $member->setMemberStatus(Member::STATUS_RETRIED);
@@ -126,12 +117,10 @@ class MemberController extends AdminBaseController
 
         $memberManager->saveModifiedEntity($member);
 
-        return $this->getMessagePlugin()->show(
+        return $this->go(
             '成员状态已更新',
             '成员: ' . $member->getMemberName() . ' 的账号状态已经被更新!',
-            $this->url()->fromRoute('admin/member'),
-            '返回',
-            3
+            $this->url()->fromRoute('admin/member')
         );
     }
 
@@ -145,18 +134,11 @@ class MemberController extends AdminBaseController
     {
         $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
-            return ;
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
-        }
 
         $form = new MemberForm($memberManager, $member, ['email', 'name']);
 
@@ -173,12 +155,10 @@ class MemberController extends AdminBaseController
 
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '成员信息已经更新',
                     '成员: ' . $data['name'] . ' 的账号信息已经被更新!',
-                    $this->url()->fromRoute('admin/member'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/member')
                 );
             }
         }
@@ -194,25 +174,16 @@ class MemberController extends AdminBaseController
 
     /**
      * Edit level page
-     *
-     * @return ViewModel
      */
     public function levelAction()
     {
         $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
-            return ;
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
-        }
 
         $form = new MemberForm($memberManager, $member, ['level']);
 
@@ -228,12 +199,10 @@ class MemberController extends AdminBaseController
 
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '成员等级已更新',
                     '成员: ' . $member->getMemberName() . ' 的等级信息已经被更新!',
-                    $this->url()->fromRoute('admin/member'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/member')
                 );
             }
         }
@@ -256,18 +225,11 @@ class MemberController extends AdminBaseController
     {
         $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止修改超级管理员信息');
-            return ;
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
-        }
 
         $form = new MemberForm($memberManager, $member, ['password']);
 
@@ -282,12 +244,10 @@ class MemberController extends AdminBaseController
 
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '密码已更改',
                     '成员: ' . $member->getMemberName() . ' 的登入密码已经更新, 需要使用新密码登入!',
-                    $this->url()->fromRoute('admin/member'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/member')
                 );
             }
         }
@@ -308,14 +268,11 @@ class MemberController extends AdminBaseController
     {
         $member_id = $this->params()->fromRoute('key');
         if($member_id == Member::DEFAULT_MEMBER_ID) {
-            throw new \Exception("这个账号不是一般人能碰的!");
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getMember($member_id);
-        if (null == $member) {
-            throw new \Exception("这个成员信息好像已经没了.");
-        }
 
         $form = new MemberForm($memberManager, $member, ['expired']);
 
@@ -332,12 +289,10 @@ class MemberController extends AdminBaseController
 
                 $memberManager->saveModifiedEntity($member);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '日期已更改',
                     '成员: ' . $member->getMemberName() . ' 的账号过期时间已经更新!',
-                    $this->url()->fromRoute('admin/member'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/member')
                 );
             }
         }
@@ -353,18 +308,11 @@ class MemberController extends AdminBaseController
 
     /**
      * View a member with all departments relationship
-     *
-     * @return ViewModel
      */
     public function departmentsAction()
     {
         $member_id = $this->params()->fromRoute('key');
         $member = $this->getMemberManager()->getMember($member_id);
-        if (null == $member) {
-            $this->getResponse()->setStatusCode(404);
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号: ' . $member_id);
-            return ;
-        }
 
         $data = [
             'inner' => [],
@@ -399,8 +347,6 @@ class MemberController extends AdminBaseController
 
     /**
      * AJAX save member departments
-     *
-     * @return JsonModel
      */
     public function updateDepartmentsAction()
     {
@@ -408,17 +354,12 @@ class MemberController extends AdminBaseController
 
         $member_id = $this->params()->fromRoute('key');
         if ($member_id == Member::DEFAULT_MEMBER_ID) {
-            $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '禁止更新超级管理员信息');
-            return new JsonModel($json);
+            throw new RuntimeException('禁止操作该用户帐号');
         }
 
         if($this->getRequest()->isPost() && $this->getRequest()->isXmlHttpRequest()) {
 
             $member = $this->getMemberManager()->getMember($member_id);
-            if (null == $member) {
-                $this->getLoggerPlugin()->err(__METHOD__ . PHP_EOL . '无效的成员编号:' . $member_id);
-                return new JsonModel($json);
-            }
 
             $selected = (array)$this->params()->fromPost('selected');
 
@@ -434,8 +375,6 @@ class MemberController extends AdminBaseController
             $this->getMemberManager()->saveModifiedEntity($member);
 
             $json['success'] = true;
-        } else {
-
         }
 
         return new JsonModel($json);
