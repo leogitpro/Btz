@@ -12,6 +12,8 @@ namespace Admin\Controller;
 use Admin\Entity\WeChat;
 use Admin\Entity\WeChatClient;
 use Admin\Form\WeChatClientForm;
+use WeChat\Entity\Account;
+use WeChat\Entity\Client;
 use Zend\View\Model\ViewModel;
 
 
@@ -24,15 +26,9 @@ class WeChatClientController extends AdminBaseController
     public function indexAction()
     {
         $myself = $this->getMemberManager()->getCurrentMember();
-
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+        if (!$weChat instanceof Account) {
+            throw new \Exception('您还没创建公众号, 请先创建好公众号再操作!');
         }
 
         // Page configuration
@@ -40,9 +36,7 @@ class WeChatClientController extends AdminBaseController
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $cm = $this->getWeChatClientManager();
-
-        $count = $cm->getClientCountByWeChat($weChat);
+        $count = $this->getWeChatClientService()->getClientCountByWeChat($weChat);
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -55,7 +49,7 @@ class WeChatClientController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChatClient', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $cm->getClientsWithLimitPageByWeChat($weChat, $page, $size);
+        $rows = $this->getWeChatClientService()->getClientsWithLimitPageByWeChat($weChat, $page, $size);
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -70,16 +64,11 @@ class WeChatClientController extends AdminBaseController
      */
     public function addAction()
     {
+
         $myself = $this->getMemberManager()->getCurrentMember();
-
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+        if (!$weChat instanceof Account) {
+            throw new \Exception('您还没创建公众号, 请先创建好公众号再操作!');
         }
 
         $form = new WeChatClientForm();
@@ -92,13 +81,13 @@ class WeChatClientController extends AdminBaseController
                 $data = $form->getData();
 
                 $start = new \DateTime($data['active']);
-                $activeTime = $start->format('U');
+                $activeTime = $start->format('U') + 1;
 
                 $end = new \DateTime($data['expire']);
                 $end->modify("+1 day");
                 $expireTime = $end->format('U') - 1;
 
-                $this->getWeChatClientManager()->createWeChatClient(
+                $this->getWeChatClientService()->createWeChatClient(
                     $weChat,
                     $data['name'],
                     $data['domain'],
@@ -129,8 +118,8 @@ class WeChatClientController extends AdminBaseController
     {
         $clientId = (string)$this->params()->fromRoute('key');
 
-        $client = $this->getWeChatClientManager()->getWeChatClient($clientId);
-        if (!$client instanceof WeChatClient) {
+        $client = $this->getWeChatClientService()->getWeChatClient($clientId);
+        if (!$client instanceof Client) {
             throw new \Exception('无法查询到此客户端信息!');
         }
 
@@ -141,7 +130,7 @@ class WeChatClientController extends AdminBaseController
 
         $name = $client->getName();
 
-        $this->getWeChatClientManager()->removeEntity($client);
+        $this->getWeChatClientService()->removeEntity($client);
 
         return $this->go(
             '客户端信息已经删除',

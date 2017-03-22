@@ -62,7 +62,7 @@ $form->prepare();
             <?php echo $this->formLabel($form->get('ip'), '允许来访的IP地址'); ?>
             <?php echo $this->formElement($form->get('ip')); ?>
             <p class="text-muted">
-                <small>IP 地址格式: <strong>xxx.xxx.xxx.xxx</strong>
+                <small>IP 地址格式: <strong>xxx.xxx.xxx.xxx</strong></small>
             </p>
             <?php echo $this->formElementErrors($form->get('ip')); ?>
         </div>
@@ -70,12 +70,18 @@ $form->prepare();
         <div class="form-group">
             <?php echo $this->formLabel($form->get('active'), '允许客户端访问的开始时间'); ?>
             <?php echo $this->formElement($form->get('active')); ?>
+            <p class="text-muted">
+                <small>日期格式示例: <strong><?php echo date('Y-m-d'); ?></strong></small>
+            </p>
             <?php echo $this->formElementErrors($form->get('active')); ?>
         </div>
 
         <div class="form-group">
             <?php echo $this->formLabel($form->get('expire'), '允许客户端访问的结束时间'); ?>
             <?php echo $this->formElement($form->get('expire')); ?>
+            <p class="text-muted">
+                <small>日期格式示例: <strong><?php echo date('Y-m-d', strtotime("+7 day")); ?></strong></small>
+            </p>
             <?php echo $this->formElementErrors($form->get('expire')); ?>
         </div>
 

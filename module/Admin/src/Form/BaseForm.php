@@ -29,14 +29,13 @@ class BaseForm extends Form
         $this->setInputFilter(new InputFilter());
         $this->setAttributes(['method' => 'post', 'role' => 'form']);
 
-        $this->addCsrfElement();
         $this->addElements();
+        $this->addCsrfElement();
         $this->addSubmitElement();
         foreach ($this->_elements as $element) {
             $this->add($element);
         }
 
-        $this->addFilters();
         $inputFilter = new InputFilter();
         foreach ($this->_filters as $filter) {
             $inputFilter->add($filter);
@@ -57,7 +56,6 @@ class BaseForm extends Form
 
 
     public function addElements() {}
-    public function addFilters() {}
 
 
     private function addCsrfElement()

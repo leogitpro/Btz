@@ -9,7 +9,6 @@
 namespace Admin\Controller;
 
 
-use Admin\Entity\WeChat;
 use Admin\Form\WeChatForm;
 use WeChat\Entity\Account;
 use WeChat\Exception\InvalidArgumentException;

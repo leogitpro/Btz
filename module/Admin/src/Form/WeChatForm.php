@@ -51,13 +51,7 @@ class WeChatForm extends BaseForm
                 'value' => $value,
             ],
         ]);
-    }
 
-    /**
-     * 验证规则: AppID
-     */
-    private function addAppIdFilter()
-    {
         $this->addFilter([
             'name' => 'appid',
             'required' => true,
@@ -114,13 +108,7 @@ class WeChatForm extends BaseForm
                 'value' => $value,
             ],
         ]);
-    }
 
-    /**
-     * 验证规则: AppSecret
-     */
-    private function addAppSecretFilter()
-    {
         $this->addFilter([
             'name' => 'appsecret',
             'required' => true,
@@ -166,7 +154,6 @@ class WeChatForm extends BaseForm
     }
 
 
-
     public function addElements()
     {
         if(!$this->weChat instanceof Account || $this->weChat->getWxChecked() != Account::STATUS_CHECKED) {
@@ -177,16 +164,5 @@ class WeChatForm extends BaseForm
         $appSecret = ($this->weChat instanceof Account) ? $this->weChat->getWxAppSecret() : '';
         $this->addAppSecretElement($appSecret);
     }
-
-
-    public function addFilters()
-    {
-        if(!$this->weChat instanceof Account || $this->weChat->getWxChecked() != Account::STATUS_CHECKED) {
-            $this->addAppIdFilter();
-        }
-
-        $this->addAppSecretFilter();
-    }
-
 
 }

@@ -43,12 +43,12 @@ $this->inlineScript()->captureEnd();
                         </tr>
                         <?php
                         foreach ($clients as $client) {
-                            if ($client instanceof \Admin\Entity\WeChatClient) {
+                            if ($client instanceof \WeChat\Entity\Client) {
                                 ?>
                                 <tr>
                                     <td><?php echo $client->getName(); ?></td>
-                                    <td><?php echo date('Y-m-d', $client->getActiveTime()); ?></td>
-                                    <td><?php echo date('Y-m-d', $client->getExpireTime()); ?></td>
+                                    <td><?php echo date('Y-m-d H:i:s', $client->getActiveTime()); ?></td>
+                                    <td><?php echo date('Y-m-d H:i:s', $client->getExpireTime()); ?></td>
                                     <td>
                                         域名: <?php echo $client->getDomain();  ?><br>
                                         IP: <?php echo $client->getIp(); ?>

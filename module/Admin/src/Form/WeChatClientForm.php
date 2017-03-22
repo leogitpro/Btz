@@ -13,12 +13,14 @@ namespace Admin\Form;
 
 class WeChatClientForm extends BaseForm
 {
+
+
     /**
-     * 客户端名字
+     * 表单: 客户端名称
      */
     private function addNameElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
@@ -26,7 +28,7 @@ class WeChatClientForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'name',
             'required' => true,
             'break_on_failure' => true,
@@ -60,12 +62,13 @@ class WeChatClientForm extends BaseForm
         ]);
     }
 
+
     /**
-     * 客户端域名
+     * 表单: 客户端域名
      */
     private function addDomainElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'domain',
             'attributes' => [
@@ -73,7 +76,7 @@ class WeChatClientForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'domain',
             'required' => true,
             'break_on_failure' => true,
@@ -104,42 +107,17 @@ class WeChatClientForm extends BaseForm
                         ],
                     ],
                 ],
-
-                /**
-                [
-                    'name' => \Zend\Validator\Hostname::class,
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        //'allow'       => \Zend\Validator\Hostname::ALLOW_DNS, // Allow these hostnames
-                        //'useIdnCheck' => true,  // Check IDN domains
-                        //'useTldCheck' => true,  // Check TLD elements
-                        //'ipValidator' => null,  // IP validator to use
-                        'messages' => [
-                            \Zend\Validator\Hostname::INVALID => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::INVALID_DASH => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::INVALID_HOSTNAME => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::INVALID_HOSTNAME_SCHEMA => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::INVALID_LOCAL_NAME => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::INVALID_URI => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::IP_ADDRESS_NOT_ALLOWED => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::LOCAL_NAME_NOT_ALLOWED => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::UNDECIPHERABLE_TLD => '这个域名好像不是可用的域名哦.',
-                            \Zend\Validator\Hostname::UNKNOWN_TLD => '这个域名好像不是可用的域名哦.',
-                        ],
-                    ],
-                ],
-                //*/
             ],
         ]);
-
     }
 
+
     /**
-     * 客户端 IP
+     * 表单: 客户端 IP
      */
     private function addIpElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'ip',
             'attributes' => [
@@ -147,7 +125,7 @@ class WeChatClientForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'ip',
             'required' => true,
             'break_on_failure' => true,
@@ -169,12 +147,13 @@ class WeChatClientForm extends BaseForm
         ]);
     }
 
+
     /**
-     * 激活时间
+     * 表单: 生效时间
      */
     private function addActiveElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'date',
             'name' => 'active',
             'attributes' => [
@@ -182,7 +161,7 @@ class WeChatClientForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'active',
             'filters'  => [
                 ['name' => 'StringTrim'],
@@ -191,12 +170,14 @@ class WeChatClientForm extends BaseForm
         ]);
     }
 
+
+
     /**
-     * 过期时间
+     * 表单: 过期时间
      */
     private function addExpireElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'date',
             'name' => 'expire',
             'attributes' => [
@@ -204,7 +185,7 @@ class WeChatClientForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'expire',
             'filters'  => [
                 ['name' => 'StringTrim'],
@@ -214,14 +195,14 @@ class WeChatClientForm extends BaseForm
     }
 
 
+
     public function addElements()
     {
-        $this->addCsrfElement();
         $this->addNameElement();
         $this->addDomainElement();
         $this->addIpElement();
         $this->addActiveElement();
         $this->addExpireElement();
-        $this->addSubmitElement();
     }
+
 }
