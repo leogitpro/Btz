@@ -228,7 +228,7 @@ $this->inlineScript()->captureEnd();
                 <label>菜单类型</label>
                 <select name="menuCategory" class="form-control menu-category">
                     <?php
-                    $list = \Admin\Entity\WeChatMenu::getTypeList();
+                    $list = \WeChat\Entity\Menu::getTypeList();
                     foreach ($list as $k => $v) {
                     ?>
                         <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
@@ -260,7 +260,7 @@ $this->inlineScript()->captureEnd();
                             <label>设置用户标签</label>
                             <select name="menuForTag" class="form-control">
                                 <option value="" selected>不设置</option>
-                                <?php if(!empty($tags)) { foreach($tags as $tag) { if($tag instanceof \Admin\Entity\WeChatTag) { ?>
+                                <?php if(!empty($tags)) { foreach($tags as $tag) { if($tag instanceof \WeChat\Entity\Tag) { ?>
                                     <option value="<?php echo $tag->getTagid(); ?>"><?php echo $tag->getTagname(); ?></option>
                                 <?php } } } ?>
                             </select>

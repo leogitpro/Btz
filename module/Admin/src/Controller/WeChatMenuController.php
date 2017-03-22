@@ -9,8 +9,8 @@
 namespace Admin\Controller;
 
 
-use Admin\Entity\WeChat;
-use Admin\Entity\WeChatMenu;
+use WeChat\Entity\Account;
+use WeChat\Entity\Menu;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -24,25 +24,14 @@ class WeChatMenuController extends AdminBaseController
     public function indexAction()
     {
         $myself = $this->getMemberManager()->getCurrentMember();
-
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
         // Page configuration
         $size = 10;
         $page = (int)$this->params()->fromRoute('key', 1);
         if ($page < 1) { $page = 1; }
 
-        $wm = $this->getWeChatMenuManager();
-
-        $count = $wm->getMenuCountByWeChat($weChat);
+        $count = $this->getWeChatMenuService()->getMenuCountByWeChat($weChat);
 
         // Get pagination helper
         $viewHelperManager = $this->getSm('ViewHelperManager');
@@ -55,7 +44,7 @@ class WeChatMenuController extends AdminBaseController
         $paginationHelper->setUrlTpl($this->url()->fromRoute('admin/weChatMenu', ['action' => 'index', 'key' => '%d']));
 
         // List data
-        $rows = $wm->getMenusWithLimitPageByWeChat($weChat, $page, $size);
+        $rows = $this->getWeChatMenuService()->getMenusWithLimitPageByWeChat($weChat, $page, $size);
 
         return new ViewModel([
             'weChat' => $weChat,
@@ -71,20 +60,10 @@ class WeChatMenuController extends AdminBaseController
      */
     public function addAction()
     {
-
         $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return $this->go(
-                '没有配置公众号',
-                '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
-
-        $tags = $this->getWeChatTagManager()->getAllTagsByWeChat($weChat);
+        $tags = $this->getWeChatTagService()->getAllTagsByWeChat($weChat);
 
         if($this->getRequest()->isPost()) {
 
@@ -183,7 +162,7 @@ class WeChatMenuController extends AdminBaseController
             $menuCategory = $this->params()->fromPost('menuCategory');
 
 
-            if (WeChatMenu::TYPE_CONDITIONAL == $menuCategory) {
+            if (Menu::TYPE_CONDITIONAL == $menuCategory) {
                 $menuForSex = (string)$this->params()->fromPost('menuForSex', '');
                 $menuForPlatform = (string)$this->params()->fromPost('menuForPlatform', '');
                 $menuForTag = (string)$this->params()->fromPost('menuForTag', '');
@@ -211,13 +190,13 @@ class WeChatMenuController extends AdminBaseController
 
                     $menuBar->matchrule = $condObj;
                 } else {
-                    $menuCategory = WeChatMenu::TYPE_DEFAULT;
+                    $menuCategory = Menu::TYPE_DEFAULT;
                 }
             } else {
-                $menuCategory = WeChatMenu::TYPE_DEFAULT;
+                $menuCategory = Menu::TYPE_DEFAULT;
             }
 
-            $this->getWeChatMenuManager()->createWeChatMenu($weChat, $menuTitle, json_encode($menuBar, JSON_UNESCAPED_UNICODE), $menuCategory);
+            $this->getWeChatMenuService()->createWeChatMenu($weChat, $menuTitle, json_encode($menuBar, JSON_UNESCAPED_UNICODE), $menuCategory);
 
             return $this->go(
                 '菜单已创建',
@@ -240,19 +219,10 @@ class WeChatMenuController extends AdminBaseController
     public function editAction()
     {
         $menuId = (string)$this->params()->fromRoute('key');
-        $wm = $this->getWeChatMenuManager();
-
-        $weChatMenu = $wm->getWeChatMenu($menuId);
-        if (!$weChatMenu instanceof WeChatMenu) {
-            return $this->go(
-                '菜单无效',
-                '未查询到您的菜单信息信息, 请确认你的菜单信息信息没有错误!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
+        $weChatMenu = $this->getWeChatMenuService()->getWeChatMenu($menuId);
 
         $weChat = $weChatMenu->getWeChat();
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             return $this->go(
                 '没有配置公众号',
                 '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
@@ -265,7 +235,7 @@ class WeChatMenuController extends AdminBaseController
             throw new \RunException('禁止操作不属于您的公众号的菜单信息!');
         }
 
-        $tags = $this->getWeChatTagManager()->getAllTagsByWeChat($weChat);
+        $tags = $this->getWeChatTagService()->getAllTagsByWeChat($weChat);
 
 
         if($this->getRequest()->isPost()) {
@@ -363,7 +333,7 @@ class WeChatMenuController extends AdminBaseController
 
             $menuCategory = $this->params()->fromPost('menuCategory');
 
-            if (WeChatMenu::TYPE_CONDITIONAL == $menuCategory) {
+            if (Menu::TYPE_CONDITIONAL == $menuCategory) {
                 $menuForSex = (string)$this->params()->fromPost('menuForSex', '');
                 $menuForPlatform = (string)$this->params()->fromPost('menuForPlatform', '');
                 $menuForTag = (string)$this->params()->fromPost('menuForTag', '');
@@ -392,10 +362,10 @@ class WeChatMenuController extends AdminBaseController
 
                     $menuBar->matchrule = $condObj;
                 } else {
-                    $menuCategory = WeChatMenu::TYPE_DEFAULT;
+                    $menuCategory = Menu::TYPE_DEFAULT;
                 }
             } else {
-                $menuCategory = WeChatMenu::TYPE_DEFAULT;
+                $menuCategory = Menu::TYPE_DEFAULT;
             }
 
             $weChatMenu->setName($menuTitle);
@@ -403,7 +373,7 @@ class WeChatMenuController extends AdminBaseController
             $weChatMenu->setType($menuCategory);
             $weChatMenu->setUpdated(new \DateTime());
 
-            $wm->saveModifiedEntity($weChatMenu);
+            $this->getWeChatMenuService()->saveModifiedEntity($weChatMenu);
 
             return $this->go(
                 '菜单已更新',
@@ -427,19 +397,10 @@ class WeChatMenuController extends AdminBaseController
     public function deleteAction()
     {
         $menuId = (string)$this->params()->fromRoute('key');
-        $wm = $this->getWeChatMenuManager();
-
-        $weChatMenu = $wm->getWeChatMenu($menuId);
-        if (!$weChatMenu instanceof WeChatMenu) {
-            return $this->go(
-                '菜单无效',
-                '未查询到您的菜单信息信息, 请确认你的菜单信息信息没有错误!',
-                $this->url()->fromRoute('admin/weChat')
-            );
-        }
+        $weChatMenu = $this->getWeChatMenuService()->getWeChatMenu($menuId);
 
         $weChat = $weChatMenu->getWeChat();
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             return $this->go(
                 '没有配置公众号',
                 '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
@@ -452,7 +413,7 @@ class WeChatMenuController extends AdminBaseController
             throw new \RunException('禁止操作不属于您的公众号的菜单信息!');
         }
 
-        if (WeChatMenu::STATUS_ACTIVATED == $weChatMenu->getStatus()) {
+        if (Menu::STATUS_ACTIVATED == $weChatMenu->getStatus()) {
             return $this->go(
                 '禁止删除',
                 '该菜单已在使用中, 请先先清空微信公众号菜单, 再删除本地菜单.',
@@ -460,7 +421,7 @@ class WeChatMenuController extends AdminBaseController
             );
         }
 
-        $wm->removeEntity($weChatMenu);
+        $this->getWeChatMenuService()->removeEntity($weChatMenu);
 
         return $this->go(
             '菜单已删除',
@@ -471,23 +432,16 @@ class WeChatMenuController extends AdminBaseController
 
 
     /**
-     * 同步微信菜单
+     * 同步微信菜单到微信平台
      */
     public function asyncAction()
     {
         $result = ['success' => false, 'code' => 0, 'message' => ''];
 
         $key = (string)$this->params()->fromRoute('key');
-        $wm = $this->getWeChatMenuManager();
-
-        $weChatMenu = $wm->getWeChatMenu($key);
-        if (!$weChatMenu instanceof WeChatMenu) {
-            $result['message'] = '未查询到您的菜单信息信息, 请确认你的菜单信息信息没有错误!';
-            return new JsonModel($result);
-        }
-
+        $weChatMenu = $this->getWeChatMenuService()->getWeChatMenu($key);
         $weChat = $weChatMenu->getWeChat();
-        if (!$weChat instanceof WeChat) {
+        if (!$weChat instanceof Account) {
             $result['message'] = '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!';
             return new JsonModel($result);
         }
@@ -498,15 +452,13 @@ class WeChatMenuController extends AdminBaseController
             return new JsonModel($result);
         }
 
-        $ws = $this->getWeChatService($weChat->getWxId());
-
-        if(WeChatMenu::TYPE_DEFAULT == $weChatMenu->getType()) {
-            if (!$ws->deleteDefaultMenu()) { //Delete all remote menu
+        if(Menu::TYPE_DEFAULT == $weChatMenu->getType()) {
+            if (!$this->getWeChatService()->menuRemoveDefault($weChat)) { //Delete all remote menu
                 $result['message'] = '公众号菜单清理失败!';
                 return new JsonModel($result);
             }
 
-            if (!$ws->createDefaultMenu($weChatMenu->getMenu())) { //Create default menu
+            if (!$this->getWeChatService()->menuCreateDefault($weChat, $weChatMenu->getMenu())) { //Create default menu
                 $result['message'] = '自定义菜单同步失败!';
                 return new JsonModel($result);
             }
@@ -515,45 +467,45 @@ class WeChatMenuController extends AdminBaseController
             $menus = $weChat->getMenus();
             $updated = [];
             foreach($menus as $menu) {
-                if($menu instanceof WeChatMenu) {
+                if($menu instanceof Menu) {
                     if($menu->getId() != $weChatMenu->getId()) {
-                        $menu->setStatus(WeChatMenu::STATUS_RETIRED);
+                        $menu->setStatus(Menu::STATUS_RETIRED);
                         $menu->setMenuid('');
                         $updated[] = $menu;
                     }
                 }
             }
-            $weChatMenu->setStatus(WeChatMenu::STATUS_ACTIVATED);
+            $weChatMenu->setStatus(Menu::STATUS_ACTIVATED);
             $updated[] = $weChatMenu;
 
-            $wm->saveModifiedEntities($updated);
+            $this->getWeChatMenuService()->saveModifiedEntities($updated);
         } else {
-            if(WeChatMenu::STATUS_ACTIVATED == $weChatMenu->getStatus()) { // Delete match menu
-                if(!$ws->deleteConditionalMenu($weChatMenu->getMenuid())) {
+            if(Menu::STATUS_ACTIVATED == $weChatMenu->getStatus()) { // Delete match menu
+                if(!$this->getWeChatService()->menuRemoveConditional($weChat, $weChatMenu->getMenuid())) {
                     $result['message'] = '个性化菜单删除失败!';
                     return new JsonModel($result);
                 } else {
                     $weChatMenu->setMenuid('');
-                    $weChatMenu->setStatus(WeChatMenu::STATUS_RETIRED);
+                    $weChatMenu->setStatus(Menu::STATUS_RETIRED);
 
-                    $wm->saveModifiedEntity($weChatMenu);
+                    $this->getWeChatMenuService()->saveModifiedEntity($weChatMenu);
                 }
             } else { //
-                $count = $wm->getActivatedMenuCountByWeChatWithType($weChat, WeChatMenu::TYPE_CONDITIONAL);
+                $count = $this->getWeChatMenuService()->getActivatedMenuCountByWeChatWithType($weChat, Menu::TYPE_CONDITIONAL);
                 if($count > 2) {
                     $result['message'] = '个性化菜单已经使用满额! 不能再增加了.';
                     return new JsonModel($result);
                 }
 
-                $menuid = $ws->createConditionalMenu($weChatMenu->getMenu());
+                $menuid = $this->getWeChatService()->menuCreateConditional($weChat, $weChatMenu->getMenu());
                 if (empty($menuid)) {
                     $result['message'] = '个性化菜单添加失败!';
                     return new JsonModel($result);
                 }
 
                 $weChatMenu->setMenuid($menuid);
-                $weChatMenu->setStatus(WeChatMenu::STATUS_ACTIVATED);
-                $wm->saveModifiedEntity($weChatMenu);
+                $weChatMenu->setStatus(Menu::STATUS_ACTIVATED);
+                $this->getWeChatMenuService()->saveModifiedEntity($weChatMenu);
             }
         }
 
@@ -572,19 +524,14 @@ class WeChatMenuController extends AdminBaseController
         $result = ['success' => false, 'code' => 0, 'message' => 'Invalid WeChat'];
 
         $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return new JsonModel($result);
-        }
-
-        if(!$this->getWeChatService($weChat->getWxId())->deleteDefaultMenu()) {
+        if(!$this->getWeChatService()->menuRemoveDefault($weChat)) {
             $result['message'] = '清空公众号菜单失败!';
             return new JsonModel($result);
         }
 
-        $this->getWeChatMenuManager()->resetWeChatMenu($weChat);
+        $this->getWeChatMenuService()->resetWeChatMenu($weChat);
 
         $result['success'] = true;
         $result['message'] = '公众号菜单已经清理完毕.';
@@ -601,27 +548,18 @@ class WeChatMenuController extends AdminBaseController
         $result = ['success' => false, 'code' => 0, 'message' => 'Invalid WeChat'];
 
         $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
-        $weChat = $this->getWeChatManager()->getWeChatByMember($myself);
-
-        if (!$weChat instanceof WeChat) {
-            return new JsonModel($result);
-        }
-
-        $mm = $this->getWeChatMenuManager();
-        $mm->deleteWeChatMenu($weChat);
-
-        $ws = $this->getWeChatService($weChat->getWxId());
-
-        $menus = $ws->exportMenu();
+        $this->getWeChatMenuService()->deleteWeChatMenu($weChat);
+        $menus = $this->getWeChatService()->menuExport($weChat);
 
         if(!empty($menus)) {
             $i = 0;
             foreach ($menus as $key => $menu) {
                 $name = $i < 1 ? '自定义菜单' : '个性化菜单-' . $i;
-                $type = $i < 1 ? WeChatMenu::TYPE_DEFAULT : WeChatMenu::TYPE_CONDITIONAL;
+                $type = $i < 1 ? Menu::TYPE_DEFAULT : Menu::TYPE_CONDITIONAL;
                 $i++;
-                $mm->createWeChatMenu($weChat, $name, json_encode($menu, JSON_UNESCAPED_UNICODE), $type, $key, WeChatMenu::STATUS_ACTIVATED);
+                $this->getWeChatMenuService()->createWeChatMenu($weChat, $name, json_encode($menu, JSON_UNESCAPED_UNICODE), $type, $key, Menu::STATUS_ACTIVATED);
             }
         }
 

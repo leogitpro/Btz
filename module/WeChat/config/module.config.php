@@ -76,6 +76,7 @@ return [
             Service\TagService::class => Service\Factory\BaseEntityFactory::class,
             Service\ClientService::class => Service\Factory\BaseEntityFactory::class,
             Service\QrCodeService::class => Service\Factory\BaseEntityFactory::class,
+            Service\MenuService::class => Service\Factory\BaseEntityFactory::class,
             Service\WeChatService::class => Service\Factory\WeChatFactory::class,
         ],
     ],

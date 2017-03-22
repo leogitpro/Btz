@@ -17,14 +17,10 @@ use Admin\Service\DepartmentManager;
 use Admin\Service\FeedbackManager;
 use Admin\Service\MemberManager;
 use Admin\Service\MessageManager;
-use Admin\Service\WeChatClientManager;
-use Admin\Service\WeChatManager;
-use Admin\Service\WeChatMenuManager;
-use Admin\Service\WeChatQrCodeManager;
-use Admin\Service\WeChatTagManager;
 use Application\Controller\AppBaseController;
 use WeChat\Service\AccountService;
 use WeChat\Service\ClientService;
+use WeChat\Service\MenuService;
 use WeChat\Service\QrCodeService;
 use WeChat\Service\TagService;
 use WeChat\Service\WeChatService;
@@ -79,47 +75,15 @@ class AdminBaseController extends AppBaseController
         return $this->getSm(QrCodeService::class);
     }
 
+    /**
+     * @return MenuService
+     */
+    protected function getWeChatMenuService()
+    {
+        return $this->getSm(MenuService::class);
+    }
+
     ///
-
-    /**
-     * @return WeChatTagManager
-     */
-    protected function getWeChatTagManager()
-    {
-        return $this->getSm(WeChatTagManager::class);
-    }
-
-    /**
-     * @return WeChatQrCodeManager
-     */
-    protected function getWeChatQrCodeManager()
-    {
-        return $this->getSm(WeChatQrCodeManager::class);
-    }
-
-    /**
-     * @return WeChatMenuManager
-     */
-    protected function getWeChatMenuManager()
-    {
-        return $this->getSm(WeChatMenuManager::class);
-    }
-
-    /**
-     * @return WeChatClientManager
-     */
-    protected function getWeChatClientManager()
-    {
-        return $this->getSm(WeChatClientManager::class);
-    }
-
-    /**
-     * @return WeChatManager
-     */
-    protected function getWeChatManager()
-    {
-        return $this->getSm(WeChatManager::class);
-    }
 
 
     /**

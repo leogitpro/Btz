@@ -96,4 +96,79 @@ class WeChatService
         return NetworkService::QrCodeCreate($token, $type, $scene, $expired);
     }
 
+
+    /**
+     * 删除公众号菜单
+     *
+     * @param Account $account
+     * @return true
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function menuRemoveDefault(Account $account)
+    {
+        $token = $this->getAccessToken($account);
+        return NetworkService::menuRemoveDefault($token);
+    }
+
+    /**
+     * 删除个性化菜单
+     *
+     * @param Account $account
+     * @param $menuid
+     * @return true
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function menuRemoveConditional(Account $account, $menuid)
+    {
+        $token = $this->getAccessToken($account);
+        return NetworkService::menuRemoveConditional($token, $menuid);
+    }
+
+    /**
+     * 导出公众号菜单
+     *
+     * @param Account $account
+     * @return array
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function menuExport(Account $account)
+    {
+        $token = $this->getAccessToken($account);
+        return NetworkService::menuExport($token);
+    }
+
+    /**
+     * 创建微信自定义菜单
+     *
+     * @param Account $account
+     * @param $menu
+     * @return true
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function menuCreateDefault(Account $account, $menu)
+    {
+        $token = $this->getAccessToken($account);
+        return NetworkService::menuCreateDefault($token, $menu);
+    }
+
+    /**
+     * 创建微信个性化菜单
+     *
+     * @param Account $account
+     * @param $menu
+     * @return string 菜单编号
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     */
+    public function menuCreateConditional(Account $account, $menu)
+    {
+        $token = $this->getAccessToken($account);
+        return NetworkService::menuCreateConditional($token, $menu);
+    }
+
+
 }

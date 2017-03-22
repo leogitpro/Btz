@@ -139,13 +139,13 @@ $this->inlineScript()->captureEnd();
                         </tr>
                         <?php
                         foreach ($menus as $menu) {
-                            if ($menu instanceof \Admin\Entity\WeChatMenu) {
+                            if ($menu instanceof \WeChat\Entity\Menu) {
                                 ?>
                                 <tr>
                                     <td><?php echo $menu->getName(); ?></td>
                                     <td><?php echo $menu->getTypeAsString(); ?></td>
                                     <td>
-                                        <?php if(\Admin\Entity\WeChatMenu::STATUS_ACTIVATED == $menu->getStatus()) { ?>
+                                        <?php if(\WeChat\Entity\Menu::STATUS_ACTIVATED == $menu->getStatus()) { ?>
                                             <span class="label label-success">
                                         <?php } else { ?>
                                             <span class="label label-default">
@@ -156,8 +156,8 @@ $this->inlineScript()->captureEnd();
                                     <td><?php echo $menu->getUpdated()->format('Y-m-d H:i:s'); ?></td>
                                     <td>
                                         <a class="async" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'async', 'key' => $menu->getId()]); ?>">
-                                            <?php if($menu->getType() == \Admin\Entity\WeChatMenu::TYPE_CONDITIONAL) { ?>
-                                                <?php if($menu->getStatus() == \Admin\Entity\WeChatMenu::STATUS_ACTIVATED) { ?>
+                                            <?php if($menu->getType() == \WeChat\Entity\Menu::TYPE_CONDITIONAL) { ?>
+                                                <?php if($menu->getStatus() == \WeChat\Entity\Menu::STATUS_ACTIVATED) { ?>
                                                     删除<strong>个性化菜单</strong>
                                                 <?php } else { ?>
                                                     添加<strong>个性化菜单</strong>
@@ -168,8 +168,10 @@ $this->inlineScript()->captureEnd();
                                         </a>
                                         <span> | </span>
                                         <a href="<?php echo $this->url('admin/weChatMenu', ['action' => 'edit', 'key' => $menu->getId()]); ?>">编辑</a>
+                                        <?php if($menu->getStatus() == \WeChat\Entity\Menu::STATUS_RETIRED) { ?>
                                         <span> | </span>
                                         <a class="delete" href="<?php echo $this->url('admin/weChatMenu', ['action' => 'delete', 'key' => $menu->getId()]); ?>">删除</a>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php } } ?>
