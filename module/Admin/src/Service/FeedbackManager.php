@@ -12,6 +12,7 @@ namespace Admin\Service;
 
 use Admin\Entity\Feedback;
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException;
 
 
 class FeedbackManager extends BaseEntityManager
@@ -22,12 +23,12 @@ class FeedbackManager extends BaseEntityManager
      *
      * @param string $feedbackId
      * @return Feedback
-     * @throws \Exception
+     * @throws InvalidArgumentException
      */
     public function getFeedback($feedbackId)
     {
         if (empty($feedbackId)) {
-            throw new \Exception('没有反馈的编号, 我们无法为您查阅信息哦!');
+            throw new InvalidArgumentException('没有反馈的编号, 我们无法为您查阅信息哦!');
         }
 
         $qb = $this->resetQb();
@@ -38,7 +39,7 @@ class FeedbackManager extends BaseEntityManager
 
         $obj = $this->getEntityFromPersistence();
         if (!$obj instanceof Feedback) {
-            throw new \Exception('查询不到相关的反馈信息!');
+            throw new InvalidArgumentException('查询不到相关的反馈信息!');
         }
         return $obj;
     }

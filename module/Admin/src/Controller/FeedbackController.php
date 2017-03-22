@@ -10,14 +10,12 @@ namespace Admin\Controller;
 
 
 use Admin\Entity\Feedback;
-use Admin\Entity\Member;
+use Admin\Exception\RuntimeException;
 use Admin\Form\FeedbackForm;
-use Doctrine\DBAL\Exception\NonUniqueFieldNameException;
-use Doctrine\ORM\NonUniqueResultException;
 use Ramsey\Uuid\Uuid;
-use Zend\Mvc\Exception\RuntimeException;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
+
 
 class FeedbackController extends AdminBaseController
 {
@@ -84,12 +82,10 @@ class FeedbackController extends AdminBaseController
                 $feedback->setReplier($myself);
                 $this->getFeedbackManager()->saveModifiedEntity($feedback);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '反馈已接收',
                     '感谢您宝贵的反馈意见! 我们已将您的意见分发到相关的负责人, 他们收到后会尽快进行回应. 谢谢!',
-                    $this->url()->fromRoute('admin/feedback'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/feedback')
                 );
             }
         }
@@ -113,17 +109,15 @@ class FeedbackController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
 
         if ($myself->getMemberId() != $feedback->getSender()->getMemberId()) {
-            throw new \Exception('你不能删除别人的反馈信息!');
+            throw new RuntimeException('你不能删除别人的反馈信息!');
         }
 
         $feedbackManager->removeEntity($feedback);
 
-        return $this->getMessagePlugin()->show(
+        return $this->go(
             '反馈已删除',
             '您已经删除您的反馈意见! 如果有任何想法, 请让我们知道. 谢谢!',
-            $this->url()->fromRoute('admin/feedback'),
-            '返回',
-            3
+            $this->url()->fromRoute('admin/feedback')
         );
     }
 
@@ -161,8 +155,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * @return mixed
-     * @throws \Exception
+     * @return 删除反馈
      */
     public function closeAction()
     {
@@ -173,12 +166,10 @@ class FeedbackController extends AdminBaseController
 
         $feedbackManager->removeEntity($feedback);
 
-        return $this->getMessagePlugin()->show(
+        return $this->go(
             '反馈已关闭',
             '成员的反馈已经关闭!',
-            $this->url()->fromRoute('admin/feedback', ['action' => 'all']),
-            '返回',
-            3
+            $this->url()->fromRoute('admin/feedback', ['action' => 'all'])
         );
     }
 

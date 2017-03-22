@@ -1,6 +1,6 @@
 <?php
 /**
- * Feedback.php
+ * FeedbackForm.php
  *
  * @author: Leo <camworkster@gmail.com>
  * @version: 1.0
@@ -9,39 +9,15 @@
 namespace Admin\Form;
 
 
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
-
-
-class FeedbackForm extends Form
+class FeedbackForm extends BaseForm
 {
-    public function __construct()
+
+    /**
+     * 表单: 反馈内容
+     */
+    private function addContentElement()
     {
-        parent::__construct('feedback_form');
-
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-        $this->setInputFilter(new InputFilter());
-
-        $this->addElements();
-        $this->addFilters();
-    }
-
-
-    public function addElements()
-    {
-        // CSRF field
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
-
-        $this->add([
+        $this->addElement([
             'type' => 'textarea',
             'name' => 'content',
             'attributes' => [
@@ -54,21 +30,7 @@ class FeedbackForm extends Form
             ],
         ]);
 
-        // Submit field
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Submit',
-            ],
-        ]);
-    }
-
-
-    public function addFilters()
-    {
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'content',
             'required' => true,
             'break_on_failure' => true,
@@ -101,5 +63,10 @@ class FeedbackForm extends Form
         ]);
     }
 
+
+    public function addElements()
+    {
+        $this->addContentElement();
+    }
 
 }
