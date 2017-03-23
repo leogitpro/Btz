@@ -11,85 +11,97 @@ namespace Admin\Form;
 
 use Admin\Entity\Department;
 use Admin\Entity\Member;
-use Admin\Service\DepartmentManager;
-use Admin\Service\MemberManager;
 use Admin\Validator\DeptIdValidator;
 use Admin\Validator\MemberIdValidator;
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
 
-class MessageForm extends Form
+class MessageForm extends BaseForm
 {
     private $receiver;
 
     private $manager;
 
-    public function __construct($manager = null, $receiver = null)
+    public function __construct($receiver = null, $manager = null)
     {
-        parent::__construct('message_form');
-
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
 
         $this->manager = $manager;
         $this->receiver = $receiver;
-        $this->setInputFilter(new InputFilter());
 
-        $this->addElements();
-        $this->addFilters();
+        parent::__construct();
     }
 
 
-    public function addElements()
+    /**
+     * 表单: 消息接收者
+     */
+    private function addReceiverElement($name, $id, $validator)
     {
+        $this->addElement([
+            'type' => 'text',
+            'name' => 'receiver_name',
+            'attributes' => [
+                'id' => 'receiver_name',
+                'value' => $name,
+            ],
+            'options' => [],
+        ]);
+        $this->addElement([
+            'type' => 'hidden',
+            'name' => 'receiver_id',
+            'attributes' => [
+                'id' => 'receiver_id',
+                'value' => $id,
+            ]
+        ]);
 
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
+        $this->addFilter([
+            'name' => 'receiver_name',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '接收者不能为空哦!',
+                        ],
+                    ],
+                ],
+                [
+                    'name'    => 'StringLength',
+                    'options' => [
+                        'min' => 2,
+                        'max' => 45,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '接收者名字太短了哦!',
+                            \Zend\Validator\StringLength::TOO_LONG => '接收者名字太长了哦!',
+                        ],
+                    ],
+                ],
             ],
         ]);
 
+        $this->addFilter([
+            'name' => 'receiver_id',
+            'break_on_failure' => true,
+            'filters'  => [],
+            'validators' => [
+                $validator,
+            ],
+        ]);
+    }
 
-        if ('*' != $this->receiver) {
-            $valueName = '';
-            $valueId = '';
 
-            if ($this->receiver instanceof Member) {
-                $valueName = $this->receiver->getMemberName();
-                $valueId = $this->receiver->getMemberId();
-            }
-
-            if ($this->receiver instanceof Department) {
-                $valueName = $this->receiver->getDeptName();
-                $valueId = $this->receiver->getDeptId();
-            }
-
-            $this->add([
-                'type' => 'text',
-                'name' => 'receiver_name',
-                'attributes' => [
-                    'id' => 'receiver_name',
-                    'value' => $valueName,
-                ],
-                'options' => [],
-            ]);
-
-            $this->add([
-                'type' => 'hidden',
-                'name' => 'receiver_id',
-                'attributes' => [
-                    'id' => 'receiver_id',
-                    'value' => $valueId,
-                ]
-            ]);
-        }
-
-        $this->add([
+    /**
+     * 表单: 消息标题
+     */
+    private function addTopicElement()
+    {
+        $this->addElement([
             'type' => 'text',
             'name' => 'topic',
             'attributes' => [
@@ -100,8 +112,44 @@ class MessageForm extends Form
             ],
         ]);
 
+        $this->addFilter([
+            'name' => 'topic',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '消息标题不能为空哦!',
+                        ],
+                    ],
+                ],
+                [
+                    'name'    => 'StringLength',
+                    'options' => [
+                        'min' => 2,
+                        'max' => 45,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '消息标题太短了哦!',
+                            \Zend\Validator\StringLength::TOO_LONG => '消息标题太长了哦!',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 
-        $this->add([
+    /**
+     * 表单: 消息内容
+     */
+    private function addConentElement()
+    {
+        $this->addElement([
             'type' => 'textarea',
             'name' => 'content',
             'attributes' => [
@@ -114,95 +162,7 @@ class MessageForm extends Form
             ],
         ]);
 
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'id' => 'submit',
-                'value' => 'Submit',
-            ],
-        ]);
-
-    }
-
-
-    public function addFilters()
-    {
-
-        if ('*' != $this->receiver) {
-
-            $this->getInputFilter()->add([
-                'name' => 'receiver_name',
-                'required' => true,
-                'break_on_failure' => true,
-                'filters'  => [
-                    ['name' => 'StringTrim'],
-                ],
-                'validators' => [
-                    [
-                        'name'    => 'StringLength',
-                        'options' => [
-                            'min' => 2,
-                            'max' => 45
-                        ],
-                    ],
-                ],
-            ]);
-
-            if ($this->manager instanceof MemberManager) {
-                $this->getInputFilter()->add([
-                    'name' => 'receiver_id',
-                    'break_on_failure' => true,
-                    'filters'  => [],
-                    'validators' => [
-                        [
-                            'name'    => MemberIdValidator::class,
-                            'options' => [
-                                'memberManager' => $this->manager,
-                            ],
-                        ],
-                    ],
-                ]);
-            }
-
-            if ($this->manager instanceof DepartmentManager) {
-                $this->getInputFilter()->add([
-                    'name' => 'receiver_id',
-                    'break_on_failure' => true,
-                    'filters'  => [],
-                    'validators' => [
-                        [
-                            'name'    => DeptIdValidator::class,
-                            'options' => [
-                                'deptManager' => $this->manager,
-                            ],
-                        ],
-                    ],
-                ]);
-            }
-        }
-
-
-        $this->getInputFilter()->add([
-            'name' => 'topic',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-            ],
-            'validators' => [
-                [
-                    'name'    => 'StringLength',
-                    'options' => [
-                        'min' => 2,
-                        'max' => 45
-                    ],
-                ],
-            ],
-        ]);
-
-
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'content',
             'required' => true,
             'break_on_failure' => true,
@@ -211,14 +171,65 @@ class MessageForm extends Form
             ],
             'validators' => [
                 [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '消息内容不能为空哦!',
+                        ],
+                    ],
+                ],
+                [
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 10,
-                        'max' => 4096
+                        'max' => 4096,
+                        'messages' => [
+                            \Zend\Validator\StringLength::TOO_SHORT => '消息内容太短了哦!',
+                            \Zend\Validator\StringLength::TOO_LONG => '消息内容太长了哦!',
+                        ],
                     ],
                 ],
             ],
         ]);
+    }
+
+
+    public function addElements()
+    {
+        if ('*' != $this->receiver) {
+            $valueName = '';
+            $valueId = '';
+            $validator = null;
+
+            if ($this->receiver instanceof Member) {
+                $valueName = $this->receiver->getMemberName();
+                $valueId = $this->receiver->getMemberId();
+                $validator = [
+                    'name'    => MemberIdValidator::class,
+                    'options' => [
+                        'memberManager' => $this->manager,
+                    ],
+                ];
+            }
+
+            if ($this->receiver instanceof Department) {
+                $valueName = $this->receiver->getDeptName();
+                $valueId = $this->receiver->getDeptId();
+                $validator = [
+                    'name'    => DeptIdValidator::class,
+                    'options' => [
+                        'deptManager' => $this->manager,
+                    ],
+                ];
+            }
+
+            $this->addReceiverElement($valueName, $valueId, $validator);
+        }
+
+        $this->addTopicElement();
+        $this->addConentElement();
+
     }
 
 }

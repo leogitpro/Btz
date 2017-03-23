@@ -9,11 +9,12 @@
 namespace Admin\Service;
 
 
+use Admin\Entity\Department;
 use Admin\Entity\Member;
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
+use Admin\Exception\InvalidArgumentException;
 use Doctrine\ORM\EntityManager;
-use Logger\Service\LoggerService;
 use Ramsey\Uuid\Uuid;
 
 
@@ -35,10 +36,9 @@ class MessageManager extends BaseEntityManager
     public function __construct(
         MemberManager $memberManager,
         DepartmentManager $departmentManager,
-        EntityManager $entityManager,
-        LoggerService $logger)
+        EntityManager $entityManager)
     {
-        parent::__construct($entityManager, $logger);
+        parent::__construct($entityManager);
 
         $this->memberManager = $memberManager;
         $this->deptManager = $departmentManager;
@@ -49,11 +49,12 @@ class MessageManager extends BaseEntityManager
      * @param string $id
      *
      * @return MessageBox
+     * @throws InvalidArgumentException
      */
     public function getMessageBox($id)
     {
         if (empty($id)) {
-            return null;
+            throw new InvalidArgumentException('消息编号不能为空');
         }
 
         $qb = $this->resetQb();
@@ -62,7 +63,11 @@ class MessageManager extends BaseEntityManager
         $qb->where($qb->expr()->eq('t.id', '?1'));
         $qb->setParameter(1, $id);
 
-        return $this->getEntityFromPersistence();
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof MessageBox) {
+            throw new InvalidArgumentException('消息编号无效');
+        }
+        return $obj;
     }
 
 
@@ -133,9 +138,6 @@ class MessageManager extends BaseEntityManager
     public function getInBoxMessagesCount()
     {
         $member = $this->memberManager->getCurrentMember();
-        if (!($member instanceof Member)) {
-            return 0;
-        }
 
         $qb = $this->resetQb();
 
@@ -162,9 +164,6 @@ class MessageManager extends BaseEntityManager
     public function getOutBoxMessagesCount()
     {
         $member = $this->memberManager->getCurrentMember();
-        if (!($member instanceof Member)) {
-            return 0;
-        }
 
         $qb = $this->resetQb();
 
@@ -373,26 +372,23 @@ class MessageManager extends BaseEntityManager
      * @param string $topic
      * @param string $content
      * @return bool
+     * @throws InvalidArgumentException
      */
-    public function sendOneMessage($receiver = null, $topic = '', $content = '')
+    public function sendOneMessage(Member $receiver, $topic, $content)
     {
         if (null == $receiver || !($receiver instanceof Member)) {
-            return false;
+            throw new InvalidArgumentException('无效的消息接收者');
         }
 
         if (empty($topic) || empty($content)) {
-            return false;
+            throw new InvalidArgumentException('发送消息必须包含标题和内容');
         }
 
         $member = $this->memberManager->getCurrentMember();
-        if (null == $member) {
-            return false;
-        }
 
         if ($receiver->getMemberId() == $member->getMemberId()) {
-            return false;
+            throw new InvalidArgumentException('不允许自己给自己发送消息');
         }
-
 
         $dt = new \DateTime();
 
@@ -425,15 +421,16 @@ class MessageManager extends BaseEntityManager
     /**
      * Broadcast a message
      *
+     * @param Department $dept
      * @param string $topic
      * @param string $content
-     * @param string $deptId
      * @return bool
+     * @throws InvalidArgumentException
      */
-    public function broadcastMessage($topic = '', $content = '', $deptId = null)
+    public function broadcastMessage(Department $dept, $topic, $content)
     {
         if (empty($topic) || empty($content)) {
-            return false;
+            throw new InvalidArgumentException('群发消息必须包含标题和内容');
         }
 
         $dt = new \DateTime();
@@ -450,11 +447,6 @@ class MessageManager extends BaseEntityManager
         $senderId = '-';
         $senderName = '系统';
 
-        if (null === $deptId) {
-            $dept = $this->deptManager->getDefaultDepartment();
-        } else {
-            $dept = $this->deptManager->getDepartment($deptId);
-        }
         $members = $dept->getMembers();
         foreach ($members as $member) {
             if ($member instanceof Member) {

@@ -5,15 +5,8 @@ $this->sideTreeMenu()->setActiveId($activeId);
 
 $this->headLink()->appendStylesheet($this->basePath('open-source-assets/bootcomplete/bootcomplete.css'));
 $this->headScript()->appendFile($this->basePath('open-source-assets/bootcomplete/jquery.bootcomplete.js'));
-$this->headScript()->appendFile($this->basePath('js/admin/message.send.js'));
 
 $autoSuggestUrl = $this->url('admin/search', ['action' => 'members']);
-$this->inlineScript()->captureStart();
-echo <<<JS
-    var autoSuggestUrl = "$autoSuggestUrl";
-JS;
-$this->inlineScript()->captureEnd();
-
 
 $form->get('receiver_name')->setAttributes([
     'class' => 'form-control',
@@ -33,12 +26,25 @@ $form->get('content')->setAttributes([
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
-$helper = $this->formElementErrors();
-$helper->setMessageOpenFormat('<p class="text-danger">');
-$helper->setMessageSeparatorString('</p><p class="text-danger">');
-$helper->setMessageCloseString('</p>');
-
 $form->prepare();
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+var autoSuggestUrl = "$autoSuggestUrl";
+
+$(function () {
+    $("#receiver_name").bootcomplete({
+        url: autoSuggestUrl,
+        method: "post",
+        idField: true,
+        idFieldName: 'receiver_id',
+        minLength: 1
+    });
+});
+
+JS;
+$this->inlineScript()->captureEnd();
 
 ?>
 

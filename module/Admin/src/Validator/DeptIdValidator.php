@@ -10,8 +10,10 @@ namespace Admin\Validator;
 
 
 use Admin\Entity\Department;
+use Admin\Exception\InvalidArgumentException;
 use Admin\Service\DepartmentManager;
 use Zend\Validator\AbstractValidator;
+
 
 class DeptIdValidator extends AbstractValidator
 {
@@ -23,7 +25,7 @@ class DeptIdValidator extends AbstractValidator
     ];
 
     protected $messageTemplates = [
-        self::ID_INVALID => 'The department is invalid',
+        self::ID_INVALID => '分组信息无效',
     ];
 
 
@@ -58,8 +60,14 @@ class DeptIdValidator extends AbstractValidator
             return false;
         }
 
-        $dept = $deptManager->getDepartment($value);
-        if (!($dept instanceof Department) || $dept->getDeptStatus() != Department::STATUS_VALID) {
+        try {
+            $dept = $deptManager->getDepartment($value);
+        } catch (InvalidArgumentException $e) {
+            $this->error(self::ID_INVALID);
+            return false;
+        }
+
+        if ($dept->getDeptStatus() != Department::STATUS_VALID) {
             $this->error(self::ID_INVALID);
             return false;
         }

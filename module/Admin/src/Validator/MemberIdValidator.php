@@ -10,9 +10,9 @@ namespace Admin\Validator;
 
 
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException;
 use Admin\Service\MemberManager;
 use Zend\Validator\AbstractValidator;
-
 
 
 class MemberIdValidator extends AbstractValidator
@@ -25,7 +25,7 @@ class MemberIdValidator extends AbstractValidator
     ];
 
     protected $messageTemplates = [
-        self::ID_INVALID => 'The member is invalid',
+        self::ID_INVALID => '成员信息无效',
     ];
 
 
@@ -60,8 +60,13 @@ class MemberIdValidator extends AbstractValidator
             return false;
         }
 
-        $member = $memberManager->getMember($value);
-        if (!($member instanceof Member) || $member->getMemberStatus() != Member::STATUS_ACTIVATED) {
+        try {
+            $member = $memberManager->getMember($value);
+        } catch (InvalidArgumentException $e) {
+            $this->error(self::ID_INVALID);
+            return false;
+        }
+        if ($member->getMemberStatus() != Member::STATUS_ACTIVATED) {
             $this->error(self::ID_INVALID);
             return false;
         }

@@ -21,7 +21,7 @@ class MessageController extends AdminBaseController
 {
 
     /**
-     * 全部消息清单. For supper administrator check
+     * 全部消息清单.
      */
     public function indexAction()
     {
@@ -63,9 +63,6 @@ class MessageController extends AdminBaseController
 
         $messageManager = $this->getMessageManager();
         $message = $messageManager->getMessageContent($messageId);
-        if (!($message instanceof MessageContent)) {
-            return new JsonModel($result);
-        }
 
         $message->setStatus(MessageContent::STATUS_INVALID);
         $messageManager->saveModifiedEntity($message);
@@ -79,7 +76,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 收件箱
+     * 用户收件箱
      */
     public function inAction()
     {
@@ -121,9 +118,6 @@ class MessageController extends AdminBaseController
 
         $messageManager = $this->getMessageManager();
         $messageBox = $messageManager->getMessageBox($boxId);
-        if (null == $messageBox) {
-            return new JsonModel($result);
-        }
 
         $messageBox->setReceiverStatus(MessageBox::STATUS_RECEIVER_READ);
         $messageManager->saveModifiedEntity($messageBox);
@@ -147,9 +141,6 @@ class MessageController extends AdminBaseController
 
         $messageManager = $this->getMessageManager();
         $messageBox = $messageManager->getMessageBox($boxId);
-        if (null == $messageBox) {
-            return new JsonModel($result);
-        }
 
         $member = $this->getMemberManager()->getCurrentMember();
         if ($member->getMemberId() == $messageBox->getReceiver()) {
@@ -231,7 +222,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 发消息
+     * 发消息到成员
      */
     public function sendAction()
     {
@@ -240,7 +231,7 @@ class MessageController extends AdminBaseController
         $memberManager = $this->getMemberManager();
         $receiver = $memberManager->getMember($key);
 
-        $form = new MessageForm($memberManager, $receiver);
+        $form = new MessageForm($receiver, $memberManager);
 
         if($this->getRequest()->isPost()) {
 
@@ -255,12 +246,10 @@ class MessageController extends AdminBaseController
 
                 $this->getMessageManager()->sendOneMessage($receiver, $data['topic'], $data['content']);
 
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '消息已发送',
                     '您给 ' . $data['receiver_name'] . ' 的消息已经发送!',
-                    $this->url()->fromRoute('admin/message', ['action' => 'out']),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/message', ['action' => 'out'])
                 );
             }
         }
@@ -273,7 +262,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 群发消息
+     * 群发消息到分组
      */
     public function deptAction()
     {
@@ -282,23 +271,22 @@ class MessageController extends AdminBaseController
         $deptManager = $this->getDeptManager();
         $receiver = $deptManager->getDepartment($key);
 
-        $form = new MessageForm($deptManager, $receiver);
+        $form = new MessageForm($receiver, $deptManager);
 
         if($this->getRequest()->isPost()) {
 
             $form->setData($this->params()->fromPost());
 
             if ($form->isValid()) {
+
                 $data = $form->getData();
+                $dept = $deptManager->getDepartment($data['receiver_id']);
+                $this->getMessageManager()->broadcastMessage($dept, $data['topic'], $data['content']);
 
-                $this->getMessageManager()->broadcastMessage($data['topic'], $data['content'], (string)$data['receiver_id']);
-
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '消息已发送',
                     '分组消息 ' . $data['receiver_name'] . ' 已经群发!',
-                    $this->url()->fromRoute('admin/message'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/message')
                 );
             }
         }
@@ -316,7 +304,7 @@ class MessageController extends AdminBaseController
     public function broadcastAction()
     {
 
-        $form = new MessageForm(null, '*');
+        $form = new MessageForm('*');
 
         if($this->getRequest()->isPost()) {
 
@@ -325,15 +313,13 @@ class MessageController extends AdminBaseController
             if ($form->isValid()) {
 
                 $data = $form->getData();
+                $dept = $this->getDeptManager()->getDefaultDepartment();
+                $this->getMessageManager()->broadcastMessage($dept, $data['topic'], $data['content']);
 
-                $this->getMessageManager()->broadcastMessage($data['topic'], $data['content']);
-
-                return $this->getMessagePlugin()->show(
+                return $this->go(
                     '广播已发送',
                     '广播消息已经群发!',
-                    $this->url()->fromRoute('admin/message'),
-                    '返回',
-                    3
+                    $this->url()->fromRoute('admin/message')
                 );
             }
         }
@@ -356,9 +342,9 @@ class MessageController extends AdminBaseController
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '全部消息', 1, 'envelope-o', 0);
         $item['actions']['in'] = self::CreateActionRegistry('in', '收件箱', 1, 'envelope-o', 8);
-        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 0, 'envelope-o', 6);
-        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息', 0, 'envelope-o', 4);
-        $item['actions']['dept'] = self::CreateActionRegistry('dept', '群发消息', 1, 'envelope-o', 3);
+        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 1, 'envelope-o', 6);
+        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息');
+        $item['actions']['dept'] = self::CreateActionRegistry('dept', '群发消息');
         $item['actions']['broadcast'] = self::CreateActionRegistry('broadcast', '发广播', 1, 'bullhorn', 1);
 
 
