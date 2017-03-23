@@ -18,11 +18,17 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 系统成员管理
+ *
+ * Class MemberController
+ * @package Admin\Controller
+ */
 class MemberController extends AdminBaseController
 {
 
     /**
-     * 成员列表
+     * 系统成员列表
      */
     public function indexAction()
     {
@@ -55,9 +61,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Create new member
-     *
-     * @return ViewModel
+     * 新增系统成员
      */
     public function addAction()
     {
@@ -95,7 +99,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Edit status
+     * 启用/停用成员账号
      */
     public function statusAction()
     {
@@ -126,9 +130,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Edit information
-     *
-     * @return ViewModel
+     * 修改成员信息
      */
     public function editAction()
     {
@@ -173,7 +175,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Edit level page
+     * 修改成员等级
      */
     public function levelAction()
     {
@@ -217,9 +219,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Edit password.
-     *
-     * @return ViewModel
+     * 修改成员密码
      */
     public function passwordAction()
     {
@@ -262,7 +262,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Setting member expired date
+     * 修改成员过期时间
      */
     public function expiredAction()
     {
@@ -305,9 +305,8 @@ class MemberController extends AdminBaseController
     }
 
 
-
     /**
-     * View a member with all departments relationship
+     * 查看成员所属分组
      */
     public function departmentsAction()
     {
@@ -346,7 +345,7 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * AJAX save member departments
+     * 配置成员分组
      */
     public function updateDepartmentsAction()
     {
@@ -382,24 +381,24 @@ class MemberController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '成员管理', 'admin/member', 1, 'user', 10);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统成员管理', 'admin/member', 1, 'user', 10);
 
-        $item['actions']['index'] = self::CreateActionRegistry('index', '查看成员列表', 1, 'bars', 9);
-        $item['actions']['add'] = self::CreateActionRegistry('add', '创建新成员', 1, 'user-plus', 1);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '系统成员列表', 1, 'bars', 9);
+        $item['actions']['add'] = self::CreateActionRegistry('add', '新增系统成员', 1, 'user-plus', 1);
 
-        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/禁用成员');
-        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改成员资料');
+        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/停用成员账号');
+        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改成员信息');
         $item['actions']['level'] = self::CreateActionRegistry('level', '修改成员等级');
         $item['actions']['password'] = self::CreateActionRegistry('password', '修改成员密码');
-        $item['actions']['expired'] = self::CreateActionRegistry('expired', '设置成员过期时间');
-        $item['actions']['departments'] = self::CreateActionRegistry('departments', '查看成员所属部门');
-        $item['actions']['update-departments'] = self::CreateActionRegistry('update-departments', '分配成员到部门');
+        $item['actions']['expired'] = self::CreateActionRegistry('expired', '修改成员过期时间');
+        $item['actions']['departments'] = self::CreateActionRegistry('departments', '查看成员所属分组');
+        $item['actions']['update-departments'] = self::CreateActionRegistry('update-departments', '配置成员分组');
 
         return $item;
     }

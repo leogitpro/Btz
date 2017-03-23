@@ -18,6 +18,12 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 系统权限管理
+ *
+ * Class AclController
+ * @package Admin\Controller
+ */
 class AclController extends AdminBaseController
 {
 
@@ -107,9 +113,7 @@ class AclController extends AdminBaseController
 
 
     /**
-     * Save modified member acl
-     *
-     * @return JsonModel
+     * 分配个人权限
      */
     public function memberDispatchAction()
     {
@@ -146,9 +150,7 @@ class AclController extends AdminBaseController
 
 
     /**
-     * List grant departments
-     *
-     * @return ViewModel
+     * 可授权分组列表
      */
     public function departmentsAction()
     {
@@ -180,9 +182,7 @@ class AclController extends AdminBaseController
 
 
     /**
-     * Acl department resource list
-     *
-     * @return ViewModel
+     * 分组权限配置
      */
     public function departmentAction()
     {
@@ -240,7 +240,7 @@ class AclController extends AdminBaseController
 
 
     /**
-     * Save modified department acl
+     * 分配分组权限
      */
     public function departmentDispatchAction()
     {
@@ -280,22 +280,22 @@ class AclController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '权限控制', 'admin/acl', 1, 'cogs', 16);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统权限管理', 'admin/acl', 1, 'cogs', 16);
 
-        $item['actions']['members'] = self::CreateActionRegistry('members', '个人权限配置', 1, 'user', 9);
-        $item['actions']['departments'] = self::CreateActionRegistry('departments', '集体权限配置', 1, 'users', 19);
+        $item['actions']['members'] = self::CreateActionRegistry('members', '可授权用户列表', 1, 'user', 9);
+        $item['actions']['departments'] = self::CreateActionRegistry('departments', '可授权分组列表', 1, 'users', 19);
 
-        $item['actions']['member'] = self::CreateActionRegistry('member', '查看个人权限', 0, null, 8);
-        $item['actions']['member-dispatch'] = self::CreateActionRegistry('member-dispatch', '配置个人权限', 0, null, 7);
+        $item['actions']['member'] = self::CreateActionRegistry('member', '个人权限配置', 0, null, 8);
+        $item['actions']['member-dispatch'] = self::CreateActionRegistry('member-dispatch', '分配个人权限', 0, null, 7);
 
-        $item['actions']['department'] = self::CreateActionRegistry('department', '查看集体权限', 0, null, 18);
-        $item['actions']['department-dispatch'] = self::CreateActionRegistry('department-dispatch', '配置集体权限', 0, null, 17);
+        $item['actions']['department'] = self::CreateActionRegistry('department', '分组权限配置', 0, null, 18);
+        $item['actions']['department-dispatch'] = self::CreateActionRegistry('department-dispatch', '分配分组权限', 0, null, 17);
 
         return $item;
     }

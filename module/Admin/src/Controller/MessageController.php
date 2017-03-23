@@ -17,11 +17,17 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 系统消息管理
+ *
+ * Class MessageController
+ * @package Admin\Controller
+ */
 class MessageController extends AdminBaseController
 {
 
     /**
-     * 全部消息清单.
+     * 全站消息列表
      */
     public function indexAction()
     {
@@ -53,7 +59,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 关闭某条消息, 影响所有拥有此条消息的人.
+     * 删除系统消息
      */
     public function closeAction()
     {
@@ -74,9 +80,8 @@ class MessageController extends AdminBaseController
     }
 
 
-
     /**
-     * 用户收件箱
+     * 我的收件箱
      */
     public function inAction()
     {
@@ -108,7 +113,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 读消息
+     * 标记消息已读
      */
     public function readAction()
     {
@@ -130,7 +135,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 删除消息
+     * 删除我的消息
      */
     public function deleteAction()
     {
@@ -160,7 +165,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 未读消息
+     * 我的未读消息
      */
     public function unreadAction()
     {
@@ -190,7 +195,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 发件箱
+     * 我的发件箱
      */
     public function outAction()
     {
@@ -222,7 +227,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 发消息到成员
+     * 发消息给成员
      */
     public function sendAction()
     {
@@ -262,7 +267,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 群发消息到分组
+     * 发消息给群组
      */
     public function deptAction()
     {
@@ -299,7 +304,7 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * 广播消息
+     * 广播全体消息
      */
     public function broadcastAction()
     {
@@ -332,20 +337,25 @@ class MessageController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '站内消息', 'admin/message', 1, 'envelope-o', 20);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统消息管理', 'admin/message', 1, 'envelope-o', 20);
 
-        $item['actions']['index'] = self::CreateActionRegistry('index', '全部消息', 1, 'envelope-o', 0);
-        $item['actions']['in'] = self::CreateActionRegistry('in', '收件箱', 1, 'envelope-o', 8);
-        $item['actions']['out'] = self::CreateActionRegistry('out', '发件箱', 1, 'envelope-o', 6);
-        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息');
-        $item['actions']['dept'] = self::CreateActionRegistry('dept', '群发消息');
-        $item['actions']['broadcast'] = self::CreateActionRegistry('broadcast', '发广播', 1, 'bullhorn', 1);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '全站消息列表', 1, 'envelope-o', 0);
+        $item['actions']['in'] = self::CreateActionRegistry('in', '我的收件箱', 1, 'envelope-o', 8);
+        $item['actions']['out'] = self::CreateActionRegistry('out', '我的发件箱', 1, 'envelope-o', 6);
+        $item['actions']['broadcast'] = self::CreateActionRegistry('broadcast', '广播全体消息', 1, 'bullhorn', 1);
+
+        $item['actions']['send'] = self::CreateActionRegistry('send', '发消息给成员');
+        $item['actions']['dept'] = self::CreateActionRegistry('dept', '发消息给群组');
+        $item['actions']['close'] = self::CreateActionRegistry('close', '删除系统消息');
+        $item['actions']['read'] = self::CreateActionRegistry('read', '标记消息已读');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除我的消息');
+        $item['actions']['unread'] = self::CreateActionRegistry('unread', '我的未读消息');
 
 
         return $item;

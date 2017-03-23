@@ -12,11 +12,17 @@ namespace Admin\Controller;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 微信公众号管理
+ *
+ * Class WeChatController
+ * @package Admin\Controller
+ */
 class WeChatController extends AdminBaseController
 {
 
     /**
-     * 所有公众号清单
+     * 公众号列表
      */
     public function indexAction()
     {
@@ -54,7 +60,7 @@ class WeChatController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号管理', 'admin/weChat', 1, 'wechat', 22);
+        $item = self::CreateControllerRegistry(__CLASS__, '微信公众号管理', 'admin/weChat', 1, 'wechat', 22);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '公众号列表', 1, 'bars', 9);
 

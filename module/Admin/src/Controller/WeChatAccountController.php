@@ -18,11 +18,17 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 我的公众号
+ *
+ * Class WeChatAccountController
+ * @package Admin\Controller
+ */
 class WeChatAccountController extends AdminBaseController
 {
 
     /**
-     * 当前用户的公众号
+     * 我的公众号
      */
     public function indexAction()
     {
@@ -43,7 +49,7 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
-     * 登记当前用户的公众号
+     * 配置公众号
      */
     public function addAction()
     {
@@ -96,7 +102,7 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
-     * 编辑当前用户的公众号
+     * 修改公众号
      */
     public function editAction()
     {
@@ -156,10 +162,7 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
-     * 刷新 AccessToken
-     *
-     * @return JsonModel
-     * @throws \Exception
+     * 手动更新 AccessToken
      */
     public function refreshTokenAction()
     {
@@ -190,7 +193,7 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
-     * Tag 列表
+     * 用户标签
      */
     public function tagsAction()
     {
@@ -268,15 +271,14 @@ class WeChatAccountController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '微信公众号', 'admin/weChatAccount', 1, 'wechat', 22);
+        $item = self::CreateControllerRegistry(__CLASS__, '我的公众号', 'admin/weChatAccount', 1, 'wechat', 22);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '我的公众号', 1, 'university', 9);
-
         $item['actions']['tags'] = self::CreateActionRegistry('tags', '用户标签', 1, 'tags', 8);
 
-        $item['actions']['add'] = self::CreateActionRegistry('add', '创建公众号');
-        $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑公众号');
-        $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '刷新AccessToken');
+        $item['actions']['add'] = self::CreateActionRegistry('add', '配置公众号');
+        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改公众号');
+        $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '手动更新 AccessToken');
 
         $item['actions']['async-tags'] = self::CreateActionRegistry('async-tags', '同步用户标签');
 

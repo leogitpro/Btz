@@ -19,13 +19,17 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 系统分组管理
+ *
+ * Class DepartmentController
+ * @package Admin\Controller
+ */
 class DepartmentController extends AdminBaseController
 {
 
     /**
-     * List departments
-     *
-     * @return ViewModel
+     * 分组列表
      */
     public function indexAction()
     {
@@ -75,9 +79,7 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * Create department page
-     *
-     * @return ViewModel
+     * 新建分组
      */
     public function addAction()
     {
@@ -118,7 +120,7 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * Setting department status
+     * 启用/停用分组
      */
     public function statusAction()
     {
@@ -157,9 +159,7 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * Edit department information page
-     *
-     * @return ViewModel
+     * 编辑分组信息
      */
     public function editAction()
     {
@@ -202,9 +202,7 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * View a department all members
-     *
-     * @return ViewModel
+     * 查看分组成员列表
      */
     public function membersAction()
     {
@@ -244,9 +242,7 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * Ajax save department members
-     *
-     * @return JsonModel
+     * 配置分组成员
      */
     public function updateMembersAction()
     {
@@ -298,21 +294,21 @@ class DepartmentController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '部门管理', 'admin/dept', 1, 'users', 12);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统分组管理', 'admin/dept', 1, 'users', 12);
 
-        $item['actions']['index'] = self::CreateActionRegistry('index', '查看部门列表', 1, 'bars', 9);
-        $item['actions']['add'] = self::CreateActionRegistry('add', '创建新部门', 1, 'plus', 1);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '分组列表', 1, 'bars', 9);
+        $item['actions']['add'] = self::CreateActionRegistry('add', '新建分组', 1, 'plus', 1);
 
-        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/禁用部门');
-        $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改部门信息');
-        $item['actions']['members'] = self::CreateActionRegistry('members', '查看部门成员');
-        $item['actions']['update-members'] = self::CreateActionRegistry('update-members', '分配部门成员');
+        $item['actions']['status'] = self::CreateActionRegistry('status', '启用/停用分组');
+        $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑分组信息');
+        $item['actions']['members'] = self::CreateActionRegistry('members', '查看分组成员列表');
+        $item['actions']['update-members'] = self::CreateActionRegistry('update-members', '配置分组成员');
 
         return $item;
     }

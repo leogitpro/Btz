@@ -13,6 +13,12 @@ use Admin\Form\UpdateProfileForm;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 个人信息管理
+ *
+ * Class ProfileController
+ * @package Admin\Controller
+ */
 class ProfileController extends AdminBaseController
 {
 

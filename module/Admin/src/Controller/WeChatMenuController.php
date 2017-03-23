@@ -15,6 +15,12 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 公众号菜单管理
+ *
+ * Class WeChatMenuController
+ * @package Admin\Controller
+ */
 class WeChatMenuController extends AdminBaseController
 {
 
@@ -432,7 +438,7 @@ class WeChatMenuController extends AdminBaseController
 
 
     /**
-     * 同步微信菜单到微信平台
+     * 同步菜单到微信平台
      */
     public function asyncAction()
     {
@@ -517,7 +523,7 @@ class WeChatMenuController extends AdminBaseController
 
 
     /**
-     * 清空微信公众号菜单
+     * 清空微信平台菜单
      */
     public function trashAction()
     {
@@ -541,7 +547,7 @@ class WeChatMenuController extends AdminBaseController
 
 
     /**
-     * 导入微信公众号菜单到本地
+     * 导入微信平台菜单到本地
      */
     public function importAction()
     {
@@ -578,15 +584,16 @@ class WeChatMenuController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号菜单', 'admin/weChatMenu', 1, 'list', 21);
+        $item = self::CreateControllerRegistry(__CLASS__, '公众号菜单管理', 'admin/weChatMenu', 1, 'list', 21);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '菜单列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '增加菜单', 1, 'plus', 6);
+
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '编辑菜单');
         $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除本地菜单');
-        $item['actions']['async'] = self::CreateActionRegistry('async', '同步菜单');
-        $item['actions']['trash'] = self::CreateActionRegistry('trash', '删除微信菜单');
-        $item['actions']['import'] = self::CreateActionRegistry('import', '导入微信菜单');
+        $item['actions']['async'] = self::CreateActionRegistry('async', '同步菜单到微信平台');
+        $item['actions']['trash'] = self::CreateActionRegistry('trash', '清空微信平台菜单');
+        $item['actions']['import'] = self::CreateActionRegistry('import', '导入微信平台菜单到本地');
 
         return $item;
     }

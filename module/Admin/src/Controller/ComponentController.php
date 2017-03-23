@@ -15,13 +15,17 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 系统组件管理
+ *
+ * Class ComponentController
+ * @package Admin\Controller
+ */
 class ComponentController extends AdminBaseController
 {
 
     /**
-     * Showing components list
-     *
-     * @return ViewModel
+     * 系统组件列表
      */
     public function indexAction()
     {
@@ -52,7 +56,7 @@ class ComponentController extends AdminBaseController
 
 
     /**
-     * Ajax call sync component data
+     * 同步系统组件
      */
     public function syncAction()
     {
@@ -86,7 +90,7 @@ class ComponentController extends AdminBaseController
 
 
     /**
-     * Remove component
+     * 删除系统组件
      */
     public function deleteAction()
     {
@@ -118,9 +122,7 @@ class ComponentController extends AdminBaseController
 
 
     /**
-     * Component actions list
-     *
-     * @return ViewModel
+     * 组件接口列表
      */
     public function actionsAction()
     {
@@ -138,7 +140,7 @@ class ComponentController extends AdminBaseController
 
 
     /**
-     * Ajax remove a component's one action
+     * 删除组件接口
      */
     public function removeAction()
     {
@@ -158,20 +160,20 @@ class ComponentController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统模块', 'admin/component', 1, 'cubes', 14);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统组件管理', 'admin/component', 1, 'cubes', 14);
 
-        $item['actions']['index'] = self::CreateActionRegistry('index', '查看模块列表', 1, 'bars', 0);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '系统组件列表', 1, 'bars', 0);
 
-        $item['actions']['sync'] = self::CreateActionRegistry('sync', '同步系统模块');
-        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除某个模块');
-        $item['actions']['actions'] = self::CreateActionRegistry('actions', '查看模块功能列表');
-        $item['actions']['remove'] = self::CreateActionRegistry('remove', '删除某个功能接口');
+        $item['actions']['sync'] = self::CreateActionRegistry('sync', '同步系统组件');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除系统组件');
+        $item['actions']['actions'] = self::CreateActionRegistry('actions', '组件接口列表');
+        $item['actions']['remove'] = self::CreateActionRegistry('remove', '删除组件接口');
 
         return $item;
     }

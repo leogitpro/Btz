@@ -17,14 +17,18 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
+/**
+ * 信息反馈管理
+ *
+ * Class FeedbackController
+ * @package Admin\Controller
+ */
 class FeedbackController extends AdminBaseController
 {
 
 
     /**
-     * Member personal feedback list
-     *
-     * @return ViewModel
+     * 我的反馈列表
      */
     public function indexAction()
     {
@@ -58,7 +62,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * Add new feedback
+     * 新增我的反馈
      */
     public function addAction()
     {
@@ -98,7 +102,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * Delete self feedback
+     * 删除我的反馈
      */
     public function deleteAction()
     {
@@ -123,7 +127,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * @return ViewModel
+     * 全部反馈列表
      */
     public function allAction()
     {
@@ -155,7 +159,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * @return 删除反馈
+     * 删除反馈
      */
     public function closeAction()
     {
@@ -175,7 +179,7 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * Reply feedback
+     * 回应反馈
      */
     public function replyAction()
     {
@@ -205,21 +209,21 @@ class FeedbackController extends AdminBaseController
 
 
     /**
-     * Controller and actions registry
+     *  ACL 登记
      *
      * @return array
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '建议反馈', 'admin/feedback', 1, 'commenting-o', 12);
+        $item = self::CreateControllerRegistry(__CLASS__, '信息反馈管理', 'admin/feedback', 1, 'commenting-o', 12);
 
-        $item['actions']['index'] = self::CreateActionRegistry('index', '我的反馈', 1, 'comments-o', 9);
-        $item['actions']['add'] = self::CreateActionRegistry('add', '发起反馈', 1, 'comment-o', 1);
+        $item['actions']['index'] = self::CreateActionRegistry('index', '我的反馈列表', 1, 'comments-o', 9);
+        $item['actions']['add'] = self::CreateActionRegistry('add', '新增我的反馈', 1, 'comment-o', 1);
 
-        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除反馈');
+        $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除我的反馈');
 
-        $item['actions']['all'] = self::CreateActionRegistry('all', '全部反馈', 1, 'comments-o', 10);
-        $item['actions']['close'] = self::CreateActionRegistry('close', '关闭反馈');
+        $item['actions']['all'] = self::CreateActionRegistry('all', '全部反馈列表', 1, 'comments-o', 10);
+        $item['actions']['close'] = self::CreateActionRegistry('close', '删除反馈');
         $item['actions']['reply'] = self::CreateActionRegistry('reply', '回应反馈');
 
         return $item;
