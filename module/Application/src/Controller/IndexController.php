@@ -8,13 +8,18 @@
 
 namespace Application\Controller;
 
+use Admin\Entity\Member;
 use Admin\Service\MemberManager;
-use Admin\WeChat\Remote;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
-use Mail\Exception\InvalidArgumentException;
-use Mail\Exception\RuntimeException;
-use WeChat\Service\NetworkManager;
+use Mail\Exception\InvalidArgumentException as MailInvalidArgumentException;
+use Mail\Exception\RuntimeException as MailRuntimeException;
+use Ramsey\Uuid\Uuid;
+use WeChat\Entity\Account;
+use WeChat\Exception\RuntimeException as WeChatRuntimeException;
+use WeChat\Exception\InvalidArgumentException as WeChatInvalidArgumentException;
+use WeChat\Service\AccountService;
+use WeChat\Service\NetworkService;
 use Zend\View\Model\ViewModel;
 
 
@@ -26,7 +31,6 @@ class IndexController extends AppBaseController
      */
     public function testAction()
     {
-        throw new \Exception('test exception');
         return new ViewModel();
     }
 
@@ -48,7 +52,18 @@ class IndexController extends AppBaseController
         return new ViewModel();
     }
 
+    /**
+     * 用户账号激活
+     */
+    public function activeAction()
+    {
+        return new ViewModel();
+    }
 
+
+    /**
+     * 申请试用
+     */
     public function applyAction()
     {
         // 验证码配置参数
@@ -57,10 +72,11 @@ class IndexController extends AppBaseController
 
 
         $memberManager = $this->getSm(MemberManager::class);
-        $weChatRemote = $this->getSm(Remote::class);
+        $accountService = $this->getSm(AccountService::class);
 
-        $form = new ApplyForm($memberManager, $weChatRemote, $captchaConfig);
+        $form = new ApplyForm($memberManager, $accountService, $captchaConfig);
 
+        $error = '';
 
         if($this->getRequest()->isPost()) {
 
@@ -70,19 +86,86 @@ class IndexController extends AppBaseController
 
                 $data = $form->getData();
 
+                $email = $data['email'];
+                $name = $data['name'];
+                $appId = $data['appid'];
+                $appSecret = $data['appsecret'];
 
-                echo '<pre>';
-                print_r($data);
-                print_r($_SESSION);
-                echo '</pre>';
-                //echo '<pre>';print_r($captchaConfig);echo '</pre>';
+                try {
+                    $res = NetworkService::getAccessToken($appId, $appSecret);
 
+                    $password = uniqid();
+                    $activeCode = md5($password . rand(1000, 9999));
+                    $accountExpired = new \DateTime('next year');
+
+                    $member = new Member();
+                    $member->setMemberId(Uuid::uuid1()->toString());
+                    $member->setMemberEmail($email);
+                    $member->setMemberPassword(md5($password));
+                    $member->setMemberName($name);
+                    $member->setMemberLevel(Member::LEVEL_INTERIOR);
+                    $member->setMemberStatus(Member::STATUS_RETRIED);
+                    $member->setMemberActiveCode($activeCode);
+                    $member->setMemberExpired($accountExpired);
+                    $member->setMemberCreated(new \DateTime());
+
+                    $weChatExpired = strtotime("+7 days");
+
+                    $weChat = new Account();
+                    $weChat->setWxAppId($appId);
+                    $weChat->setWxAppSecret($appSecret);
+                    $weChat->setWxChecked(Account::STATUS_CHECKED);
+                    $weChat->setWxAccessToken($res['access_token']);
+                    $weChat->setWxAccessTokenExpired(($res['expires_in'] + time() - 300));
+                    $weChat->setWxExpired($weChatExpired);
+                    $weChat->setWxCreated(new \DateTime());
+                    $weChat->setMember($member);
+
+                    $memberManager->saveModifiedEntities([$member, $weChat]);
+
+                    // Send mail
+                    $mailTpl = $this->getConfigPlugin()->get('mail.template.apply');
+                    $username = $name;
+                    $active_url = $this->getServerPlugin()->domain() . $this->url()->fromRoute('active', ['key' => $activeCode, 'suffix' => '.html']);
+                    $account_expired = $accountExpired->format('Y-m-d');
+                    $wechat_expired = date('Y-m-d', $weChatExpired);
+                    $contact_url = $this->getServerPlugin()->domain() . $this->url()->fromRoute('contact');
+
+                    $mailTpl = str_replace('%username%', $username, $mailTpl);
+                    $mailTpl = str_replace('%active_url%', $active_url, $mailTpl);
+                    $mailTpl = str_replace('%account_expired%', $account_expired, $mailTpl);
+                    $mailTpl = str_replace('%wechat_expired%', $wechat_expired, $mailTpl);
+                    $mailTpl = str_replace('%contact_url%', $contact_url, $mailTpl);
+
+                    $postData = [
+                        'mail_subject' => 'Btz微信接口平台试用通知',
+                        'mail_content' => $mailTpl,
+                        'mail_recipient' => $email,
+                    ];
+
+                    $asyncUrl = $this->url()->fromRoute('send-mail');
+                    $this->getAsyncRequestPlugin()->post($this->getServerPlugin()->domain() . $asyncUrl, $postData);
+
+                    return $this->getDisplayPlugin()->show(
+                        '感谢您, 申请成功!',
+                        '一封您的帐号激活邮件已经发往: ' . $email . ' 请检查邮件激活账号, 立即享用我们为您提供的专业服务吧!',
+                        $this->url()->fromRoute('home'),
+                        '返回',
+                        3000
+                    );
+
+                } catch (WeChatRuntimeException $e) {
+                    $error = 'wx';
+                } catch (WeChatInvalidArgumentException $e) {
+                    $error = 'wx';
+                }
             }
         }
 
 
         return new ViewModel([
             'form' => $form,
+            'error' => $error,
         ]);
     }
 
@@ -163,9 +246,9 @@ class IndexController extends AppBaseController
 
         try {
             $this->getMailService()->sendMail($recipient, $subject, $content);
-        } catch (InvalidArgumentException $e) {
+        } catch (MailInvalidArgumentException $e) {
             $this->getLoggerPlugin()->exception($e);
-        } catch (RuntimeException $e) {
+        } catch (MailRuntimeException $e) {
             $this->getLoggerPlugin()->exception($e);
         }
 

@@ -271,4 +271,5 @@ class MemberManager extends BaseEntityManager
 
         return $member;
     }
+
 }

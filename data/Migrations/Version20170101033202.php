@@ -34,6 +34,7 @@ class Version20170101033202 extends AbstractMigration
         $member->addColumn('member_id', 'string', ['fixed' => true, 'length' => 36]);
         $member->addColumn('member_email', 'string', ['length' => 45, 'default' => '']);
         $member->addColumn('member_password', 'string', ['length' => 32, 'fixed' => true, 'default' => '']);
+        $member->addColumn('member_active_code', 'string', ['length' => 32, 'fixed' => true, 'default' => '']);
         $member->addColumn('member_name', 'string', ['length' => 45, 'default' => '']);
         $member->addColumn('member_status', 'smallint', ['default' => 0, 'comment' => 'Account status']);
         $member->addColumn('member_level', 'smallint', ['default' => 0, 'comment' => 'Account level']);
@@ -41,6 +42,7 @@ class Version20170101033202 extends AbstractMigration
         $member->addColumn('member_created', 'datetime');
         $member->setPrimaryKey(['member_id']);
         $member->addUniqueIndex(['member_email']);
+        $member->addIndex(['member_active_code']);
         $member->addIndex(['member_status', 'member_level', 'member_name']);
 
 

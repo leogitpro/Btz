@@ -71,6 +71,13 @@ class Member
      */
     private $memberPassword = '';
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="member_active_code", type="string", length=32)
+     */
+    private $memberActiveCode = '';
+
 
     /**
      * Member name.
@@ -245,6 +252,22 @@ class Member
     public function setMemberPassword($memberPassword)
     {
         $this->memberPassword = $memberPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMemberActiveCode()
+    {
+        return $this->memberActiveCode;
+    }
+
+    /**
+     * @param string $memberActiveCode
+     */
+    public function setMemberActiveCode($memberActiveCode)
+    {
+        $this->memberActiveCode = $memberActiveCode;
     }
 
     /**

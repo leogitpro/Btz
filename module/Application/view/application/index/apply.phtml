@@ -1,6 +1,8 @@
 <?php
 $this->headTitle('申请试用');
+
 $this->barMenu()->setActiveItemId(null);
+
 $this->barBreadcrumbs()->setItems([
     'Bentuzi' => $this->url('home'),
     '服务&产品' => $this->url('service'),
@@ -22,6 +24,10 @@ $form->get('appid')->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'微信公众号 AppID'
 ]);
+$form->get('appsecret')->setAttributes([
+    'class'=>'form-control',
+    'placeholder'=>'微信公众号 AppSecret'
+]);
 $form->get('captcha')->setAttributes([
     'class' => 'form-control',
 ]);
@@ -32,6 +38,33 @@ $form->get('submit')->setAttributes([
 ]);
 
 $form->prepare();
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $("form").submit(function () {
+        var appid = $("#appid").val();
+        if(appid.length < 3) {
+            $("#appid").focus();
+            return false;
+        }
+        var appsecret = $("#appsecret").val();
+        if(appsecret.length < 3) {
+            $("#appsecret").focus();
+            return false;
+        }
+        if(confirm("请确认您的公众号的相关信息为:\\nAppID: " + appid + "\\nAppSecret: " + appsecret + "\\n接下来系统将和微信平台确认此 ID, 一旦确认 AppID 有效, 我们将给您发送正式试用邮件. \\n是否需要继续?")) {
+            alert("接下来和微信平台进行信息验证, 可能需要一点时间, 请勿离开此页, 我们会通知您验证结果.");
+            $(":submit", this).attr("disabled","disabled");
+            return true;
+        } else {
+            return false;
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
 
 
 ?>
@@ -63,6 +96,12 @@ $form->prepare();
             <?php echo $this->formLabel($form->get('appid'), '微信公众号 AppID'); ?>
             <?php echo $this->formElement($form->get('appid')); ?>
             <?php echo $this->formElementErrors($form->get('appid')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('appsecret'), '微信公众号 AppSecret'); ?>
+            <?php echo $this->formElement($form->get('appsecret')); ?>
+            <?php echo $this->formElementErrors($form->get('appsecret')); ?>
         </div>
 
         <div class="form-group">

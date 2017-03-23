@@ -12,8 +12,8 @@ namespace Application\Form;
 
 use Admin\Service\MemberManager;
 use Admin\Validator\MemberEmailUniqueValidator;
-use Admin\Validator\WeChatAppIdValidator;
-use Admin\WeChat\Remote;
+use WeChat\Service\AccountService;
+use WeChat\Validator\AppIdUniqueValidator;
 
 
 class ApplyForm extends BaseForm
@@ -30,27 +30,27 @@ class ApplyForm extends BaseForm
     private $memberManager;
 
     /**
-     * @var Remote
+     * @var AccountService
      */
-    private $remote;
+    private $accountService;
 
 
-    public function __construct(MemberManager $memberManager, Remote $remote, $captcha_config)
+    public function __construct(MemberManager $memberManager, AccountService $accountService, $captcha_config)
     {
         $this->captchaConfig = $captcha_config;
         $this->memberManager = $memberManager;
-        $this->remote = $remote;
+        $this->accountService = $accountService;
 
         parent::__construct();
     }
 
 
     /**
-     * Member account
+     * 表单: 用户账号
      */
-    protected function addEmailElement()
+    private function addEmailElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'email',
             'attributes' => [
@@ -61,7 +61,7 @@ class ApplyForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'email',
             'required' => true,
             'break_on_failure' => true,
@@ -109,11 +109,11 @@ class ApplyForm extends BaseForm
 
 
     /**
-     * Member name
+     * 表单: 用户名称
      */
-    protected function AddNameElement()
+    private function AddNameElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'name',
             'attributes' => [
@@ -124,7 +124,7 @@ class ApplyForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name'     => 'name',
             'required' => true,
             'break_on_failure' => true,
@@ -161,11 +161,11 @@ class ApplyForm extends BaseForm
 
 
     /**
-     * WeChat AppID
+     * 表单: 微信 AppID
      */
-    protected function addWxIdElement()
+    private function addWeChatAppIdElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'appid',
             'attributes' => [
@@ -176,7 +176,7 @@ class ApplyForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name'     => 'appid',
             'required' => true,
             'break_on_failure' => true,
@@ -206,12 +206,63 @@ class ApplyForm extends BaseForm
                     ],
                 ],
                 [
-                    'name' => WeChatAppIdValidator::class,
+                    'name' => AppIdUniqueValidator::class,
                     'break_chain_on_failure' => true,
                     'options' => [
-                        'weChatRemote' => $this->remote,
+                        'accountService' => $this->accountService,
                         'messages' => [
-                            WeChatAppIdValidator::APP_ID_INVALID => '我们跟微信服务平台打听了一下无此 AppID 的公众号!',
+                            AppIdUniqueValidator::APPID_EXISTED => '该公众号已经申请过, 不可重复申请试用.',
+                        ],
+                    ],
+
+                ],
+            ],
+        ]);
+    }
+
+
+    /**
+     * 表单: 微信 AppSecret
+     */
+    private function addWeChatAppSecretElement()
+    {
+        $this->addElement([
+            'type' => 'text',
+            'name' => 'appsecret',
+            'attributes' => [
+                'id' => 'appsecret',
+            ],
+            'options' => [
+                'label' => 'AppSecret',
+            ],
+        ]);
+
+        $this->addFilter([
+            'name'     => 'appsecret',
+            'required' => true,
+            'break_on_failure' => true,
+            'filters'  => [
+                ['name' => 'StringTrim'],
+                ['name' => 'StripTags'],
+                ['name' => 'StripNewlines'],
+            ],
+            'validators' => [
+                [
+                    'name' => 'NotEmpty',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Validator\NotEmpty::IS_EMPTY => '请填写微信公众号 AppSecret!',
+                        ],
+                    ],
+                ],
+                [
+                    'name'    => 'Regex',
+                    'break_chain_on_failure' => true,
+                    'options' => [
+                        'pattern' => "/^[0-9a-zA-Z]+$/",
+                        'messages' => [
+                            \Zend\Validator\Regex::NOT_MATCH=> '请填写正确的 AppSecret!',
                         ],
                     ],
                 ],
@@ -221,11 +272,11 @@ class ApplyForm extends BaseForm
 
 
     /**
-     * Form captcha
+     * 表单: 验证码
      */
     public function addCaptchaElement()
     {
-        $this->add([
+        $this->addElement([
             'type' => 'captcha',
             'name' => 'captcha',
             'options' => [
@@ -234,7 +285,7 @@ class ApplyForm extends BaseForm
             ],
         ]);
 
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name'     => 'captcha',
             'break_on_failure' => true,
             'validators' => [
@@ -251,17 +302,13 @@ class ApplyForm extends BaseForm
     }
 
 
-
-    protected function addElements()
+    public function addElements()
     {
-        $this->addCaptchaElement();
-
-        $this->addCsrfElement();
         $this->addEmailElement();
-        $this->addNameElement();
-        $this->addWxIdElement();
-
-        $this->addSubmitElement();
+        $this->AddNameElement();
+        $this->addWeChatAppIdElement();
+        $this->addWeChatAppSecretElement();
+        $this->addCaptchaElement();
     }
 
 }

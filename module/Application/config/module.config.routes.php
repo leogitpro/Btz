@@ -48,6 +48,21 @@ return [
         ],
     ],
 
+    'active' => [
+        'type' => Segment::class,
+        'options' => [
+            'route'    => '/active[/:key][:suffix]',
+            'constraints' => [
+                'action'     => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'suffix' => '(/|.html)',
+            ],
+            'defaults' => [
+                'controller' => Controller\IndexController::class,
+                'action'     => 'active',
+            ],
+        ],
+    ],
+
     'contact' => [
         'type' => Literal::class,
         'options' => [
