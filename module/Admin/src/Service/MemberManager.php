@@ -126,6 +126,31 @@ class MemberManager extends BaseEntityManager
 
 
     /**
+     * @param $activeCode
+     * @return Member
+     * @throws InvalidArgumentException
+     */
+    public function getMemberByActiveCode($activeCode)
+    {
+        if(empty($activeCode)) {
+            throw new InvalidArgumentException('激活码不能为空');
+        }
+
+        $qb = $this->resetQb();
+
+        $qb->from(Member::class, 't')->select('t');
+        $qb->where($qb->expr()->eq('t.memberActiveCode', '?1'));
+        $qb->setParameter(1, $activeCode);
+
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Member) {
+            throw new InvalidArgumentException('无效的账号激活码');
+        }
+        return $obj;
+    }
+
+
+    /**
      * Get administrator information by email
      *
      * @param string $email

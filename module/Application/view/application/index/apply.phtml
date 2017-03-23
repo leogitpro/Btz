@@ -73,6 +73,11 @@ $this->inlineScript()->captureEnd();
     <div class="col-lg-5">
         <h3>申请试用</h3>
         <p>请填写下面的表单, 系统会给您发送申请激活邮件. 请注意查收邮件.</p>
+        <?php if(!empty($error) && 'wx' == $error) { ?>
+            <div class="alert alert-danger">
+                <strong>公众号未能通过微信平台确认, 请确认的公众号信息填写正确.</strong>
+            </div>
+        <?php } ?>
 
         <?php echo $this->form()->openTag($form); ?>
 

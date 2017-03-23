@@ -9,6 +9,8 @@
 namespace Application\Controller;
 
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException as AdminInvalidArgumentException;
+use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
@@ -57,7 +59,36 @@ class IndexController extends AppBaseController
      */
     public function activeAction()
     {
-        return new ViewModel();
+        $activeCode = $this->params()->fromRoute('key', '');
+        $memberManager = $this->getSm(MemberManager::class);
+
+        try {
+            $member = $memberManager->getMemberByActiveCode($activeCode);
+            if($member->getMemberStatus() == Member::STATUS_RETRIED) {
+                $deptManager = $this->getSm(DepartmentManager::class);
+                $member->getDepts()->add($deptManager->getDefaultDepartment());
+                $member->setMemberStatus(Member::STATUS_ACTIVATED);
+                $member->setMemberActiveCode(md5(time() . rand(1111, 9999)));
+                $memberManager->saveModifiedEntity($member);
+            }
+
+            return $this->getDisplayPlugin()->show(
+                '账号激活成功!',
+                '您的账号已经激活成功, 您可以登录管理平台进行更多的公众号管理.',
+                $this->url()->fromRoute('admin'),
+                '登入管理平台',
+                5
+            );
+
+        } catch (AdminInvalidArgumentException $e) {
+            return $this->getDisplayPlugin()->show(
+                '无效的激活码!',
+                '您的激活码可能已经被使用, 账号一经激活, 激活码即失效!',
+                $this->url()->fromRoute('home'),
+                '返回',
+                3
+            );
+        }
     }
 
 
@@ -125,13 +156,15 @@ class IndexController extends AppBaseController
 
                     // Send mail
                     $mailTpl = $this->getConfigPlugin()->get('mail.template.apply');
-                    $username = $name;
+
                     $active_url = $this->getServerPlugin()->domain() . $this->url()->fromRoute('active', ['key' => $activeCode, 'suffix' => '.html']);
                     $account_expired = $accountExpired->format('Y-m-d');
                     $wechat_expired = date('Y-m-d', $weChatExpired);
                     $contact_url = $this->getServerPlugin()->domain() . $this->url()->fromRoute('contact');
 
-                    $mailTpl = str_replace('%username%', $username, $mailTpl);
+                    $mailTpl = str_replace('%username%', $name, $mailTpl);
+                    $mailTpl = str_replace('%password%', $password, $mailTpl);
+
                     $mailTpl = str_replace('%active_url%', $active_url, $mailTpl);
                     $mailTpl = str_replace('%account_expired%', $account_expired, $mailTpl);
                     $mailTpl = str_replace('%wechat_expired%', $wechat_expired, $mailTpl);
@@ -151,7 +184,7 @@ class IndexController extends AppBaseController
                         '一封您的帐号激活邮件已经发往: ' . $email . ' 请检查邮件激活账号, 立即享用我们为您提供的专业服务吧!',
                         $this->url()->fromRoute('home'),
                         '返回',
-                        3000
+                        5
                     );
 
                 } catch (WeChatRuntimeException $e) {
@@ -161,7 +194,6 @@ class IndexController extends AppBaseController
                 }
             }
         }
-
 
         return new ViewModel([
             'form' => $form,

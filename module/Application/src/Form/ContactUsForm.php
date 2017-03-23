@@ -9,11 +9,8 @@
 namespace Application\Form;
 
 
-use Zend\Form\Form;
-use Zend\InputFilter\InputFilter;
 
-
-class ContactUsForm extends Form
+class ContactUsForm extends BAseForm
 {
 
     /**
@@ -29,39 +26,18 @@ class ContactUsForm extends Form
      */
     public function __construct($captchaConfig)
     {
-        parent::__construct('contact_us_form');
-
         $this->captchaConfig = $captchaConfig;
 
-        $this->setAttributes(['method' => 'post', 'role' => 'form']);
-
-        $this->setInputFilter(new InputFilter());
-
-        $this->addElements();
-        $this->addInputFilters();
+        parent::__construct();
     }
 
 
     /**
-     * Add the form fields
-     *
+     * 表单: 用户邮件
      */
-    public function addElements()
+    private function addEmailElement()
     {
-        // Add the CSRF field
-        $this->add([
-            'type'  => 'csrf',
-            'name' => 'csrf',
-            'attributes' => [],
-            'options' => [
-                'csrf_options' => [
-                    'timeout' => 600
-                ]
-            ],
-        ]);
-
-        // Add the E-mail field
-        $this->add([
+        $this->addElement([
             'type' => 'text',
             'name' => 'email',
             'attributes' => [
@@ -72,56 +48,7 @@ class ContactUsForm extends Form
             ],
         ]);
 
-        // Add the Subject field
-        $this->add([
-            'type' => 'text',
-            'name' => 'subject',
-            'attributes' => [
-                'id' => 'subject',
-            ],
-            'options' => [
-                'label' => 'Subject',
-            ],
-        ]);
-
-        // Add the message field
-        $this->add([
-            'type'  => 'textarea',
-            'name' => 'message',
-            'attributes' => [
-                'id' => 'message'
-            ],
-            'options' => [
-                'label' => 'Message content',
-            ],
-        ]);
-
-        // Add captcha field
-        $this->add([
-            'type' => 'captcha',
-            'name' => 'captcha',
-            'options' => [
-                'label' => 'Verification code',
-                'captcha' => $this->captchaConfig,
-            ],
-        ]);
-
-
-        // Add submit field
-        $this->add([
-            'type' => 'submit',
-            'name' => 'submit',
-            'attributes' => [
-                'value' => 'Submit',
-            ],
-        ]);
-    }
-
-
-    public function addInputFilters()
-    {
-        // Add E-mail filter and validators
-        $this->getInputFilter()->add([
+        $this->addFilter([
             'name' => 'email',
             'required' => true,
             'break_on_failure' => true,
@@ -146,14 +73,34 @@ class ContactUsForm extends Form
                         'useMxCheck' => false,
                         'messages' => [
                             \Zend\Validator\EmailAddress::INVALID_FORMAT => '请留下您的有效的邮件地址方便我们与您联络!',
+                            \Zend\Validator\EmailAddress::INVALID_HOSTNAME => '您的邮件地址的域名很奇怪, 好像不太合适.',
+                            \Zend\Validator\Hostname::LOCAL_NAME_NOT_ALLOWED => '',
+                            \Zend\Validator\Hostname::INVALID_HOSTNAME => '',
                         ],
                     ],
                 ],
             ],
         ]);
+    }
 
-        // Add Subject filter and validators
-        $this->getInputFilter()->add([
+
+    /**
+     * 表单: 主题
+     */
+    private function addSubjectElement()
+    {
+        $this->addElement([
+            'type' => 'text',
+            'name' => 'subject',
+            'attributes' => [
+                'id' => 'subject',
+            ],
+            'options' => [
+                'label' => 'Subject',
+            ],
+        ]);
+
+        $this->addFilter([
             'name'     => 'subject',
             'required' => true,
             'break_on_failure' => true,
@@ -186,9 +133,26 @@ class ContactUsForm extends Form
                 ],
             ],
         ]);
+    }
 
-        // Add Message content filter and validators
-        $this->getInputFilter()->add([
+
+    /**
+     * 表单: 内容
+     */
+    private function addContentElement()
+    {
+        $this->addElement([
+            'type'  => 'textarea',
+            'name' => 'message',
+            'attributes' => [
+                'id' => 'message'
+            ],
+            'options' => [
+                'label' => 'Message content',
+            ],
+        ]);
+
+        $this->addFilter([
             'name'     => 'message',
             'required' => true,
             'break_on_failure' => true,
@@ -219,6 +183,44 @@ class ContactUsForm extends Form
                 ],
             ],
         ]);
+    }
 
+    /**
+     * 表单: 验证码
+     */
+    private function addCaptchaElement()
+    {
+        $this->addElement([
+            'type' => 'captcha',
+            'name' => 'captcha',
+            'options' => [
+                'label' => 'Verification code',
+                'captcha' => $this->captchaConfig,
+            ],
+        ]);
+
+        $this->addFilter([
+            'name'     => 'captcha',
+            'break_on_failure' => true,
+            'validators' => [
+                [
+                    'name' => \Zend\Captcha\Image::class,
+                    'options' => [
+                        'messages' => [
+                            \Zend\Captcha\Image::BAD_CAPTCHA => '请输入正确的验证码!',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+
+    public function addElements()
+    {
+        $this->addEmailElement();
+        $this->addSubjectElement();
+        $this->addContentElement();
+        $this->addCaptchaElement();
     }
 }

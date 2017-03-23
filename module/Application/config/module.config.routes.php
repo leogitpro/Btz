@@ -53,7 +53,7 @@ return [
         'options' => [
             'route'    => '/active[/:key][:suffix]',
             'constraints' => [
-                'action'     => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
@@ -100,9 +100,10 @@ return [
             'index' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => 'index[/:action][:suffix]',
+                    'route'    => 'index[/:action[/:key]][:suffix]',
                     'constraints' => [
-                        'action'     => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                        'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
+                        'key' => '[a-zA-Z0-9_\-]+',
                         'suffix' => '(/|.html)',
                     ],
                     'defaults' => [
