@@ -1,0 +1,47 @@
+<?php
+$this->pageTitleBar('更新公众号过期时间');
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+
+$form->get('expired')->setAttributes([
+    'class' => 'form-control',
+    'value' => date('Y-m-d', $weChat->getWxExpired()),
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <div>
+            <h3>AppID: <?php echo $weChat->getWxAppId(); ?></h3>
+            <small><?php echo $weChat->getMember()->getMemberName(); ?>: &lt;<?php echo $weChat->getMember()->getMemberEmail(); ?>&gt;</small>
+        </div>
+
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('expired'), '设置公众号过期时间'); ?>
+            <?php echo $this->formElement($form->get('expired')); ?>
+            <p class="text-muted"><small>日期格式: <strong>年-月-日</strong> 或 <strong>年/月/日</strong></small></p>
+            <?php echo $this->formElementErrors($form->get('expired')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>

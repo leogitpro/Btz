@@ -9,6 +9,8 @@
 namespace Admin\Controller;
 
 
+use Admin\Exception\InvalidArgumentException;
+use Admin\Form\WeChatExpiredForm;
 use Zend\View\Model\ViewModel;
 
 
@@ -54,6 +56,48 @@ class WeChatController extends AdminBaseController
 
 
     /**
+     * 设置过期时间
+     */
+    public function expiredAction()
+    {
+        $weChadId = (int)$this->params()->fromRoute('key', 0);
+        if (!$weChadId) {
+            throw new InvalidArgumentException('微信 ID 为空, 不能继续操作!');
+        }
+
+        $weChat = $this->getWeChatAccountService()->getWeChat($weChadId);
+
+        $form = new WeChatExpiredForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+
+                $data = $form->getData();
+
+                $expired = new \DateTime($data['expired']);
+
+                $weChat->setWxExpired($expired->format('U') + 24 * 3600 - 1);
+                $this->getWeChatAccountService()->saveModifiedEntity($weChat);
+
+                return $this->go(
+                    '公众号已更新',
+                    '微信公众号: ' . $weChat->getWxAppId() . ' 的过期时间已调整为: ' . $expired->format('Y-m-d'),
+                    $this->url()->fromRoute('admin/weChat')
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'weChat' => $weChat,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
+    /**
      *  ACL 注册
      *
      * @return array
@@ -63,6 +107,8 @@ class WeChatController extends AdminBaseController
         $item = self::CreateControllerRegistry(__CLASS__, '微信公众号管理', 'admin/weChat', 1, 'wechat', 22);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '公众号列表', 1, 'bars', 9);
+
+        $item['actions']['expired'] = self::CreateActionRegistry('expired', '设置过期时间');
 
         return $item;
     }
