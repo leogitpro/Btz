@@ -16,6 +16,8 @@ use Admin\Entity\Action;
 use Admin\Entity\Component;
 use Admin\Entity\Department;
 use Admin\Entity\Member;
+use Admin\Exception\InvalidArgumentException;
+use Admin\Exception\RuntimeException;
 use Doctrine\ORM\EntityManager;
 
 
@@ -423,9 +425,11 @@ class AclManager extends BaseEntityManager
      */
     public function isValid($controllerClass, $actionKey)
     {
-        $member = $this->memberManager->getCurrentMember();
-
-        if (null == $member || Member::STATUS_ACTIVATED != $member->getMemberStatus()) {
+        try {
+            $member = $this->memberManager->getCurrentMember();
+        } catch (RuntimeException $e) {
+            return false;
+        } catch (InvalidArgumentException $e) {
             return false;
         }
 
@@ -438,8 +442,9 @@ class AclManager extends BaseEntityManager
             return false;
         }
 
-        $component = $this->componentManager->getComponent($controllerClass);
-        if (null == $component) {
+        try {
+            $component = $this->componentManager->getComponent($controllerClass);
+        } catch (InvalidArgumentException $e) {
             return false;
         }
 

@@ -10,6 +10,7 @@ namespace Admin\Controller;
 
 
 use Admin\Form\WeChatForm;
+use Admin\Form\WeChatOrderForm;
 use WeChat\Entity\Account;
 use WeChat\Exception\InvalidArgumentException;
 use WeChat\Exception\RuntimeException;
@@ -263,6 +264,57 @@ class WeChatAccountController extends AdminBaseController
     }
 
 
+    /**
+     * 我的订单
+     */
+    public function orderAction()
+    {
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+
+        return new ViewModel([
+            'weChat' => $weChat,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+    /**
+     * 订购服务
+     */
+    public function addOrderAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+
+        $form = new WeChatOrderForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                //$data = $form->getData();
+                //$second = $data['second'];
+                $second = 365 * 24 * 3600;
+                $money = 12000;
+
+                $this->getWeChatOrderService()->createOrder($weChat, $second, $money);
+
+                return $this->go(
+                    '订单已创建',
+                    '您的订单已经创建成功, 待支付完成后公众号服务时间会自动延长.',
+                    $this->url()->fromRoute('admin/weChatAccount', ['action' => 'order'])
+                );
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+            'weChat' => $weChat,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
 
     /**
      * ACL 注册
@@ -276,9 +328,13 @@ class WeChatAccountController extends AdminBaseController
         $item['actions']['index'] = self::CreateActionRegistry('index', '我的公众号', 1, 'university', 9);
         $item['actions']['tags'] = self::CreateActionRegistry('tags', '用户标签', 1, 'tags', 8);
 
+        $item['actions']['order'] = self::CreateActionRegistry('order', '我的订单', 1, 'shopping-cart', 6);
+
         $item['actions']['add'] = self::CreateActionRegistry('add', '配置公众号');
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改公众号');
         $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '手动更新 AccessToken');
+
+        $item['actions']['add-order'] = self::CreateActionRegistry('add-order', '订购服务');
 
         $item['actions']['async-tags'] = self::CreateActionRegistry('async-tags', '同步用户标签');
 

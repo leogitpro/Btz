@@ -21,6 +21,7 @@ use Application\Controller\AppBaseController;
 use WeChat\Service\AccountService;
 use WeChat\Service\ClientService;
 use WeChat\Service\MenuService;
+use WeChat\Service\OrderService;
 use WeChat\Service\QrCodeService;
 use WeChat\Service\TagService;
 use WeChat\Service\WeChatService;
@@ -81,6 +82,15 @@ class AdminBaseController extends AppBaseController
     protected function getWeChatMenuService()
     {
         return $this->getSm(MenuService::class);
+    }
+
+
+    /**
+     * @return OrderService
+     */
+    protected function getWeChatOrderService()
+    {
+        return $this->getSm(OrderService::class);
     }
 
     ///

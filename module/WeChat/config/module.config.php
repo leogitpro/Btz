@@ -77,6 +77,8 @@ return [
             Service\ClientService::class => Service\Factory\BaseEntityFactory::class,
             Service\QrCodeService::class => Service\Factory\BaseEntityFactory::class,
             Service\MenuService::class => Service\Factory\BaseEntityFactory::class,
+            Service\OrderService::class => Service\Factory\BaseEntityFactory::class,
+            Service\InvoiceService::class => Service\Factory\BaseEntityFactory::class,
             Service\WeChatService::class => Service\Factory\WeChatFactory::class,
         ],
     ],

@@ -13,6 +13,7 @@ namespace WeChat\Service;
 use Admin\Entity\Member;
 use WeChat\Entity\Account;
 use WeChat\Exception\InvalidArgumentException;
+use WeChat\Exception\RuntimeException;
 
 
 class AccountService extends BaseEntityService
@@ -127,6 +128,7 @@ class AccountService extends BaseEntityService
         if (!$weChat instanceof Account) {
             throw new InvalidArgumentException('该用户无微信公众号帐号信息');
         }
+
         return $weChat;
     }
 

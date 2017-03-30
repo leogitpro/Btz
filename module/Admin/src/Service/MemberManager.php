@@ -85,6 +85,7 @@ class MemberManager extends BaseEntityManager
      * @param string $member_id
      * @return Member
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function getMember($member_id = null)
     {
@@ -102,6 +103,16 @@ class MemberManager extends BaseEntityManager
         if (!$obj instanceof Member) {
             throw new InvalidArgumentException('无效的成员编号');
         }
+
+        $expired = $obj->getMemberExpired();
+        if(time() > $expired->format('U')) {
+            throw new RuntimeException('用户账号已经过期');
+        }
+
+        if (Member::STATUS_ACTIVATED != $obj->getMemberStatus()) {
+            throw new RuntimeException('用户账号已经被锁定');
+        }
+
         return $obj;
     }
 
@@ -109,6 +120,7 @@ class MemberManager extends BaseEntityManager
     /**
      * @return Member
      * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function getCurrentMember()
     {

@@ -84,6 +84,32 @@ class Version20170319043717 extends AbstractMigration
         $tag->setPrimaryKey(['id']);
         $tag->addIndex(['wx']);
         $tag->addIndex(['tagid']);
+
+
+        $order = $schema->createTable('wechat_order');
+        $order->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $order->addColumn('wx', 'integer', ['unsigned' => true]);
+        $order->addColumn('no', 'string', ['fixed' => true, 'length' => 14]);
+        $order->addColumn('money', 'integer', ['unsigned' => true]);
+        $order->addColumn('paid', 'smallint', ['unsigned' => true]);
+        $order->addColumn('second', 'integer', ['unsigned' => true]);
+        $order->addColumn('created', 'datetime');
+        $order->setPrimaryKey(['id']);
+        $order->addIndex(['wx']);
+
+        $invoice = $schema->createTable('wechat_invoice');
+        $invoice->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
+        $invoice->addColumn('wx', 'integer', ['unsigned' => true]);
+        $invoice->addColumn('title', 'string', ['length' => 100]);
+        $invoice->addColumn('receiver', 'string', ['length' => 45]);
+        $invoice->addColumn('phone', 'string', ['length' => 45]);
+        $invoice->addColumn('address', 'string', ['length' => 100]);
+        $invoice->addColumn('money', 'integer', ['unsigned' => true]);
+        $invoice->addColumn('status', 'smallint', ['unsigned' => true]);
+        $invoice->addColumn('note', 'string', ['length' => 255]);
+        $invoice->addColumn('created', 'datetime');
+        $invoice->setPrimaryKey(['id']);
+        $invoice->addIndex(['wx']);
     }
 
     public function postUp(Schema $schema)
@@ -103,6 +129,8 @@ class Version20170319043717 extends AbstractMigration
         $schema->dropTable('wechat_qrcode');
         $schema->dropTable('wechat_menu');
         $schema->dropTable('wechat_tag');
+        $schema->dropTable('wechat_order');
+        $schema->dropTable('wechat_invoice');
 
     }
 }

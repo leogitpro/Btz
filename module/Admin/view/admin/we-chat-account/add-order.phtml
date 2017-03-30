@@ -1,0 +1,74 @@
+<?php
+$this->pageTitleBar('购买服务');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+if(!$weChat instanceof \WeChat\Entity\Account) {
+    throw new InvalidArgumentException('无公众号信息');
+}
+
+$orders = $weChat->getOrders();
+
+
+$form->get('second')->setAttributes([
+    'class' => 'form-control',
+    'value' => 365 * 24 * 3600,
+]);
+$form->get('second')->setOptions([
+        'value_options' => [
+                365 * 24 * 3600 => '1 年',
+        ],
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+
+$expiredSecond = $weChat->getWxExpired();
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function () {
+    
+function expiredToDate() {
+    var owndSecond = $expiredSecond;
+    var addedSecond = parseInt($("select").val());
+    var d = new Date((owndSecond + addedSecond) * 1000);
+    $("#expiredTo").text(d.toLocaleDateString());
+}
+
+    expiredToDate();
+    $("select").change(function() {
+        expiredToDate();
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('second'), '服务周期'); ?>
+            <?php echo $this->formElement($form->get('second')); ?>
+            <p><small>购买后公众号服务有效期将至: <strong id="expiredTo"><?php echo date("Y-m-d", $weChat->getWxExpired() + 365 * 24 * 3600); ?></strong></small></p>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
+
+    </div>
+</div>
+

@@ -129,12 +129,30 @@ class Account
     private $qrCodes;
 
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="WeChat\Entity\Order", mappedBy="weChat")
+     */
+    private $orders;
+
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="WeChat\Entity\Invoice", mappedBy="weChat")
+     */
+    private $invoices;
+
+
 
     public function __construct()
     {
         $this->clients = new ArrayCollection();
         $this->menus = new ArrayCollection();
         $this->qrCodes = new ArrayCollection();
+        $this->orders = new ArrayCollection();
+        $this->invoices = new ArrayCollection();
     }
 
 
@@ -344,6 +362,38 @@ class Account
     public function setQrCodes($qrCodes)
     {
         $this->qrCodes = $qrCodes;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getOrders()
+    {
+        return $this->orders;
+    }
+
+    /**
+     * @param ArrayCollection $orders
+     */
+    public function setOrders($orders)
+    {
+        $this->orders = $orders;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getInvoices()
+    {
+        return $this->invoices;
+    }
+
+    /**
+     * @param ArrayCollection $invoices
+     */
+    public function setInvoices($invoices)
+    {
+        $this->invoices = $invoices;
     }
 
 }
