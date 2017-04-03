@@ -343,7 +343,7 @@ class MessageController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统消息管理', 'admin/message', 1, 'envelope-o', 20);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统消息管理', 'admin/message', 1, 'envelope-o', 8);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '全站消息列表', 1, 'envelope-o', 0);
         $item['actions']['in'] = self::CreateActionRegistry('in', '我的收件箱', 1, 'envelope-o', 8);

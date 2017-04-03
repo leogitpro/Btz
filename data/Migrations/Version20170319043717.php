@@ -96,6 +96,7 @@ class Version20170319043717 extends AbstractMigration
         $order->addColumn('created', 'datetime');
         $order->setPrimaryKey(['id']);
         $order->addIndex(['wx']);
+        $order->addIndex(['wx', 'no']);
 
         $invoice = $schema->createTable('wechat_invoice');
         $invoice->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);

@@ -387,7 +387,7 @@ class MemberController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统成员管理', 'admin/member', 1, 'user', 10);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统成员管理', 'admin/member', 1, 'user', 6);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '系统成员列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '新增系统成员', 1, 'user-plus', 1);

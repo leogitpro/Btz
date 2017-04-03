@@ -300,7 +300,7 @@ class DepartmentController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统分组管理', 'admin/dept', 1, 'users', 12);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统分组管理', 'admin/dept', 1, 'users', 4);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '分组列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '新建分组', 1, 'plus', 1);

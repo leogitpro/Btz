@@ -84,7 +84,7 @@ class Order
     {
         return [
             self::PAID_STATUS_DEFAULT => '待付款',
-            self::PAID_STATUS_SENT => '待收款',
+            self::PAID_STATUS_SENT => '已付款, 待确认',
             self::PAID_STATUS_RECEIVED => '已收款',
         ];
     }

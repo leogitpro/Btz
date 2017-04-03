@@ -12,6 +12,7 @@ namespace Admin\Controller;
 use Admin\Form\WeChatForm;
 use Admin\Form\WeChatOrderForm;
 use WeChat\Entity\Account;
+use WeChat\Entity\Order;
 use WeChat\Exception\InvalidArgumentException;
 use WeChat\Exception\RuntimeException;
 use WeChat\Service\NetworkService;
@@ -198,7 +199,6 @@ class WeChatAccountController extends AdminBaseController
      */
     public function tagsAction()
     {
-
         $myself = $this->getMemberManager()->getCurrentMember();
 
         try {
@@ -279,6 +279,7 @@ class WeChatAccountController extends AdminBaseController
         ]);
     }
 
+
     /**
      * 订购服务
      */
@@ -317,6 +318,32 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
+     * 已支付通知
+     */
+    public function paidOrderAction()
+    {
+        $key = $this->params()->fromRoute('key', '');
+
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+
+        $order = $this->getWeChatOrderService()->getWeChatOrderByNo($weChat, $key);
+
+        if ($order->getPaid() == Order::PAID_STATUS_DEFAULT) {
+            $order->setPaid(Order::PAID_STATUS_SENT);
+            $this->getWeChatOrderService()->saveModifiedEntity($order);
+        }
+
+        return $this->go(
+            '订单已更新',
+            '已经通知财务进行账号核实, 已经核实付款信息, 公众号将服务有效期会自动延长.',
+            $this->url()->fromRoute('admin/weChatAccount', ['action' => 'order'])
+        );
+
+    }
+
+
+    /**
      * ACL 注册
      *
      * @return array
@@ -335,6 +362,7 @@ class WeChatAccountController extends AdminBaseController
         $item['actions']['refresh-token'] = self::CreateActionRegistry('refresh-token', '手动更新 AccessToken');
 
         $item['actions']['add-order'] = self::CreateActionRegistry('add-order', '订购服务');
+        $item['actions']['paid-order'] = self::CreateActionRegistry('paid-order', '订单支付完成');
 
         $item['actions']['async-tags'] = self::CreateActionRegistry('async-tags', '同步用户标签');
 

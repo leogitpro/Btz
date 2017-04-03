@@ -166,7 +166,7 @@ class ComponentController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统组件管理', 'admin/component', 1, 'cubes', 14);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统组件管理', 'admin/component', 1, 'cubes', 0);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '系统组件列表', 1, 'bars', 0);
 

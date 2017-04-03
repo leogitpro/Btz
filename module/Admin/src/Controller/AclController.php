@@ -286,7 +286,7 @@ class AclController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '系统权限管理', 'admin/acl', 1, 'cogs', 16);
+        $item = self::CreateControllerRegistry(__CLASS__, '系统权限管理', 'admin/acl', 1, 'cogs', 2);
 
         $item['actions']['members'] = self::CreateActionRegistry('members', '可授权用户列表', 1, 'user', 9);
         $item['actions']['departments'] = self::CreateActionRegistry('departments', '可授权分组列表', 1, 'users', 19);

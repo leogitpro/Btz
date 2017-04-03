@@ -215,7 +215,7 @@ class FeedbackController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '信息反馈管理', 'admin/feedback', 1, 'commenting-o', 12);
+        $item = self::CreateControllerRegistry(__CLASS__, '信息反馈管理', 'admin/feedback', 1, 'commenting-o', 10);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '我的反馈列表', 1, 'comments-o', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '新增我的反馈', 1, 'comment-o', 1);
