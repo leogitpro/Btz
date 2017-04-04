@@ -1,0 +1,28 @@
+<?php
+$this->pageTitleBar('申请发票');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+if(!$weChat instanceof \WeChat\Entity\Account) {
+    throw new InvalidArgumentException('无公众号信息');
+}
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+$(function () {
+    
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-6">
+
+
+    </div>
+</div>
+

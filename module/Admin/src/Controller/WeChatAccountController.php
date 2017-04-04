@@ -12,6 +12,7 @@ namespace Admin\Controller;
 use Admin\Form\WeChatForm;
 use Admin\Form\WeChatOrderForm;
 use WeChat\Entity\Account;
+use WeChat\Entity\Invoice;
 use WeChat\Entity\Order;
 use WeChat\Exception\InvalidArgumentException;
 use WeChat\Exception\RuntimeException;
@@ -269,7 +270,6 @@ class WeChatAccountController extends AdminBaseController
      */
     public function orderAction()
     {
-
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
@@ -344,6 +344,61 @@ class WeChatAccountController extends AdminBaseController
 
 
     /**
+     * 发票记录
+     */
+    public function invoiceAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+
+        $invoices = $weChat->getInvoices();
+        $orders = $weChat->getOrders();
+
+        $paiedMoney = 0;
+        foreach ($orders as $order) {
+            if ($order instanceof Order) {
+                if (Order::PAID_STATUS_RECEIVED == $order->getPaid()) {
+                    $paiedMoney += $order->getMoney();
+                }
+            }
+        }
+
+        $askedMoney = 0;
+        foreach ($invoices as $invoice) {
+            if ($invoice instanceof Invoice) {
+                $askedMoney += $invoice->getMoney();
+            }
+        }
+
+        $lastMoney = $paiedMoney - $askedMoney;
+
+
+        return new ViewModel([
+            'weChat' => $weChat,
+            'lastMoney' => $lastMoney,
+            'invoices' => $invoices,
+            'activeId' => __METHOD__,
+        ]);
+    }
+
+    /**
+     * 请求开票
+     */
+    public function askInvoiceAction()
+    {
+        $myself = $this->getMemberManager()->getCurrentMember();
+        $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+
+        return new ViewModel([
+            'weChat' => $weChat,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
+
+
+    /**
      * ACL 注册
      *
      * @return array
@@ -356,6 +411,7 @@ class WeChatAccountController extends AdminBaseController
         $item['actions']['tags'] = self::CreateActionRegistry('tags', '用户标签', 1, 'tags', 8);
 
         $item['actions']['order'] = self::CreateActionRegistry('order', '我的订单', 1, 'shopping-cart', 6);
+        $item['actions']['invoice'] = self::CreateActionRegistry('invoice', '我的发票', 1, 'ticket', 4);
 
         $item['actions']['add'] = self::CreateActionRegistry('add', '配置公众号');
         $item['actions']['edit'] = self::CreateActionRegistry('edit', '修改公众号');
@@ -363,6 +419,8 @@ class WeChatAccountController extends AdminBaseController
 
         $item['actions']['add-order'] = self::CreateActionRegistry('add-order', '订购服务');
         $item['actions']['paid-order'] = self::CreateActionRegistry('paid-order', '订单支付完成');
+
+        $item['actions']['ask-invoice'] = self::CreateActionRegistry('ask-invoice', '申请发票');
 
         $item['actions']['async-tags'] = self::CreateActionRegistry('async-tags', '同步用户标签');
 

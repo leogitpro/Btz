@@ -1,0 +1,61 @@
+<?php
+$this->pageTitleBar('我的发票');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+if(!$weChat instanceof \WeChat\Entity\Account) {
+    throw new InvalidArgumentException('无公众号信息');
+}
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    //todo
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <p>
+            <span>您的可开发票金额为: <strong><?php echo $lastMoney; ?></strong> 元. </span>
+            <?php if($lastMoney) { ?>
+                <a class="btn btn-default btn-xs" href="<?php echo $this->url('admin/weChatAccount', ['action'=>'ask-invoice']); ?>"><i class="fa fa-plus fa-fw"></i> 申请发票</a>
+            <?php } ?>
+        </p>
+        <?php if ($invoices->count()) {  ?>
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table table-striped">
+                        <tr>
+                            <th width="20%">发票抬头</th>
+                            <th width="40%">收件信息</th>
+                            <th width="10%">状态</th>
+                            <th width="30%">其他信息</th>
+                        </tr>
+                        <?php
+                        foreach ($invoices as $invoice) {
+                            if ($invoice instanceof \WeChat\Entity\Invoice) {
+                                ?>
+                                <tr>
+                                    <td><?php echo $invoice->getTitle(); ?></td>
+                                    <td>
+                                        收件: <?php echo $invoice->getReceiver(); ?><br>
+                                        电话: <?php echo $invoice->getPhone(); ?><br>
+                                        地址: <?php echo $invoice->getAddress(); ?><br>
+                                    </td>
+                                    <td><?php echo $invoice->getStatusAsString(); ?></td>
+                                    <td><?php echo $invoice->getNote(); ?></td>
+                                </tr>
+                            <?php } } ?>
+
+                    </table>
+
+                </div>
+            </div>
+
+        <?php } ?>
+    </div>
+</div>
