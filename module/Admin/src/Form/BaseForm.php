@@ -44,13 +44,21 @@ class BaseForm extends Form
     }
 
 
-    public function addElement($element)
+    public function addElement($element = [])
     {
+        if (empty($element)) {
+            return ;
+        }
+
         $this->_elements[] = $element;
     }
 
-    public function addFilter($filter)
+    public function addFilter($filter = [])
     {
+        if (empty($filter)) {
+            return ;
+        }
+
         $this->_filters[] = $filter;
     }
 

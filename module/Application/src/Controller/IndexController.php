@@ -14,6 +14,7 @@ use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
+use Application\Form\TestForm;
 use Mail\Exception\InvalidArgumentException as MailInvalidArgumentException;
 use Mail\Exception\RuntimeException as MailRuntimeException;
 use Ramsey\Uuid\Uuid;
@@ -33,7 +34,21 @@ class IndexController extends AppBaseController
      */
     public function testAction()
     {
-        return new ViewModel();
+        $form = new TestForm();
+
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+
+            if ($form->isValid()) {
+                var_dump($form->getData());
+            }
+        }
+
+        return new ViewModel([
+            'form' => $form,
+        ]);
     }
 
 
