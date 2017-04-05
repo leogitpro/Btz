@@ -51,7 +51,78 @@ class IndexController extends AppBaseController
      */
     public function serviceAction()
     {
-        return new ViewModel();
+        $items = [
+            [
+                'title' => '公众号接入',
+                'desc' => '微信公众账号接入平台',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '免费试用',
+                'desc' => '每个微信认证公众号可以申请7天免费体验服务',
+                'share' => 1,
+                'pro' => 0,
+            ],
+            [
+                'title' => '菜单管理',
+                'desc' => '支持多套公众号自定义, 个性化菜单及切换服务',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '接口管理',
+                'desc' => 'AccessToken, 授权接口, JSSDK 分享接口服务',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '接口安全管理',
+                'desc' => '提供基于域名与 IP 及时效性接口访问控制服务',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '二维码管理',
+                'desc' => '任意生成 png, svg, eps 格式的公众号带参二维码',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '二维码追踪服务',
+                'desc' => '追踪由本平台发行的公众号二维码被扫描数据统计服务',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '数据同步',
+                'desc' => '公众号用户标签等数据同步服务',
+                'share' => 1,
+                'pro' => 1,
+            ],
+            [
+                'title' => '接口访问统计',
+                'desc' => '追踪授权出去的接口被调用数据统计',
+                'share' => 0,
+                'pro' => 1,
+            ],
+            [
+                'title' => '超大并发请求服务',
+                'desc' => '支持超大访问量的公众号接口调用',
+                'share' => 0,
+                'pro' => 1,
+            ],
+            [
+                'title' => '独享服务器服务',
+                'desc' => '支持公众号独立服务器部署支持',
+                'share' => 0,
+                'pro' => 1,
+            ],
+        ];
+
+        return new ViewModel([
+            'items' => [], //$items,
+        ]);
     }
 
     /**
