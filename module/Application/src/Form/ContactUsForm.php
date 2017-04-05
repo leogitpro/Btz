@@ -10,7 +10,7 @@ namespace Application\Form;
 
 
 
-class ContactUsForm extends BAseForm
+class ContactUsForm extends BaseForm
 {
 
     /**
