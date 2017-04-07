@@ -11,6 +11,20 @@ $this->barBreadcrumbs()->setItems([
 
 $form = $this->form;
 
+$inputName = $form->get('name');
+$messages = $inputName->getMessages();
+if (!empty($messages)) {
+    $localMessages = [];
+    if (array_key_exists(\Zend\Validator\NotEmpty::IS_EMPTY, $messages)) {
+        $localMessages[\Zend\Validator\NotEmpty::IS_EMPTY] = '不能为空空';
+    }
+
+    $inputName->setMessages(array_merge($messages, $localMessages));
+}
+
+var_dump($messages);
+
+
 $form->get('name')->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'您的名字'
@@ -23,6 +37,7 @@ $form->get('submit')->setAttributes([
 ]);
 
 $form->prepare();
+
 
 
 

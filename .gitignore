@@ -9,6 +9,7 @@ public/img/captcha/*.png
 
 # Composer files
 composer.phar
+composer.lock
 vendor/
 
 # Local configs

@@ -19,6 +19,7 @@ return [
     'DoctrineModule',
     'DoctrineORMModule',
     'Logger',
+    'Form',
     'Mail',
     'Application',
     'Api',

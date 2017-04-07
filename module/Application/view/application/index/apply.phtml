@@ -12,25 +12,179 @@ $this->barBreadcrumbs()->setItems([
 
 $form = $this->form;
 
-$form->get('email')->setAttributes([
+// 表单: 邮件地址
+$input = $form->get('email');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com'
 ]);
-$form->get('name')->setAttributes([
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '请务必填写您的电子邮件地址.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+
+        if (in_array($key, [
+            \Zend\Validator\EmailAddress::INVALID,
+            \Zend\Validator\EmailAddress::INVALID_FORMAT,
+            \Zend\Validator\EmailAddress::INVALID_HOSTNAME,
+            \Zend\Validator\EmailAddress::INVALID_MX_RECORD,
+            \Zend\Validator\EmailAddress::INVALID_SEGMENT,
+            \Zend\Validator\EmailAddress::DOT_ATOM,
+            \Zend\Validator\EmailAddress::QUOTED_STRING,
+            \Zend\Validator\EmailAddress::INVALID_LOCAL_PART,
+            \Zend\Validator\EmailAddress::LENGTH_EXCEEDED,
+            \Zend\Validator\EmailAddress::INVALID,
+            \Zend\Validator\Hostname::INVALID,
+            \Zend\Validator\Hostname::CANNOT_DECODE_PUNYCODE,
+            \Zend\Validator\Hostname::INVALID_DASH,
+            \Zend\Validator\Hostname::INVALID_HOSTNAME,
+            \Zend\Validator\Hostname::INVALID_HOSTNAME_SCHEMA,
+            \Zend\Validator\Hostname::INVALID_LOCAL_NAME,
+            \Zend\Validator\Hostname::INVALID_URI,
+            \Zend\Validator\Hostname::IP_ADDRESS_NOT_ALLOWED,
+            \Zend\Validator\Hostname::LOCAL_NAME_NOT_ALLOWED,
+            \Zend\Validator\Hostname::UNDECIPHERABLE_TLD,
+            \Zend\Validator\Hostname::UNKNOWN_TLD,
+        ])) {
+            $localMessages[\Zend\Validator\EmailAddress::INVALID_FORMAT] = '请使用正确的 E-mail 地址.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+
+        if ($key == \Admin\Validator\MemberEmailUniqueValidator::EMAIL_EXISTED) {
+            $localMessages[$key] = '该邮件地址已经申请过, 不可重复申请试用.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+// 表单: 用户名称
+$input = $form->get('name');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'您的名字'
 ]);
-$form->get('appid')->setAttributes([
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '请让我们知道您的大名.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
+            $localMessages[$key] = '您的大名长度太短了.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
+            $localMessages[$key] = '您的大名长度太长了.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if(!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+// 表单: AppID
+$input = $form->get('appid');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'微信公众号 AppID'
 ]);
-$form->get('appsecret')->setAttributes([
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '请填写您的公众号 AppID.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\Regex::NOT_MATCH) {
+            $localMessages[$key] = '请填写正确的公众号 AppID.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \WeChat\Validator\AppIdUniqueValidator::APPID_EXISTED) {
+            $localMessages[$key] = '该公众号已经申请过试用, 不能再次申请.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if(!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+// 表单: AppSecret
+$input = $form->get('appsecret');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'微信公众号 AppSecret'
 ]);
-$form->get('captcha')->setAttributes([
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '请填写您的公众号 AppSecret.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\Regex::NOT_MATCH) {
+            $localMessages[$key] = '请填写正确的公众号 AppSecret.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if(!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+// 表单: 验证码
+$input = $form->get('captcha');
+$input->setAttributes([
     'class' => 'form-control',
 ]);
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if ($key == \Zend\Captcha\Image::BAD_CAPTCHA) {
+            $localMessages[$key] = '请填写正确的申请验证码.';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if(!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
 
 $form->get('submit')->setAttributes([
     'class'=>'btn btn-primary',

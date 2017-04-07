@@ -23,6 +23,7 @@
     "autoload": {
         "psr-4": {
             "Logger\\": "module/Logger/src",
+            "Form\\": "module/Form/src",
             "Mail\\": "module/Mail/src",
             "Application\\": "module/Application/src/",
             "Api\\": "module/Api/src/",
