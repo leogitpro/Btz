@@ -3,20 +3,20 @@ $this->headTitle('登入系统');
 
 $form = $this->form;
 
-$inputAccount = $form->get('email');
-$inputAccount->setAttributes([
+$input = $form->get('email');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com',
 ]);
 
-$inputAccountMessages = $inputAccount->getMessages();
-$localAccountMessages = [];
-if(!empty($inputAccountMessages)) {
-    $keys = array_keys($inputAccountMessages);
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
     foreach ($keys as $key) {
         if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localAccountMessages[$key] = '登录账户不能留空, 请输入您的账号.';
-            unset($inputAccountMessages[$key]);
+            $localMessages[$key] = '登录账户不能留空, 请输入您的账号.';
+            unset($inputMessages[$key]);
             continue;
         }
 
@@ -43,48 +43,49 @@ if(!empty($inputAccountMessages)) {
             \Zend\Validator\Hostname::UNDECIPHERABLE_TLD,
             \Zend\Validator\Hostname::UNKNOWN_TLD,
         ])) {
-            $localAccountMessages[\Zend\Validator\EmailAddress::INVALID_FORMAT] = '请使用正确的 E-mail 邮箱地址.';
-            unset($inputAccountMessages[$key]);
+            $localMessages[\Zend\Validator\EmailAddress::INVALID_FORMAT] = '请使用正确的 E-mail 邮箱地址.';
+            unset($inputMessages[$key]);
             continue;
         }
     }
 }
-
-if (!empty($localAccountMessages)) {
-    $inputAccount->setMessages(array_merge($inputAccountMessages, $localAccountMessages));
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
 }
 
-$inputPassword = $form->get('password');
-$inputPassword->setAttributes([
+// 表单: 密码
+$input = $form->get('password');
+$input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'在这里输入您的登录密码',
 ]);
 
-$inputPasswordMessages = $inputPassword->getMessages();
-$localPasswordMessages = [];
-if(!empty($inputPasswordMessages)) {
-    $keys = array_keys($inputPasswordMessages);
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
     foreach ($keys as $key) {
         if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localPasswordMessages[$key] = '登录密码不能为空, 请输入您的密码.';
-            unset($inputPasswordMessages[$key]);
+            $localMessages[$key] = '登录密码不能为空, 请输入您的密码.';
+            unset($inputMessages[$key]);
             continue;
         }
         if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localPasswordMessages[$key] = '登录密码长度太短了.';
-            unset($inputPasswordMessages[$key]);
+            $localMessages[$key] = '登录密码长度太短了.';
+            unset($inputMessages[$key]);
             continue;
         }
         if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localPasswordMessages[$key] = '登录密码长度太长了.';
-            unset($inputPasswordMessages[$key]);
+            $localMessages[$key] = '登录密码长度太长了.';
+            unset($inputMessages[$key]);
             continue;
         }
     }
 }
-
-if (!empty($localPasswordMessages)) {
-    $inputPassword->setMessages(array_merge($inputPasswordMessages, $localPasswordMessages));
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
 }
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary', 'value' => '登入系统']);
