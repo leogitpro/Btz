@@ -2,10 +2,19 @@
 $this->pageTitleBar('更新公众号信息');
 $this->sideTreeMenu()->setActiveId($activeId);
 
+if(!$weChat instanceof \WeChat\Entity\Account) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的参数');
+}
 
-$form->get('appsecret')->setAttributes([
+$input = $form->get('appsecret');
+$input->setAttributes([
     'class' => 'form-control',
+    'value' => $weChat->getWxAppSecret(),
     'placeholder' => '这里请填写 AppSecret'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '微信公众号的 AppSecret 不填写后面没法继续愉快的玩耍了!',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的 AppSecret, 请注意大小写!',
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);

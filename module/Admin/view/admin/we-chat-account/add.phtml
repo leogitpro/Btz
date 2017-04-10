@@ -2,14 +2,26 @@
 $this->pageTitleBar('创建公众号');
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$form->get('appid')->setAttributes([
+$input = $form->get('appid');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '这里请填写 AppID'
 ]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '微信公众号的 AppID 不填写后面没法继续愉快的玩耍了!',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的 AppID, 请注意大小写!',
+    \WeChat\Validator\AppIdUniqueValidator::APPID_EXISTED => '该公众号已经被登记, 不能再被使用.',
+]);
 
-$form->get('appsecret')->setAttributes([
+
+$input = $form->get('appsecret');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '这里请填写 AppSecret'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '微信公众号的 AppSecret 不填写后面没法继续愉快的玩耍了!',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的 AppSecret, 请注意大小写!',
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);

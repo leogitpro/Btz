@@ -46,7 +46,7 @@ $input->setAttributes([
 ]);
 $localMessages = [
     \Zend\Validator\NotEmpty::IS_EMPTY => '请填写您的公众号 AppID.',
-    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的公众号 AppID.',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的公众号 AppID, 请注意大小写!',
     \WeChat\Validator\AppIdUniqueValidator::APPID_EXISTED => '该公众号已经申请过试用, 不能再次申请.',
 ];
 $this->formLocalMessage($input, $localMessages);
@@ -60,7 +60,7 @@ $input->setAttributes([
 ]);
 $localMessages = [
     \Zend\Validator\NotEmpty::IS_EMPTY => '请填写您的公众号 AppSecret.',
-    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的公众号 AppSecret.',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的公众号 AppSecret, 请注意大小写!',
 ];
 $this->formLocalMessage($input, $localMessages);
 
