@@ -8,34 +8,11 @@ $input = $form->get('content');
 $input->setAttributes([
     'class'=>'form-control',
 ]);
-
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '反馈内容不能为空哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localMessages[$key] = '反馈的内容是不是太少了点? 请再说的详细一点吧, 谢谢!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localMessages[$key] = '我想说是不是太多了点? 这是带给了您多大的仇恨哪. 内容太多了啦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if (!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
-
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '反馈内容不能为空哦!',
+    \Zend\Validator\StringLength::TOO_SHORT => '反馈的内容是不是太少了点? 请再说的详细一点吧, 谢谢!',
+    \Zend\Validator\StringLength::TOO_LONG => '我想说是不是太多了点? 这是带给了您多大的仇恨哪. 内容太多了啦!',
+]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 

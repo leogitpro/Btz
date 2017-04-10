@@ -10,75 +10,29 @@ $input->setAttributes([
     'class'=>'form-control',
     'placeholder' => '这里填写消息标题',
 ]);
-
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '消息标题不能为空哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localMessages[$key] = '消息标题太短了哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localMessages[$key] = '消息标题太长了哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if (!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
-
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '消息标题不能为空哦!',
+    \Zend\Validator\StringLength::TOO_SHORT => '消息标题太短了哦!',
+    \Zend\Validator\StringLength::TOO_LONG => '消息标题太长了哦!',
+]);
 
 // 表单: 内容
 $input = $form->get('content');
 $input->setAttributes([
     'class'=>'form-control',
+    'rows' => 6,
 ]);
-
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '消息内容不能为空哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localMessages[$key] = '消息内容太短了哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localMessages[$key] = '消息内容太长了哦!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if (!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
-
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '消息内容不能为空哦!',
+    \Zend\Validator\StringLength::TOO_SHORT => '消息内容太短了哦!',
+    \Zend\Validator\StringLength::TOO_LONG => '消息内容太长了哦!',
+]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $form->prepare();
 
 ?>
-
 
 <div class="row">
     <div class="col-lg-6">

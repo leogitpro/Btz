@@ -9,11 +9,10 @@ $input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com',
 ]);
-$localMessages = [
+$this->formLocalMessage($input, [
     \Zend\Validator\NotEmpty::IS_EMPTY => '登录账户不能留空, 请输入您的账号.',
     '__undefined__' => '请使用正确的 E-mail 邮箱地址.',
-];
-$this->formLocalMessage($input, $localMessages);
+]);
 
 
 // 表单: 密码
@@ -22,12 +21,11 @@ $input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'在这里输入您的登录密码',
 ]);
-$localMessages = [
+$this->formLocalMessage($input, [
     \Zend\Validator\NotEmpty::IS_EMPTY => '登录密码不能为空, 请输入您的密码.',
     \Zend\Validator\StringLength::TOO_SHORT => '登录密码长度太短了.',
     \Zend\Validator\StringLength::TOO_LONG => '登录密码长度太长了.',
-];
-$this->formLocalMessage($input, $localMessages);
+]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary', 'value' => '登入系统']);
 
