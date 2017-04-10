@@ -13,6 +13,8 @@ namespace Admin\Form;
 use Admin\Entity\Department;
 use Admin\Service\DepartmentManager;
 use Admin\Validator\DeptNameUniqueValidator;
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
 
 
 class DepartmentForm extends BaseForm
@@ -42,57 +44,26 @@ class DepartmentForm extends BaseForm
     /**
      * 表单: 部门名称
      */
-    private function addNameElement()
+    private function addDepartmentName()
     {
-        $value = '';
-        if($this->dept instanceof Department) {
-            $value = $this->dept->getDeptName();
-        }
-
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'name',
-            'attributes' => [
-                'id' => 'name',
-                'value' => $value,
-            ],
-            'options' => [
-                'label' => '部门名称',
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'name',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 2,
-                        'max' => 45,
-                    ],
-                ],
-                [
-                    'name' => DeptNameUniqueValidator::class,
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'departmentManager' => $this->deptManager,
-                        'department' => $this->dept,
-                    ],
+        $validators = [
+            Factory::StringLength(2, 45),
+            [
+                'name' => DeptNameUniqueValidator::class,
+                'break_chain_on_failure' => true,
+                'options' => [
+                    'departmentManager' => $this->deptManager,
+                    'department' => $this->dept,
                 ],
             ],
-        ]);
+        ];
+
+        $this->addTextElement('name', true, $validators);
     }
 
 
     public function addElements()
     {
-        $this->addNameElement();
+        $this->addDepartmentName();
     }
 }

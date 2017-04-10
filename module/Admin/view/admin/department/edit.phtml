@@ -1,11 +1,16 @@
 <?php
-$this->pageTitleBar('Edit department');
+$this->pageTitleBar('修改分组信息');
 
 $this->sideTreeMenu()->setActiveId($activeId);
+
+if (!$dept instanceof \Admin\Entity\Department) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的参数');
+}
 
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
+    'value' => $dept->getDeptName(),
     'placeholder' => 'Enter the department name'
 ]);
 
@@ -26,7 +31,7 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('name'), '分组名称'); ?>
             <?php echo $this->formElement($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
         </div>

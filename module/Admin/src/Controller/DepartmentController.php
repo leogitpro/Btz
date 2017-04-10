@@ -104,8 +104,8 @@ class DepartmentController extends AdminBaseController
                 $deptManager->saveModifiedEntity($dept);
 
                 return $this->go(
-                    '部门已经创建',
-                    '新的部门: ' . $data['name'] . ' 已经创建成功!',
+                    '分组已经创建',
+                    '新的分组: ' . $data['name'] . ' 已经创建成功!',
                     $this->url()->fromRoute('admin/dept')
                 );
             }
@@ -151,8 +151,8 @@ class DepartmentController extends AdminBaseController
         $deptManager->saveModifiedEntity($department);
 
         return $this->go(
-            '部门已更新',
-            '部门: ' . $department->getDeptName() . ' 状态已经更新!',
+            '分组已更新',
+            '分组: ' . $department->getDeptName() . ' 状态已经更新!',
             $this->url()->fromRoute('admin/dept')
         );
     }
@@ -185,8 +185,8 @@ class DepartmentController extends AdminBaseController
                 $deptManager->saveModifiedEntity($department);
 
                 return $this->go(
-                    '部门已更新',
-                    '部门: ' . $data['name'] . ' 的信息已经更新!',
+                    '分组已更新',
+                    '分组: ' . $data['name'] . ' 的信息已经更新!',
                     $this->url()->fromRoute('admin/dept')
                 );
             }
