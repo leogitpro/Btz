@@ -16,7 +16,7 @@ use Zend\View\Helper\AbstractHelper;
 class FormLocalMessage extends AbstractHelper
 {
 
-    public function __construct(ElementInterface $element, $messages = [])
+    public function __invoke(ElementInterface $element, $messages = [])
     {
         if (empty($messages)) {
             return ;
@@ -36,11 +36,17 @@ class FormLocalMessage extends AbstractHelper
                     unset($defaultMessages[$key]);
                 }
             }
-            $defaultMessages['__undefined__'] = $messages['__undefined__'];
-            $element->setMessages($defaultMessages);
+            if(empty($defaultMessages)) {
+                $defaultMessages['__undefined__'] = $messages['__undefined__'];
+            }
         } else {
-            $mergedMessages = array_merge($defaultMessages, $messages);
-            $element->setMessages($mergedMessages);
+            $keys = array_keys($defaultMessages);
+            foreach ($keys as $key) {
+                if(array_key_exists($key, $messages)) {
+                    $defaultMessages[$key] = $messages[$key];
+                }
+            }
         }
+        $element->setMessages($defaultMessages);
     }
 }
