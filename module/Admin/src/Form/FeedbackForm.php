@@ -9,64 +9,29 @@
 namespace Admin\Form;
 
 
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
+
+
 class FeedbackForm extends BaseForm
 {
 
     /**
      * 表单: 反馈内容
      */
-    private function addContentElement()
+    private function addFeedbackContent()
     {
-        $this->addElement([
-            'type' => 'textarea',
-            'name' => 'content',
-            'attributes' => [
-                'id' => 'content',
-                'rows' => 5,
-                'cols' => 30,
-            ],
-            'options' => [
-                'label' => '',
-            ],
-        ]);
+        $validators = [
+            Factory::StringLength(10, 4096),
+        ];
 
-        $this->addFilter([
-            'name' => 'content',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'NotEmpty',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'messages' => [
-                            \Zend\Validator\NotEmpty::IS_EMPTY => '反馈内容不能为空哦!',
-                        ],
-                    ],
-                ],
-                [
-                    'name'    => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 10,
-                        'max' => 4096,
-                        'messages' => [
-                            \Zend\Validator\StringLength::TOO_SHORT => '反馈的内容是不是太少了点? 请再说的详细一点吧, 谢谢!',
-                            \Zend\Validator\StringLength::TOO_LONG => '我想说是不是太多了点? 这是带给了您多大的仇恨哪. 内容太多了啦!',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $this->addTextareaElement('content', true, $validators);
     }
 
 
     public function addElements()
     {
-        $this->addContentElement();
+        $this->addFeedbackContent();
     }
 
 }
