@@ -1,11 +1,18 @@
 <?php
-
+/**
+ * UpdatePasswordForm.php
+ *
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
+ */
 
 namespace Admin\Form;
 
 
 use Admin\Service\MemberManager;
 use Admin\Validator\OldPasswordValidator;
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
 
 
 class UpdatePasswordForm extends BaseForm
@@ -23,134 +30,57 @@ class UpdatePasswordForm extends BaseForm
         parent::__construct();
     }
 
+
     /**
      * 表单: 用户旧密码
      */
-    private function addOldPasswordElement()
+    private function addOldPassword()
     {
-        $this->addElement([
-            'type' => 'password',
-            'name' => 'old_password',
-            'attributes' => [
-                'id' => 'old_password',
-            ],
-            'options' => [
-                'label' => 'Old password',
-            ],
-        ]);
+        $validators = [
+            Factory::StringLength(4, 15),
+            [
+                'name'    => OldPasswordValidator::class,
+                'break_chain_on_failure' => true,
+                'options' => [
+                    'memberManager' => $this->memberManager,
+                ],
+            ]
+        ];
 
-        $this->addFilter([
-            'name'     => 'old_password',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                [
-                    'name' => 'StringToLower',
-                    'options' => [
-                        'encoding' => 'UTF-8',
-                    ],
-                ],
-            ],
-            'validators' => [
-                [
-                    'name'    => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 4,
-                        'max' => 15
-                    ],
-                ],
-                [
-                    'name'    => OldPasswordValidator::class,
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'memberManager' => $this->memberManager,
-                    ],
-                ],
-            ],
-        ]);
+        $this->addPasswordElement('old_password', $validators);
     }
 
 
     /**
      * 表单: 用户新密码
      */
-    private function addNewPasswordElement()
+    private function addNewPassword()
     {
-        $this->addElement([
-            'type' => 'password',
-            'name' => 'new_password',
-            'attributes' => [
-                'id' => 'new_password',
-            ],
-            'options' => [
-                'label' => 'New password',
-            ],
-        ]);
+        $validators = [
+            Factory::StringLength(4, 15),
+        ];
 
-        $this->addFilter([
-            'name'     => 'new_password',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                [
-                    'name' => 'StringToLower',
-                    'options' => [
-                        'encoding' => 'UTF-8',
-                    ],
-                ],
-            ],
-            'validators' => [
-                [
-                    'name'    => 'StringLength',
-                    'options' => [
-                        'min' => 4,
-                        'max' => 15
-                    ],
-                ],
-            ],
-        ]);
+        $this->addPasswordElement('new_password', $validators);
     }
 
     /**
      * 表单: 用户确认密码
      */
-    private function addConfirmPasswordElement()
+    private function addConfirmPassword()
     {
-        $this->addElement([
-            'type' => 'password',
-            'name' => 're_new_password',
-            'attributes' => [
-                'id' => 're_new_password',
-            ],
-            'options' => [
-                'label' => 'Confirm Password',
-            ],
-        ]);
+        $validators = [
+            Factory::Identical('new_password'),
+        ];
 
-        $this->addFilter([
-            'name'     => 're_new_password',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-            ],
-            'validators' => [
-                [
-                    'name'    => 'identical',
-                    'options' => [
-                        'token' => 'new_password',
-                    ],
-                ],
-            ],
-        ]);
+        $this->addPasswordElement('re_new_password', $validators);
     }
 
 
     public function addElements()
     {
-        $this->addOldPasswordElement();
-        $this->addNewPasswordElement();
-        $this->addConfirmPasswordElement();
+        $this->addOldPassword();
+        $this->addNewPassword();
+        $this->addConfirmPassword();
     }
 
 }

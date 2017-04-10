@@ -65,4 +65,15 @@ class Factory
         ];
     }
 
+
+    public static function Identical($token)
+    {
+        return [
+            'name'    => 'identical',
+            'options' => [
+                'token' => $token,
+            ],
+        ];
+    }
+
 }
