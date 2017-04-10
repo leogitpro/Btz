@@ -108,6 +108,49 @@ class BaseForm extends Form
 
 
     /**
+     * @param $name
+     * @param bool $required
+     * @param array $validators
+     * @param array $filters
+     */
+    protected function addTextareaElement($name = 'content', $required = true, $validators = [], $filters = [])
+    {
+        $this->addElement([
+            'type' => 'textarea',
+            'name' => $name,
+            'attributes' => [
+                'id' => $name,
+            ],
+        ]);
+
+        $filter = [
+            'name' => $name,
+            'break_on_failure' => true,
+            'filters' => array_merge(
+                $filters,
+                [
+                    FilterFactory::StringTrim(),
+                    FilterFactory::StripTags(),
+                    FilterFactory::StripNewlines(),
+                ]
+            ),
+        ];
+
+        if ($required) {
+            //$filter['required'] = true;
+            $filter['validators'] = array_merge(
+                [
+                    ValidatorFactory::NotEmpty(),
+                ],
+                $validators
+            );
+        }
+
+        $this->addFilter($filter);
+    }
+
+
+    /**
      * 表单: 验证码
      *
      * @param string $name
