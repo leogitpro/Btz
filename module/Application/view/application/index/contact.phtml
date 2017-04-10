@@ -14,50 +14,11 @@ $input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'name@example.com'
 ]);
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '请务必填写您的电子邮件地址.';
-            unset($inputMessages[$key]);
-            continue;
-        }
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请务必填写您的电子邮件地址.',
+    '__undefined__' => '请使用正确的 E-mail 邮箱地址.',
+]);
 
-        if (in_array($key, [
-            \Zend\Validator\EmailAddress::INVALID,
-            \Zend\Validator\EmailAddress::INVALID_FORMAT,
-            \Zend\Validator\EmailAddress::INVALID_HOSTNAME,
-            \Zend\Validator\EmailAddress::INVALID_MX_RECORD,
-            \Zend\Validator\EmailAddress::INVALID_SEGMENT,
-            \Zend\Validator\EmailAddress::DOT_ATOM,
-            \Zend\Validator\EmailAddress::QUOTED_STRING,
-            \Zend\Validator\EmailAddress::INVALID_LOCAL_PART,
-            \Zend\Validator\EmailAddress::LENGTH_EXCEEDED,
-            \Zend\Validator\EmailAddress::INVALID,
-            \Zend\Validator\Hostname::INVALID,
-            \Zend\Validator\Hostname::CANNOT_DECODE_PUNYCODE,
-            \Zend\Validator\Hostname::INVALID_DASH,
-            \Zend\Validator\Hostname::INVALID_HOSTNAME,
-            \Zend\Validator\Hostname::INVALID_HOSTNAME_SCHEMA,
-            \Zend\Validator\Hostname::INVALID_LOCAL_NAME,
-            \Zend\Validator\Hostname::INVALID_URI,
-            \Zend\Validator\Hostname::IP_ADDRESS_NOT_ALLOWED,
-            \Zend\Validator\Hostname::LOCAL_NAME_NOT_ALLOWED,
-            \Zend\Validator\Hostname::UNDECIPHERABLE_TLD,
-            \Zend\Validator\Hostname::UNKNOWN_TLD,
-        ])) {
-            $localMessages[\Zend\Validator\EmailAddress::INVALID_FORMAT] = '请使用正确的 E-mail 地址.';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if (!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
 
 
 // 表单: 信息主题
@@ -66,68 +27,25 @@ $input->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'请告诉我们您的目的'
 ]);
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '请填写一下主题, 谢谢!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localMessages[$key] = '请简要的填写一下主题, 谢谢!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localMessages[$key] = '请保持主题简要, 具体内容请写在内容区.';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if(!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写一下主题, 谢谢!',
+    \Zend\Validator\StringLength::TOO_SHORT => '请简要的填写一下主题, 谢谢!',
+    \Zend\Validator\StringLength::TOO_LONG => '请保持主题简要, 具体内容请写在内容区.',
+]);
 
 
 // 表单: 信息内容
 $input = $form->get('message');
 $input->setAttributes([
     'class'=>'form-control',
-    'rows'=>6,
+    'rows'=> 6,
     'placeholder'=>'请告诉我们您想联络的具体内容'
 ]);
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if ($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
-            $localMessages[$key] = '请填写一下具体内容, 谢谢!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
-            $localMessages[$key] = '请保持内容务必详细一点, 谢谢!';
-            unset($inputMessages[$key]);
-            continue;
-        }
-        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
-            $localMessages[$key] = '我们发现您写了一篇长篇小说给我们看, 太长了.';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if(!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
-
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写一下具体内容, 谢谢!',
+    \Zend\Validator\StringLength::TOO_SHORT => '请保持内容务必详细一点, 谢谢!',
+    \Zend\Validator\StringLength::TOO_LONG => '我们发现您写了一篇长篇小说给我们看, 太长了.',
+]);
 
 
 // 表单: 验证码
@@ -135,22 +53,9 @@ $input = $form->get('captcha');
 $input->setAttributes([
     'class' => 'form-control',
 ]);
-$inputMessages = $input->getMessages();
-$localMessages = [];
-if(!empty($inputMessages)) {
-    $keys = array_keys($inputMessages);
-    foreach ($keys as $key) {
-        if ($key == \Zend\Captcha\Image::BAD_CAPTCHA) {
-            $localMessages[$key] = '请填写正确的验证码.';
-            unset($inputMessages[$key]);
-            continue;
-        }
-    }
-}
-//var_dump($inputMessages);
-if(!empty($localMessages)) {
-    $input->setMessages(array_merge($inputMessages, $localMessages));
-}
+$this->formLocalMessage($input, [
+    \Zend\Captcha\Image::BAD_CAPTCHA => '请填写正确的验证码.',
+]);
 
 
 $form->get('submit')->setAttributes([
