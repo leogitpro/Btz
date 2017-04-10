@@ -57,7 +57,7 @@ class IndexController extends AppBaseController
      */
     public function indexAction()
     {
-        //echo '<pre>';$v = $this->getConfigPlugin()->get('view_manager');print_r($v);echo '</pre>';
+        //echo '<pre>';$v = $this->getConfigPlugin()->get('view_helpers');print_r($v);echo '</pre>';
         return new ViewModel();
     }
 
