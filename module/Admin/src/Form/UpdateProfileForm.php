@@ -1,71 +1,37 @@
 <?php
-
+/**
+ * UpdateProfileForm.php
+ *
+ * @author: Leo <camworkster@gmail.com>
+ * @version: 1.0
+ */
 
 namespace Admin\Form;
 
 
-use Admin\Entity\Member;
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
 
 
 class UpdateProfileForm extends BaseForm
 {
 
     /**
-     * @var Member
-     */
-    private $member;
-
-
-    public function __construct(Member $member)
-    {
-        $this->member = $member;
-
-        parent::__construct();
-    }
-
-
-    /**
      * 表单: 用户名字
      */
-    private function addNameElements()
+    private function addUpdateProfileName()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'name',
-            'attributes' => [
-                'id' => 'name',
-                'value' => $this->member->getMemberName(),
-            ],
-            'options' => [
-                'label' => 'Full Name',
-            ],
-        ]);
+        $validators = [
+            Factory::StringLength(2, 15),
+        ];
 
-        $this->addFilter([
-            'name' => 'name',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 2,
-                        'max' => 15,
-                    ],
-                ],
-            ],
-        ]);
+        $this->addTextElement('name', true, $validators);
     }
 
 
     public function addElements()
     {
-        $this->addNameElements();
+        $this->addUpdateProfileName();
     }
 
 }

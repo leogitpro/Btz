@@ -1,9 +1,11 @@
 <?php
+
 $this->pageTitleBar('更新我的资料');
 
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
+    'placeholder' => $member->getMemberName(),
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -23,7 +25,7 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('name'), '更新名字'); ?>
             <?php echo $this->formElement($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
 

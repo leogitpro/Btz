@@ -76,7 +76,7 @@ class ProfileController extends AdminBaseController
         $memberManager = $this->getMemberManager();
         $member = $memberManager->getCurrentMember();
 
-        $form = new UpdateProfileForm($member);
+        $form = new UpdateProfileForm();
 
         if($this->getRequest()->isPost()) {
 
