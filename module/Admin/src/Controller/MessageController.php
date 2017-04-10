@@ -261,6 +261,7 @@ class MessageController extends AdminBaseController
 
         return new ViewModel([
             'form' => $form,
+            'receiver' => $receiver,
             'activeId' => __METHOD__,
         ]);
     }
@@ -298,6 +299,7 @@ class MessageController extends AdminBaseController
 
         return new ViewModel([
             'form' => $form,
+            'receiver' => $receiver,
             'activeId' => __METHOD__,
         ]);
     }

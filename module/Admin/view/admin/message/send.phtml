@@ -3,30 +3,148 @@ $this->pageTitleBar('发送消息');
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
+if (!$receiver instanceof \Admin\Entity\Member) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的参数');
+}
+
+// 表单: 消息接收者
+$input = $form->get('receiver_id');
+$input->setAttributes([
+    'value' => $receiver->getMemberId(),
+]);
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if($key == \Admin\Validator\MemberIdValidator::ID_INVALID) {
+            $localMessages[$key] = '无效的接收者帐户!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+
+$input = $form->get('receiver_name');
+$input->setAttributes([
+    'class'=>'form-control',
+    'placeholder' => '接收人名称',
+    'autocomplete' => 'off',
+    'value' => $receiver->getMemberName(),
+]);
+
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '接收者不能为空哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
+            $localMessages[$key] = '接收者名字太短了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
+            $localMessages[$key] = '接收者名字太长了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+
+// 表单: 标题
+$input = $form->get('topic');
+$input->setAttributes([
+    'class'=>'form-control',
+    'placeholder' => '这里填写消息标题',
+]);
+
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '消息标题不能为空哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
+            $localMessages[$key] = '消息标题太短了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
+            $localMessages[$key] = '消息标题太长了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+
+// 表单: 内容
+$input = $form->get('content');
+$input->setAttributes([
+    'class'=>'form-control',
+    'rows' => 6,
+]);
+
+$inputMessages = $input->getMessages();
+$localMessages = [];
+if(!empty($inputMessages)) {
+    $keys = array_keys($inputMessages);
+    foreach ($keys as $key) {
+        if($key == \Zend\Validator\NotEmpty::IS_EMPTY) {
+            $localMessages[$key] = '消息内容不能为空哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_SHORT) {
+            $localMessages[$key] = '消息内容太短了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+        if ($key == \Zend\Validator\StringLength::TOO_LONG) {
+            $localMessages[$key] = '消息内容太长了哦!';
+            unset($inputMessages[$key]);
+            continue;
+        }
+    }
+}
+//var_dump($inputMessages);
+if (!empty($localMessages)) {
+    $input->setMessages(array_merge($inputMessages, $localMessages));
+}
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+
+
 $this->headLink()->appendStylesheet($this->basePath('open-source-assets/bootcomplete/bootcomplete.css'));
 $this->headScript()->appendFile($this->basePath('open-source-assets/bootcomplete/jquery.bootcomplete.js'));
 
 $autoSuggestUrl = $this->url('admin/search', ['action' => 'members']);
 
-$form->get('receiver_name')->setAttributes([
-    'class' => 'form-control',
-    'placeholder' => '接收人名称',
-    'autocomplete' => 'off',
-]);
-
-
-$form->get('topic')->setAttributes([
-    'class' => 'form-control',
-    'placeholder' => '输入消息标题'
-]);
-
-$form->get('content')->setAttributes([
-    'class' => 'form-control',
-]);
-
-$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
-
-$form->prepare();
 
 $this->inlineScript()->captureStart();
 echo <<<JS
@@ -48,7 +166,6 @@ $this->inlineScript()->captureEnd();
 
 ?>
 
-
 <div class="row">
     <div class="col-lg-6">
 
@@ -69,14 +186,14 @@ $this->inlineScript()->captureEnd();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('topic')); ?>
+            <?php echo $this->formLabel($form->get('topic'), '消息标题'); ?>
             <?php echo $this->formElement($form->get('topic')); ?>
             <?php echo $this->formElementErrors($form->get('topic')); ?>
 
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('content')); ?>
+            <?php echo $this->formLabel($form->get('content'), '消息内容'); ?>
             <?php echo $this->formElement($form->get('content')); ?>
             <?php echo $this->formElementErrors($form->get('content')); ?>
 

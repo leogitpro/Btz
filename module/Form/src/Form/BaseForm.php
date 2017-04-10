@@ -109,6 +109,31 @@ class BaseForm extends Form
 
     /**
      * @param string $name
+     */
+    protected function addHiddenElement($name = 'hide', $validators = [])
+    {
+        $this->addElement([
+            'type' => 'hidden',
+            'name' => $name,
+            'attributes' => [
+                'id' => $name,
+            ]
+        ]);
+
+        $filter = [
+            'name' => $name,
+            'filters' => [
+                FilterFactory::StripTags(),
+            ],
+            'validators' => $validators,
+        ];
+
+        $this->addFilter($filter);
+    }
+
+
+    /**
+     * @param string $name
      * @param array $options
      * @param bool $required
      * @param array $validators
