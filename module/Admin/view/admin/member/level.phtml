@@ -3,9 +3,14 @@ $this->pageTitleBar('成员等级更新');
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
+if(!$member instanceof \Admin\Entity\Member) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的用户信息');
+}
+
+
 $form->get('level')->setAttributes([
     'class' => 'form-control',
-    //'value' => 1, // Default administrator level: Member::LEVEL_JUNIOR
+    'value' => $member->getMemberLevel(),
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -25,7 +30,7 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('level')); ?>
+            <?php echo $this->formLabel($form->get('level'), '帐号等级'); ?>
             <?php echo $this->formElement($form->get('level')); ?>
             <?php echo $this->formElementErrors($form->get('level')); ?>
         </div>

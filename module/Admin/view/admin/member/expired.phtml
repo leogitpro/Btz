@@ -2,8 +2,15 @@
 $this->pageTitleBar('设置成员过期时间');
 $this->sideTreeMenu()->setActiveId($activeId);
 
+
+if(!$member instanceof \Admin\Entity\Member) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的用户信息');
+}
+
+
 $form->get('expired')->setAttributes([
     'class' => 'form-control',
+    'value' => $member->getMemberExpired()->format('Y-m-d'),
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);

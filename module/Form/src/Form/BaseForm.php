@@ -108,6 +108,92 @@ class BaseForm extends Form
 
 
     /**
+     * @param string $name
+     * @param array $options
+     * @param bool $required
+     * @param array $validators
+     * @param array $filters
+     */
+    protected function addSelectElement($name = 'select', $options = [], $required = true, $validators = [], $filters = [])
+    {
+        $this->addElement([
+            'type' => 'select',
+            'name' => $name,
+            'attributes' => [
+                'id' => $name,
+            ],
+            'options' => [
+                'value_options' => $options,
+            ],
+        ]);
+
+        $filter = [
+            'name' => $name,
+            'break_on_failure' => true,
+            'filters' => array_merge(
+                $filters,
+                [
+                    FilterFactory::StripTags(),
+                ]
+            ),
+        ];
+
+        if ($required) {
+            //$filter['required'] = true;
+            $filter['validators'] = array_merge(
+                [
+                    ValidatorFactory::NotEmpty(),
+                ],
+                $validators
+            );
+        }
+
+        $this->addFilter($filter);
+    }
+
+
+    /**
+     * @param string $name
+     * @param bool $required
+     * @param array $validators
+     * @param array $filters
+     */
+    protected function addDateElement($name = 'date', $required = true, $validators = [], $filters = [])
+    {
+        $this->addElement([
+            'type' => 'date',
+            'name' => $name,
+            'attributes' => [
+                'id' => $name,
+            ],
+        ]);
+
+        $filter = [
+            'name' => $name,
+            'break_on_failure' => true,
+            'filters' => array_merge(
+                $filters,
+                [
+                    FilterFactory::StripTags(),
+                ]
+            ),
+        ];
+
+        if ($required) {
+            //$filter['required'] = true;
+            $filter['validators'] = array_merge(
+                [
+                    ValidatorFactory::NotEmpty(),
+                ],
+                $validators
+            );
+        }
+
+        $this->addFilter($filter);
+    }
+
+
+    /**
      * @param $name
      * @param bool $required
      * @param array $validators

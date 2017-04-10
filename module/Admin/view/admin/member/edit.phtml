@@ -2,13 +2,20 @@
 $this->pageTitleBar('修改成员信息');
 $this->sideTreeMenu()->setActiveId($activeId);
 
+if(!$member instanceof \Admin\Entity\Member) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的用户信息');
+}
+
+
 $form->get('email')->setAttributes([
     'class' => 'form-control',
+    'value' => $member->getMemberEmail(),
     'placeholder' => 'Enter the email'
 ]);
 
 $form->get('name')->setAttributes([
     'class' => 'form-control',
+    'value' => $member->getMemberName(),
     'placeholder' => 'Enter the name'
 ]);
 
@@ -29,13 +36,13 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('email')); ?>
+            <?php echo $this->formLabel($form->get('email'), '帐号 E-mail 地址'); ?>
             <?php echo $this->formElement($form->get('email')); ?>
             <?php echo $this->formElementErrors($form->get('email')); ?>
         </div>
 
         <div class="form-group">
-            <?php echo $this->formLabel($form->get('name')); ?>
+            <?php echo $this->formLabel($form->get('name'), '帐号名称'); ?>
             <?php echo $this->formElement($form->get('name')); ?>
             <?php echo $this->formElementErrors($form->get('name')); ?>
         </div>

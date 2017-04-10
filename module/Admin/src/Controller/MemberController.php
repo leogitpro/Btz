@@ -272,7 +272,7 @@ class MemberController extends AdminBaseController
         }
 
         $memberManager = $this->getMemberManager();
-        $member = $memberManager->getMember($member_id);
+        $member = $memberManager->getMember($member_id, false);
 
         $form = new MemberForm($memberManager, $member, ['expired']);
 
@@ -302,6 +302,7 @@ class MemberController extends AdminBaseController
             'member' => $member,
             'activeId' => __CLASS__,
         ]);
+
     }
 
 

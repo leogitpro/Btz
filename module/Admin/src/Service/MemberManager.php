@@ -83,11 +83,12 @@ class MemberManager extends BaseEntityManager
      * Get administrator information
      *
      * @param string $member_id
+     * @param bool $validate
      * @return Member
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getMember($member_id = null)
+    public function getMember($member_id = null, $validate = true)
     {
         if (empty($member_id)) {
             throw new InvalidArgumentException('不能查询空的成员编号');
@@ -102,6 +103,10 @@ class MemberManager extends BaseEntityManager
         $obj = $this->getEntityFromPersistence();
         if (!$obj instanceof Member) {
             throw new InvalidArgumentException('无效的成员编号');
+        }
+
+        if (!$validate) {
+            return $obj;
         }
 
         $expired = $obj->getMemberExpired();
@@ -297,7 +302,7 @@ class MemberManager extends BaseEntityManager
         $member->setMemberName($name);
         $member->setMemberStatus(Member::STATUS_ACTIVATED);
         $member->setMemberLevel(Member::LEVEL_INTERIOR);
-        $member->setMemberExpired(new \DateTime("last day"));
+        $member->setMemberExpired(new \DateTime("next year"));
         $member->setMemberCreated(new \DateTime());
 
         foreach ($depts as $dept) {
