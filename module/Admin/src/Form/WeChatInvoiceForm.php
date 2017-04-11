@@ -9,106 +9,70 @@
 namespace Admin\Form;
 
 
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
+
+
 class WeChatInvoiceForm extends BaseForm
 {
 
     /**
      * 表单: 发票抬头
      */
-    private function addTitleElement()
+    private function addWeChatInvoiceTitle()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'title',
-            'attributes' => [
-                'id' => 'title',
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'name',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'NotEmpty',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'messages' => [
-                            \Zend\Validator\NotEmpty::IS_EMPTY => '请填写您要开具的发票抬头. 不能留空的.',
-                        ],
-                    ],
-                ],
-                [
-                    'name' => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 1,
-                        'max' => 45,
-                        'messages' => [
-                            \Zend\Validator\StringLength::TOO_SHORT => '抬头太短了.',
-                            \Zend\Validator\StringLength::TOO_LONG => '抬头太长了.',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $this->addTextElement('title', true, [Factory::StringLength(1, 45)]);
     }
 
     /**
      * 表单: 发票金额
      */
-    private function addMoneyElement()
+    private function addWeChatInvoiceMoney()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'money',
-            'attributes' => [
-                'id' => 'money',
-            ],
-        ]);
-
-        $this->addFilter();
+        $this->addTextElement('money', true, [Factory::Regex("/^[1-9][0-9]+$/")]);
     }
 
     /**
      * 表单: 发票收件人名称
      */
-    private function addReceiverElement()
+    private function addWeChatInvoiceReceiverName()
     {
-        $this->addElement();
-        $this->addFilter();
+        $this->addTextElement('receiver_name', true, [Factory::StringLength(1, 15)]);
     }
 
     /**
      * 表单: 发票收件人电话
      */
-    private function addPhoneElement()
+    private function addWeChatInvoiceReceiverPhone()
     {
-        $this->addElement();
-        $this->addFilter();
+        $this->addTextElement('receiver_phone', true, [Factory::Regex("/^[0-9\\-]+$/")]);
     }
 
     /**
      * 表单: 发票收件人地址
      */
-    private function addAddressElement()
+    private function addWeChatInvoiceReceiverAddress()
     {
-        $this->addElement();
-        $this->addFilter();
+        $this->addTextElement('receiver_address');
     }
 
     /**
      * 表单: 其他信息
      */
-    private function addNoteElement()
+    private function addWeChatInvoiceNote()
     {
-        $this->addElement();
-        $this->addFilter();
+        $this->addTextareaElement('note', false);
+    }
+
+
+    public function addElements()
+    {
+        $this->addWeChatInvoiceTitle();
+        $this->addWeChatInvoiceMoney();
+        $this->addWeChatInvoiceReceiverName();
+        $this->addWeChatInvoiceReceiverPhone();
+        $this->addWeChatInvoiceReceiverAddress();
+        $this->addWeChatInvoiceNote();
     }
 
 }

@@ -10,6 +10,8 @@
 namespace Admin\Form;
 
 
+use Form\Form\BaseForm;
+use Form\Validator\Factory;
 use WeChat\Entity\QrCode;
 
 
@@ -19,151 +21,42 @@ class WeChatQrCodeForm extends BaseForm
     /**
      * 表单: 二维码名字
      */
-    private function addNameElement()
+    private function addWeChatQrCodeName()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'name',
-            'attributes' => [
-                'id' => 'name',
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'name',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'NotEmpty',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'messages' => [
-                            \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的名称方便您日后管理!',
-                        ],
-                    ],
-                ],
-                [
-                    'name' => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'min' => 2,
-                        'max' => 45,
-                        'messages' => [
-                            \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的二维码重名哦.',
-                            \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $this->addTextElement('name', true, [Factory::StringLength(2, 45)]);
     }
-
 
     /**
      * 表单: 二维码类型
      */
-    private function addTypeElement()
+    private function addWeChatQrCodeType()
     {
-        $this->addElement([
-            'type' => 'select',
-            'name' => 'type',
-            'attributes' => [
-                'id' => 'type',
-            ],
-            'options' => [
-                'value_options' => QrCode::getTypeList(),
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'type',
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-        ]);
+        $this->addSelectElement('type', QrCode::getTypeList());
     }
 
     /**
      * 二维码过期时间
      */
-    private function addExpiredElement()
+    private function addWeChatQrCodeExpired()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'expired',
-            'attributes' => [
-                'id' => 'expired',
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'expired',
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-        ]);
+        $this->addTextElement('expired', true, [Factory::Regex("/^[1-9][0-9]{1,5}$/")]);
     }
-
 
     /**
      * 二维码参数
      */
-    private function addSceneElement()
+    private function addWeChatQrCodeScene()
     {
-        $this->addElement([
-            'type' => 'text',
-            'name' => 'scene',
-            'attributes' => [
-                'id' => 'scene',
-            ],
-        ]);
-
-        $this->addFilter([
-            'name' => 'scene',
-            'required' => true,
-            'break_on_failure' => true,
-            'filters'  => [
-                ['name' => 'StringTrim'],
-                ['name' => 'StripTags'],
-            ],
-            'validators' => [
-                [
-                    'name' => 'NotEmpty',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'messages' => [
-                            \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的参数, 这个非常重要.',
-                        ],
-                    ],
-                ],
-                [
-                    'name' => 'StringLength',
-                    'break_chain_on_failure' => true,
-                    'options' => [
-                        'max' => 64,
-                        'messages' => [
-                            \Zend\Validator\StringLength::TOO_LONG => '参数太长, 微信不允许设置这么长的参数哦.',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $this->addTextElement('scene', true, [Factory::Regex("/^[a-zA-Z0-9]{1,64}$/")]);
     }
 
 
     public function addElements()
     {
-        $this->addNameElement();
-        $this->addTypeElement();
-        $this->addExpiredElement();
-        $this->addSceneElement();
+        $this->addWeChatQrCodeName();
+        $this->addWeChatQrCodeType();
+        $this->addWeChatQrCodeExpired();
+        $this->addWeChatQrCodeScene();
     }
 
 }

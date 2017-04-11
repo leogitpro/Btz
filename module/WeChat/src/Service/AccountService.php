@@ -53,11 +53,13 @@ class AccountService extends BaseEntityService
 
 
     /**
-     * @param $weChatId
+     * @param string $weChatId
+     * @param bool $ignoreExpired
      * @return Account
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
-    public function getWeChat($weChatId)
+    public function getWeChat($weChatId, $ignoreExpired = false)
     {
         $qb = $this->resetQb();
 
@@ -69,16 +71,25 @@ class AccountService extends BaseEntityService
         if (!$weChat instanceof Account) {
             throw new InvalidArgumentException('无此编号的微信公众号帐号信息: ' . $weChatId);
         }
+
+        if (!$ignoreExpired) {
+            if ($weChat->getWxExpired() < time()) {
+                throw new RuntimeException('公众号已过期!');
+            }
+        }
+
         return $weChat;
     }
 
 
     /**
      * @param string $appId
+     * @param bool $ignoreExpired
      * @return Account
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
-    public function getWeChatByAppId($appId)
+    public function getWeChatByAppId($appId, $ignoreExpired = false)
     {
         $qb = $this->resetQb();
 
@@ -90,6 +101,13 @@ class AccountService extends BaseEntityService
         if (!$weChat instanceof Account) {
             throw new InvalidArgumentException('无此AppID的微信公众号帐号信息: ' . $appId);
         }
+
+        if (!$ignoreExpired) {
+            if ($weChat->getWxExpired() < time()) {
+                throw new RuntimeException('公众号已过期!');
+            }
+        }
+
         return $weChat;
     }
 
@@ -113,10 +131,11 @@ class AccountService extends BaseEntityService
 
     /**
      * @param Member $member
+     * @param bool $ignoreExpired
      * @return Account
      * @throws InvalidArgumentException
      */
-    public function getWeChatByMember($member)
+    public function getWeChatByMember($member, $ignoreExpired = false)
     {
         $qb = $this->resetQb();
 
@@ -127,6 +146,12 @@ class AccountService extends BaseEntityService
         $weChat = $this->getEntityFromPersistence();
         if (!$weChat instanceof Account) {
             throw new InvalidArgumentException('该用户无微信公众号帐号信息');
+        }
+
+        if (!$ignoreExpired) {
+            if ($weChat->getWxExpired() < time()) {
+                throw new RuntimeException('公众号已过期!');
+            }
         }
 
         return $weChat;

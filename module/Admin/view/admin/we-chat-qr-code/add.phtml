@@ -3,24 +3,42 @@ $this->pageTitleBar('申请二维码');
 
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$form->get('name')->setAttributes([
+$input = $form->get('name');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '二维码名称'
 ]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的名称方便您日后管理!',
+    \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的二维码重名哦.',
+    \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
+]);
 
-$form->get('type')->setAttributes([
+$input = $form->get('type');
+$input->setAttributes([
     'class' => 'form-control qrcode-type',
 ]);
-
-$form->get('expired')->setAttributes([
-    'class' => 'form-control',
-    'value' => 604800,
-    'placeholder' => '有效时间(秒)',
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的类型.',
 ]);
 
-$form->get('scene')->setAttributes([
+$input = $form->get('expired');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '604800',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请设置好二维码的失效时间.',
+]);
+
+$input =$form->get('scene');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '二维码参数',
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好二维码的参数, 这个非常重要.',
+    \Zend\Validator\Regex::NOT_MATCH => '请设置有效的二维码参数.',
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);

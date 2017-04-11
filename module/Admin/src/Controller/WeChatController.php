@@ -65,7 +65,7 @@ class WeChatController extends AdminBaseController
             throw new InvalidArgumentException('微信 ID 为空, 不能继续操作!');
         }
 
-        $weChat = $this->getWeChatAccountService()->getWeChat($weChadId);
+        $weChat = $this->getWeChatAccountService()->getWeChat($weChadId, true);
 
         $form = new WeChatExpiredForm();
 

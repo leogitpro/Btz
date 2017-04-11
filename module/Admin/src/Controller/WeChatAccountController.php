@@ -38,7 +38,7 @@ class WeChatAccountController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
 
         try {
-            $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
+            $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself, true);
         } catch (InvalidArgumentException $e) {
             $this->getLoggerPlugin()->exception($e);
             $weChat = null;

@@ -64,7 +64,7 @@ class WeChatForm extends BaseForm
     private function addWeChatAppSecret()
     {
         $validators = [
-            Factory::Regex("/^[0-9a-z]{18, 255}$/"),
+            Factory::Regex("/^[0-9a-z]{18,255}$/"),
         ];
         $this->addTextElement('appsecret', true, $validators);
     }

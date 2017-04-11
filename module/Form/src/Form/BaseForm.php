@@ -242,7 +242,6 @@ class BaseForm extends Form
                 [
                     FilterFactory::StringTrim(),
                     FilterFactory::StripTags(),
-                    FilterFactory::StripNewlines(),
                 ]
             ),
         ];

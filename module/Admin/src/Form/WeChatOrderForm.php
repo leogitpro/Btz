@@ -9,32 +9,20 @@
 namespace Admin\Form;
 
 
+use Form\Form\BaseForm;
+
+
 class WeChatOrderForm extends BaseForm
 {
 
-    private function addSecondElement()
+    private function addWeChatOrderSecond()
     {
-        $this->addElement([
-            'type' => 'select',
-            'name' => 'second',
-            'attributes' => [
-                'id' => 'second',
-            ],
-            'options' => [
-                'label' => 'Member level',
-                'value_options' => [
-                    365 * 24 * 3600 => '1 年',
-                ],
-            ],
-        ]);
-
-        //$this->addFilter();
+        $this->addSelectElement('second', [365 * 24 * 3600 => '1 年']);
     }
-
 
     public function addElements()
     {
-        $this->addSecondElement();
+        $this->addWeChatOrderSecond();
     }
 
 }
