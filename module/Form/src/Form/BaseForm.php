@@ -208,7 +208,7 @@ class BaseForm extends Form
             //$filter['required'] = true;
             $filter['validators'] = array_merge(
                 [
-                    ValidatorFactory::NotEmpty(),
+                    ValidatorFactory::Date()
                 ],
                 $validators
             );

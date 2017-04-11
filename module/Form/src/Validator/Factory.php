@@ -57,6 +57,44 @@ class Factory
         ];
     }
 
+    public static function Date($format = 'Y-m-d')
+    {
+        return [
+            'name'    => 'Date',
+            'break_chain_on_failure' => true,
+            'options' => [
+                'format' => $format,
+            ],
+        ];
+    }
+
+    public static function Hostname()
+    {
+        return [
+            'name' => 'Hostname',
+            'break_chain_on_failure' => true,
+            'options' => [
+                'allow' => \Zend\Validator\Hostname::ALLOW_DNS,
+                'useIdnCheck' => false,
+                'useTldCheck' => false,
+            ],
+        ];
+    }
+
+    public static function Ip()
+    {
+        return [
+            'name' => 'Ip',
+            'break_chain_on_failure' => true,
+            'options' => [
+                'allowipv4' => true,
+                'allowipv6' => true,
+                'allowipvfuture' => false,
+                'allowliteral' => false,
+            ],
+        ];
+    }
+
 
     public static function CaptchaImage()
     {

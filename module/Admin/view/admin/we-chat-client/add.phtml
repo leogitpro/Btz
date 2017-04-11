@@ -1,30 +1,53 @@
 <?php
 $this->pageTitleBar('添加客户端');
-
 $this->sideTreeMenu()->setActiveId($activeId);
 
-$form->get('name')->setAttributes([
+$input = $form->get('name');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '客户端名称'
 ]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请设置好客户端的名称方便您日后管理!',
+    \Zend\Validator\StringLength::TOO_SHORT => '名字太短啦, 这样容易和其他的客户端重名哦.',
+    \Zend\Validator\StringLength::TOO_LONG => '名字太长, 感觉电脑屏幕都不够用了都.',
+]);
 
-$form->get('domain')->setAttributes([
+
+$input = $form->get('domain');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '例如: example.com'
 ]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请输入允许来访的客户端域名, 这样能更好的包含您的数据安全.',
+    '__undefined__' => '请输入有效的客户端域名.',
+]);
 
-$form->get('ip')->setAttributes([
+$input = $form->get('ip');
+$input->setAttributes([
     'class' => 'form-control',
     'placeholder' => '例如: 114.114.114.114'
 ]);
-
-$form->get('active')->setAttributes([
-    'type' => 'date',
-    'class' => 'form-control',
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '允许来访的 IP 地址不能空哦, 否则就被禁止访问了.',
+    '__undefined__' => '请输入有效的客户端 IP 地址.',
 ]);
 
-$form->get('expire')->setAttributes([
+$input = $form->get('active');
+$input->setAttributes([
     'class' => 'form-control',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请输入有效的客户端生效日期.',
+]);
+
+$input = $form->get('expire');
+$input->setAttributes([
+    'class' => 'form-control',
+]);
+$this->formLocalMessage($input, [
+    '__undefined__' => '请输入有效的客户端失效日期.',
 ]);
 
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
@@ -53,7 +76,10 @@ $form->prepare();
             <?php echo $this->formLabel($form->get('domain'), '允许来访的域名'); ?>
             <?php echo $this->formElement($form->get('domain')); ?>
             <p class="text-muted">
-                <small>域名格式: <strong>www.example.com</strong> 或者 <strong>example.com</strong></small>
+                <small>
+                    域名格式: <strong>www.example.com</strong> 或 <strong>example.com</strong>
+                    不限制域名请填写: <strong class="text-info">anonymous.com</strong>
+                </small>
             </p>
             <?php echo $this->formElementErrors($form->get('domain')); ?>
         </div>
@@ -62,7 +88,10 @@ $form->prepare();
             <?php echo $this->formLabel($form->get('ip'), '允许来访的IP地址'); ?>
             <?php echo $this->formElement($form->get('ip')); ?>
             <p class="text-muted">
-                <small>IP 地址格式: <strong>xxx.xxx.xxx.xxx</strong></small>
+                <small>
+                    IP 地址格式: <strong>xxx.xxx.xxx.xxx</strong>
+                    不限制 IP 请填写: <strong class="text-info">0.0.0.0</strong>
+                </small>
             </p>
             <?php echo $this->formElementErrors($form->get('ip')); ?>
         </div>
@@ -71,7 +100,9 @@ $form->prepare();
             <?php echo $this->formLabel($form->get('active'), '允许客户端访问的开始时间'); ?>
             <?php echo $this->formElement($form->get('active')); ?>
             <p class="text-muted">
-                <small>日期格式示例: <strong><?php echo date('Y-m-d'); ?></strong></small>
+                <small>
+                    日期格式示例: <strong><?php echo date('Y-m-d'); ?></strong>
+                </small>
             </p>
             <?php echo $this->formElementErrors($form->get('active')); ?>
         </div>
