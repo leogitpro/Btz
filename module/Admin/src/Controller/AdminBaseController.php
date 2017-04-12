@@ -20,6 +20,7 @@ use Admin\Service\MessageManager;
 use Application\Controller\AppBaseController;
 use WeChat\Service\AccountService;
 use WeChat\Service\ClientService;
+use WeChat\Service\InvoiceService;
 use WeChat\Service\MenuService;
 use WeChat\Service\OrderService;
 use WeChat\Service\QrCodeService;
@@ -91,6 +92,14 @@ class AdminBaseController extends AppBaseController
     protected function getWeChatOrderService()
     {
         return $this->getSm(OrderService::class);
+    }
+
+    /**
+     * @return InvoiceService
+     */
+    protected function getWeChatInvoiceService()
+    {
+        return $this->getSm(InvoiceService::class);
     }
 
     ///

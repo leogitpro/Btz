@@ -10,6 +10,7 @@ namespace Admin\Controller;
 
 
 use Admin\Form\WeChatForm;
+use Admin\Form\WeChatInvoiceForm;
 use Admin\Form\WeChatOrderForm;
 use WeChat\Entity\Account;
 use WeChat\Entity\Invoice;
@@ -389,8 +390,35 @@ class WeChatAccountController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
+        $form = new WeChatInvoiceForm();
+
+        if($this->getRequest()->isPost()) {
+
+            $form->setData($this->params()->fromPost());
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $this->getWeChatInvoiceService()->createInvoice(
+                    $weChat,
+                    $data['title'],
+                    $data['money'],
+                    $data['receiver_name'],
+                    $data['receiver_phone'],
+                    $data['receiver_address'],
+                    $data['note']
+                );
+
+                return $this->go(
+                    '开票请求已收到',
+                    '您的开票请求我们已经收到, 请耐心等待. 我们将尽快确认并寄出您的发票.',
+                    $this->url()->fromRoute('admin/weChatAccount', ['action' => 'invoice'])
+                );
+            }
+        }
+
         return new ViewModel([
             'weChat' => $weChat,
+            'form' => $form,
             'activeId' => __CLASS__,
         ]);
     }

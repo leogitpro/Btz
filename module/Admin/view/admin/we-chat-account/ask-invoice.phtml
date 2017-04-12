@@ -6,6 +6,76 @@ if(!$weChat instanceof \WeChat\Entity\Account) {
     throw new InvalidArgumentException('无公众号信息');
 }
 
+// 表单: 抬头
+$input = $form->get('title');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '发票抬头'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写发票抬头',
+    \Zend\Validator\StringLength::TOO_SHORT => '发票抬头太短了.',
+    \Zend\Validator\StringLength::TOO_LONG => '发票抬头太长了.',
+]);
+
+// 表单: 金额
+$input = $form->get('money');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '发票金额'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写发票金额',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的开票金额',
+]);
+
+
+// 表单: 收件人名字
+$input = $form->get('receiver_name');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '收件人名字'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写发票收件人名字',
+    \Zend\Validator\StringLength::TOO_SHORT => '发票收件人名字太短了.',
+    \Zend\Validator\StringLength::TOO_LONG => '发票收件人名字太长了.',
+]);
+
+// 表单: 收件人电话
+$input = $form->get('receiver_phone');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '收件人电话'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写发票收件人电话',
+    \Zend\Validator\Regex::NOT_MATCH => '请填写正确的收件人电话',
+]);
+
+// 表单: 收件人地址
+$input = $form->get('receiver_address');
+$input->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => '收件人地址'
+]);
+$this->formLocalMessage($input, [
+    \Zend\Validator\NotEmpty::IS_EMPTY => '请填写发票收件人地址',
+]);
+
+// 表单: 收件人地址
+$input = $form->get('note');
+$input->setAttributes([
+    'class' => 'form-control',
+    'rows' => 6,
+    'placeholder' => '备注信息'
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+
+
 
 $this->inlineScript()->captureStart();
 echo <<<JS
@@ -22,7 +92,54 @@ $this->inlineScript()->captureEnd();
 <div class="row">
     <div class="col-lg-6">
 
+        <?php echo $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('csrf')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('title'), '发票抬头'); ?>
+            <?php echo $this->formElement($form->get('title')); ?>
+            <?php echo $this->formElementErrors($form->get('title')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('money'), '发票金额'); ?>
+            <?php echo $this->formElement($form->get('money')); ?>
+            <?php echo $this->formElementErrors($form->get('money')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('receiver_name'), '发票邮寄收件人名字'); ?>
+            <?php echo $this->formElement($form->get('receiver_name')); ?>
+            <?php echo $this->formElementErrors($form->get('receiver_name')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('receiver_phone'), '发票邮寄收件人电话'); ?>
+            <?php echo $this->formElement($form->get('receiver_phone')); ?>
+            <?php echo $this->formElementErrors($form->get('receiver_phone')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('receiver_address'), '发票邮寄收件人地址'); ?>
+            <?php echo $this->formElement($form->get('receiver_address')); ?>
+            <?php echo $this->formElementErrors($form->get('receiver_address')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formLabel($form->get('note'), '其他备注'); ?>
+            <?php echo $this->formElement($form->get('note')); ?>
+        </div>
+
+        <div class="form-group">
+            <?php echo $this->formElement($form->get('submit')); ?>
+        </div>
+
+        <?php echo $this->form()->closeTag(); ?>
 
     </div>
 </div>
+
 

@@ -21,9 +21,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Invoice
 {
-    const STATUS_INVOICE_APPLY = 0;
-    const STATUS_INVOICE_PRINT = 1;
-    const STATUS_INVOICE_DELIVER = 2;
+    const STATUS_INVOICE_REFUSED = 0;
+    const STATUS_INVOICE_APPLY = 1;
+    const STATUS_INVOICE_PRINT = 2;
+    const STATUS_INVOICE_DELIVER = 3;
 
     /**
      * @var string
@@ -104,6 +105,7 @@ class Invoice
     public static function getStatusList()
     {
         return [
+            self::STATUS_INVOICE_REFUSED => '被拒绝',
             self::STATUS_INVOICE_APPLY => '已申请',
             self::STATUS_INVOICE_PRINT => '打印中',
             self::STATUS_INVOICE_DELIVER => '已邮寄',
