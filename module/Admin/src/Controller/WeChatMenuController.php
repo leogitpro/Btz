@@ -9,6 +9,7 @@
 namespace Admin\Controller;
 
 
+use Admin\Exception\RuntimeException;
 use WeChat\Entity\Account;
 use WeChat\Entity\Menu;
 use Zend\View\Model\JsonModel;
@@ -238,7 +239,7 @@ class WeChatMenuController extends AdminBaseController
 
         $myself = $this->getMemberManager()->getCurrentMember();
         if ($myself->getMemberId() != $weChat->getMember()->getMemberId()) {
-            throw new \RunException('禁止操作不属于您的公众号的菜单信息!');
+            throw new RuntimeException('禁止操作不属于您的公众号的菜单信息!');
         }
 
         $tags = $this->getWeChatTagService()->getAllTagsByWeChat($weChat);

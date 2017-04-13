@@ -91,6 +91,17 @@ class DepartmentManager extends BaseEntityManager
 
 
     /**
+     * Get weChat department
+     *
+     * @return Department
+     */
+    public function getWeChatDepartment()
+    {
+        return $this->getDepartment(Department::WE_CHAT_DEPT_ID);
+    }
+
+
+    /**
      * Get department information by name.
      *
      * @param string $name

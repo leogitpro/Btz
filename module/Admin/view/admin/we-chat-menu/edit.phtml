@@ -1,7 +1,7 @@
 <?php
 
 if(!$menu instanceof \WeChat\Entity\Menu) {
-    throw new Exception("视图数据异常!");
+    throw new \Admin\Exception\InvalidArgumentException("视图数据异常!");
 }
 
 $json = json_decode($menu->getMenu(), true);
@@ -293,7 +293,7 @@ $this->inlineScript()->captureEnd();
                 </select>
             </div>
 
-            <div class="form-group" style="<?php echo $menu->getType() != \Admin\Entity\WeChatMenu::TYPE_CONDITIONAL ? 'display: none;' : ''; ?>">
+            <div class="form-group" style="<?php echo $menu->getType() != \WeChat\Entity\Menu::TYPE_CONDITIONAL ? 'display: none;' : ''; ?>">
 
                 <div class="panel panel-default">
                     <div class="panel-body">

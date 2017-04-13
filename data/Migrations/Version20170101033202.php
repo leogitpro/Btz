@@ -121,6 +121,10 @@ class Version20170101033202 extends AbstractMigration
             "INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?)",
             ['ad739904-f423-11e6-b154-acbc32bf6185', 'Default', 1, date('Y-m-d H:i:s')]
         );
+        $this->connection->executeUpdate(
+            "INSERT INTO `sys_department` (`dept_id`, `dept_name`, `dept_status`, `dept_created`) VALUES (?, ?, ?, ?)",
+            ['266cb0b4-2022-11e7-a2ce-acbc32bf6185', 'WeChat Group', 1, date('Y-m-d H:i:s')]
+        );
 
         // Init member table
         $this->connection->executeUpdate(

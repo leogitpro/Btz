@@ -151,8 +151,12 @@ class IndexController extends AppBaseController
         try {
             $member = $memberManager->getMemberByActiveCode($activeCode);
             if($member->getMemberStatus() == Member::STATUS_RETRIED) {
+
                 $deptManager = $this->getSm(DepartmentManager::class);
+
                 $member->getDepts()->add($deptManager->getDefaultDepartment());
+                $member->getDepts()->add($deptManager->getWeChatDepartment());
+
                 $member->setMemberStatus(Member::STATUS_ACTIVATED);
                 $member->setMemberActiveCode(md5(time() . rand(1111, 9999)));
                 $memberManager->saveModifiedEntity($member);
@@ -372,4 +376,8 @@ class IndexController extends AppBaseController
 
         return $this->getResponse();
     }
+
+
+
+
 }

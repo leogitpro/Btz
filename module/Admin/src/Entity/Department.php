@@ -29,6 +29,7 @@ class Department
     const STATUS_INVALID = 0;
 
     const DEFAULT_DEPT_ID = 'ad739904-f423-11e6-b154-acbc32bf6185';
+    const WE_CHAT_DEPT_ID = '266cb0b4-2022-11e7-a2ce-acbc32bf6185';
 
     /**
      * Primary key, UUID
