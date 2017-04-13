@@ -12,6 +12,7 @@ use Admin\Entity\Member;
 use Admin\Exception\InvalidArgumentException as AdminInvalidArgumentException;
 use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
+use Application\Exception\InvalidArgumentException;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
 use Application\Form\TestForm;
@@ -34,21 +35,7 @@ class IndexController extends AppBaseController
      */
     public function testAction()
     {
-        $form = new TestForm();
-
-
-        if($this->getRequest()->isPost()) {
-
-            $form->setData($this->params()->fromPost());
-
-            if ($form->isValid()) {
-                var_dump($form->getData());
-            }
-        }
-
-        return new ViewModel([
-            'form' => $form,
-        ]);
+        throw new InvalidArgumentException('test exception on application');
     }
 
 

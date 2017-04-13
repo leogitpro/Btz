@@ -14,7 +14,7 @@ use Zend\Router\Http\Segment;
 
 
 return [
-    // IndexController router configuration
+
     'index' => [
         'type' => Segment::class,
         'options' => [
@@ -29,39 +29,22 @@ return [
                 'action' => 'index',
             ],
         ],
-    ], // End IndexController router
+    ],
 
-    // WechatController router configuration
-    'wechat' => [
+    'weixin' => [
         'type' => Segment::class,
         'options' => [
-            'route' => 'wechat[/:action[/:key]][:suffix]',
+            'route' => 'weixin[/:action[/:key]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                 'key' => '[a-zA-Z0-9_\-]+',
                 'suffix' => '(/|.html)',
             ],
             'defaults' => [
-                'controller' => Controller\WechatController::class,
+                'controller' => Controller\WeixinController::class,
                 'action' => 'index',
             ],
         ],
-    ], // End WechatController router
+    ],
 
-    // QrcodeController router configuration
-    'qrcode' => [
-        'type' => Segment::class,
-        'options' => [
-            'route' => 'qrcode[/:action[/:key]][:suffix]',
-            'constraints' => [
-                'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
-                'key' => '[a-zA-Z0-9_\-]+',
-                'suffix' => '(/|.html)',
-            ],
-            'defaults' => [
-                'controller' => Controller\QrcodeController::class,
-                'action' => 'index',
-            ],
-        ],
-    ], // End QrcodeController router
 ];

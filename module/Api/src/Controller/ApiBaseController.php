@@ -21,6 +21,7 @@ use Zend\View\Model\ViewModel;
 class ApiBaseController extends AppBaseController
 {
 
+    /**
     public function onDispatch(MvcEvent $e)
     {
         $response = parent::onDispatch($e);
@@ -39,39 +40,6 @@ class ApiBaseController extends AppBaseController
         return $this->getResponse();
     }
 
-    /**
-     * @return WechatManager
-     */
-    protected function getWechatManager()
-    {
-        return $this->getSm(WechatManager::class);
-    }
-
-    /**
-     * @param array|mixed $data
-     * @return \Zend\Stdlib\ResponseInterface
-     */
-    protected function sendJsonResponse($data)
-    {
-        $response = $this->getResponse();
-        $headers = $response->getHeaders();
-        $headers->addHeaderLine('content-type', 'application/json; charset=UTF-8');
-        $response->setContent(Json::encode($data, true));
-        return $response;
-    }
-
-    /**
-     * @param array|mixed $data
-     * @return \Zend\Stdlib\ResponseInterface
-     */
-    protected function sendHtmlResponse($data = '')
-    {
-        $response = $this->getResponse();
-        $headers = $response->getHeaders();
-        $headers->addHeaderLine('content-type', 'text/html; charset=UTF-8');
-        $response->setContent($data);
-        return $response;
-    }
-
+    //*/
 
 }

@@ -18,17 +18,17 @@ return [
     // Router configuration
     'router' => [
         'routes' => [
-            'wxapi' => [
+            'weixin' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/wx[/:action[/:key]][:suffix]',
+                    'route' => '/weixin[/:action[/:key]][:suffix]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                         'key' => '[a-zA-Z0-9_\-]+',
                         'suffix' => '(/|.html)',
                     ],
                     'defaults' => [
-                        'controller' => Controller\WechatController::class,
+                        'controller' => Controller\WeixinController::class,
                         'action' => 'index',
                     ],
                 ],
@@ -53,8 +53,7 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
-            Controller\WechatController::class => InvokableFactory::class,
-            Controller\QrcodeController::class => InvokableFactory::class,
+            Controller\WeixinController::class => InvokableFactory::class,
         ],
     ],
 

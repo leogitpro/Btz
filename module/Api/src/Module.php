@@ -27,21 +27,57 @@ class Module
         $sharedEventManager = $event->getApplication()->getEventManager()->getSharedManager();
 
         // Register listener
-        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatchListener'], 100);
+        $sharedEventManager->attach(\Zend\Mvc\Application::class, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
     }
 
 
 
     /**
      * @param MvcEvent $event
-     * @throws \Exception
      */
-    public function onDispatchListener(MvcEvent $event)
+    public function onDispatchErrorListener(MvcEvent $event)
     {
-        // Disabled view layout
-        $event->getViewModel()->setTerminal(true);
+        $controllerClass = $event->getControllerClass();
+        $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
+        if ($moduleNamespace != __NAMESPACE__) {
+            return ;
+        }
 
-        // Todo
+        $exception = $event->getParam('exception');
+        if(!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
+            return ;
+        }
+
+        
+        $request = $event->getRequest();
+        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+
+            $response = new \Zend\Http\PhpEnvironment\Response();
+            //$response->setStatusCode(500);
+            $content = $exception->getMessage();
+
+            $headerContentType = new \Zend\Http\Header\ContentType();
+
+            if($request->isXmlHttpRequest()) {
+                $headerContentType->setMediaType('application/json');
+                $content = \Zend\Json\Encoder::encode(['errcode' => '9999', 'errmsg' => $content]);
+            } else {
+                $headerContentType = new \Zend\Http\Header\ContentType();
+                $headerContentType->setMediaType('text/html');
+            }
+
+            $headerContentType->setCharset('UTF-8');
+
+            $responseHeaders = new \Zend\Http\Headers();
+            $responseHeaders->addHeader($headerContentType);
+
+            $response->setHeaders($responseHeaders);
+
+            $response->setStatusCode(200);
+
+            $response->setContent($content);
+            $event->setResult($response);
+        }
 
     }
 
