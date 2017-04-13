@@ -9,14 +9,15 @@
 namespace Admin\Controller;
 
 
+use Admin\Exception\RuntimeException as AdminRuntimeException;
 use Admin\Form\WeChatForm;
 use Admin\Form\WeChatInvoiceForm;
 use Admin\Form\WeChatOrderForm;
 use WeChat\Entity\Account;
 use WeChat\Entity\Invoice;
 use WeChat\Entity\Order;
-use WeChat\Exception\InvalidArgumentException;
-use WeChat\Exception\RuntimeException;
+use WeChat\Exception\InvalidArgumentException as WeChatInvalidArgumentException;
+use WeChat\Exception\RuntimeException as WeChatRuntimeException;
 use WeChat\Service\NetworkService;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -40,7 +41,7 @@ class WeChatAccountController extends AdminBaseController
 
         try {
             $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself, true);
-        } catch (InvalidArgumentException $e) {
+        } catch (WeChatInvalidArgumentException $e) {
             $this->getLoggerPlugin()->exception($e);
             $weChat = null;
         }
@@ -86,10 +87,10 @@ class WeChatAccountController extends AdminBaseController
                         $this->url()->fromRoute('admin/weChatAccount')
                     );
 
-                } catch (InvalidArgumentException $e) {
+                } catch (WeChatInvalidArgumentException $e) {
                     $this->getLoggerPlugin()->exception($e);
                     $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
-                } catch (RuntimeException $e) {
+                } catch (WeChatRuntimeException $e) {
                     $this->getLoggerPlugin()->exception($e);
                     $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
                 }
@@ -146,10 +147,10 @@ class WeChatAccountController extends AdminBaseController
                         $this->url()->fromRoute('admin/weChatAccount')
                     );
 
-                } catch (InvalidArgumentException $e) {
+                } catch (WeChatInvalidArgumentException $e) {
                     $this->getLoggerPlugin()->exception($e);
                     $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
-                } catch (RuntimeException $e) {
+                } catch (WeChatRuntimeException $e) {
                     $this->getLoggerPlugin()->exception($e);
                     $error = '无法通过微信平台验证, AppID 和 AppSecret 无效!';
                 }
@@ -205,7 +206,7 @@ class WeChatAccountController extends AdminBaseController
 
         try {
             $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
-        } catch (InvalidArgumentException $e) {
+        } catch (WeChatInvalidArgumentException $e) {
             return $this->go(
                 '没有配置公众号',
                 '未查询到您的公众号信息, 无法继续操作. 您需要先配置您的公众号信息!',
@@ -367,7 +368,9 @@ class WeChatAccountController extends AdminBaseController
         $askedMoney = 0;
         foreach ($invoices as $invoice) {
             if ($invoice instanceof Invoice) {
-                $askedMoney += $invoice->getMoney();
+                if ($invoice->getStatus() != Invoice::STATUS_INVOICE_REFUSED) {
+                    $askedMoney += $invoice->getMoney();
+                }
             }
         }
 
@@ -390,6 +393,32 @@ class WeChatAccountController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
+        $invoices = $weChat->getInvoices();
+        $orders = $weChat->getOrders();
+
+        $paiedMoney = 0;
+        foreach ($orders as $order) {
+            if ($order instanceof Order) {
+                if (Order::PAID_STATUS_RECEIVED == $order->getPaid()) {
+                    $paiedMoney += $order->getMoney();
+                }
+            }
+        }
+
+        $askedMoney = 0;
+        foreach ($invoices as $invoice) {
+            if ($invoice instanceof Invoice) {
+                if ($invoice->getStatus() != Invoice::STATUS_INVOICE_REFUSED) {
+                    $askedMoney += $invoice->getMoney();
+                }
+            }
+        }
+
+        $lastMoney = $paiedMoney - $askedMoney;
+        if ($lastMoney < 1) {
+            throw new AdminRuntimeException('已付款的金额已全部被申请开具过发票, 无开票金额可用.');
+        }
+
         $form = new WeChatInvoiceForm();
 
         if($this->getRequest()->isPost()) {
@@ -397,6 +426,15 @@ class WeChatAccountController extends AdminBaseController
             $form->setData($this->params()->fromPost());
             if ($form->isValid()) {
                 $data = $form->getData();
+
+                if ($data['money'] > $lastMoney) {
+                    return $this->go(
+                        '开票请求无效',
+                        '您的开票最大为: ' . $lastMoney . '元, 不能申请超过此金额的发票.',
+                        $this->url()->fromRoute('admin/weChatAccount', ['action' => 'invoice'])
+                    );
+                }
+
 
                 $this->getWeChatInvoiceService()->createInvoice(
                     $weChat,

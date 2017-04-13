@@ -20,6 +20,61 @@ class OrderService extends BaseEntityService
 
 
     /**
+     * @return int
+     */
+    public function getOrdersCount()
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(Order::class, 't');
+
+        return $this->getEntitiesCount();
+    }
+
+    /**
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getOrdersByLimitPage($page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(Order::class, 't');
+
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
+
+        $qb->orderBy('t.paid', 'ASC');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
+    /**
+     * @param string $id
+     * @return Order
+     * @throws InvalidArgumentException
+     */
+    public function getOrder($id)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t');
+        $qb->from(Order::class, 't');
+
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $id);
+
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Order) {
+            throw new InvalidArgumentException('无法获取相关的订单信息');
+        }
+        return $obj;
+    }
+
+
+    /**
      * @param Account $weChat
      * @param string $no
      * @return Order

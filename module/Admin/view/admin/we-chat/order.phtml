@@ -1,0 +1,70 @@
+<?php
+$this->pageTitleBar('订单管理');
+$this->sideTreeMenu()->setActiveId($activeId);
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table table-striped">
+                    <tr>
+                        <th width="20%">订单编号/公众号ID</th>
+                        <th width="20%">公众号</th>
+                        <th width="15%">金额/时间</th>
+                        <th width="15%">状态</th>
+                        <th width="30%">操作</th>
+                    </tr>
+                    <?php foreach ($rows as $row) {
+                        if ($row instanceof \WeChat\Entity\Order) {
+                            $weChat = $row->getWeChat();
+                            $member = $row->getWeChat()->getMember();
+                    ?>
+                        <tr>
+                            <td>
+                                <strong><?php echo $row->getNo(); ?></strong>
+                                <br>
+                                <small class="text-muted"><?php echo $weChat->getWxAppId(); ?></small>
+                            </td>
+                            <td>
+                                <?php echo $member->getMemberName(); ?>
+                                <br>
+                                <?php echo $member->getMemberEmail(); ?>
+                            </td>
+                            <td>
+                                <strong><?php echo $row->getMoney(); ?></strong> 元
+                                <br>
+                                <small class="text-muted"><?php echo intval($row->getSecond() / 86400) ?> 天</small>
+                            </td>
+                            <td>
+                                <?php if(\WeChat\Entity\Order::PAID_STATUS_RECEIVED == $row->getPaid()) { ?>
+                                    <span class="btn btn-success btn-xs"><?php echo $row->getPaidAsString(); ?></span>
+                                <?php } else if(\WeChat\Entity\Order::PAID_STATUS_SENT == $row->getPaid()) { ?>
+                                    <span class="btn btn-warning btn-xs"><?php echo $row->getPaidAsString(); ?></span>
+                                <?php } else { ?>
+                                    <span class="btn btn-danger btn-xs"><?php echo $row->getPaidAsString(); ?></span>
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <?php if(\WeChat\Entity\Order::PAID_STATUS_RECEIVED != $row->getPaid()) { ?>
+                                    <a
+                                        class="btn btn-default btn-xs confirm"
+                                        title="订单号: <?php echo $row->getNo(); ?>"
+                                        href="<?php echo $this->url('admin/weChat', ['action' => 'confirm-order-paid', 'key' => $row->getId()]); ?>"
+                                    >
+                                        确认收款
+                                    </a>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                    <?php } } ?>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php echo $this->pagination()->render(); ?>
+

@@ -584,7 +584,7 @@ class WeChatMenuController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号菜单管理', 'admin/weChatMenu', 1, 'list', 21);
+        $item = self::CreateControllerRegistry(__CLASS__, '公众号菜单', 'admin/weChatMenu', 1, 'list', 21);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '菜单列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '增加菜单', 1, 'plus', 6);

@@ -141,7 +141,7 @@ class WeChatClientController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号客户端管理', 'admin/weChatClient', 1, 'laptop', 21);
+        $item = self::CreateControllerRegistry(__CLASS__, '公众号客户端', 'admin/weChatClient', 1, 'laptop', 21);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '客户端列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '添加客户端', 1, 'plus', 8);

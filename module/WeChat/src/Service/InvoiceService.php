@@ -12,10 +12,65 @@ namespace WeChat\Service;
 use Ramsey\Uuid\Uuid;
 use WeChat\Entity\Account;
 use WeChat\Entity\Invoice;
+use WeChat\Exception\InvalidArgumentException;
 
 
 class InvoiceService extends BaseEntityService
 {
+
+
+    /**
+     * @return int
+     */
+    public function getInvoicesCount()
+    {
+        $qb = $this->resetQb();
+
+        $qb->select($qb->expr()->count('t.id'));
+        $qb->from(Invoice::class, 't');
+
+        return $this->getEntitiesCount();
+    }
+
+    /**
+     * @param int $page
+     * @param int $size
+     * @return array
+     */
+    public function getInvoicesByLimitPage($page = 1, $size = 10)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t')->from(Invoice::class, 't');
+        $qb->setMaxResults($size)->setFirstResult(($page -1) * $size);
+        $qb->orderBy('t.status', 'ASC');
+
+        return $this->getEntitiesFromPersistence();
+    }
+
+
+    /**
+     * @param string $id
+     * @return Invoice
+     * @throws InvalidArgumentException
+     */
+    public function getInvoice($id)
+    {
+        $qb = $this->resetQb();
+
+        $qb->select('t');
+        $qb->from(Invoice::class, 't');
+
+        $qb->where($qb->expr()->eq('t.id', '?1'));
+        $qb->setParameter(1, $id);
+
+        $obj = $this->getEntityFromPersistence();
+        if (!$obj instanceof Invoice) {
+            throw new InvalidArgumentException('无法获取相关的发票信息');
+        }
+        return $obj;
+    }
+
 
 
     /**

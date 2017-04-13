@@ -30,10 +30,11 @@ $this->inlineScript()->captureEnd();
                 <div class="col-lg-12">
                     <table class="table table-striped">
                         <tr>
-                            <th width="20%">发票抬头</th>
+                            <th width="15%">发票抬头</th>
+                            <th width="10%">金额(元)</th>
                             <th width="40%">收件信息</th>
                             <th width="10%">状态</th>
-                            <th width="30%">其他信息</th>
+                            <th width="25%">其他信息</th>
                         </tr>
                         <?php
                         foreach ($invoices as $invoice) {
@@ -41,13 +42,27 @@ $this->inlineScript()->captureEnd();
                                 ?>
                                 <tr>
                                     <td><?php echo $invoice->getTitle(); ?></td>
+                                    <td>&yen;<?php echo $invoice->getMoney(); ?></td>
                                     <td>
                                         收件: <?php echo $invoice->getReceiver(); ?><br>
                                         电话: <?php echo $invoice->getPhone(); ?><br>
-                                        地址: <?php echo $invoice->getAddress(); ?><br>
+                                        <small>地址: <?php echo $invoice->getAddress(); ?></small><br>
                                     </td>
-                                    <td><?php echo $invoice->getStatusAsString(); ?></td>
-                                    <td><?php echo $invoice->getNote(); ?></td>
+                                    <td>
+                                        <button class="btn btn-<?php
+                                        if(\WeChat\Entity\Invoice::STATUS_INVOICE_REFUSED == $invoice->getStatus()) {
+                                            echo 'danger';
+                                        } else if(\WeChat\Entity\Invoice::STATUS_INVOICE_PRINT == $invoice->getStatus() ||
+                                        \WeChat\Entity\Invoice::STATUS_INVOICE_DELIVER == $invoice->getStatus()) {
+                                            echo 'success';
+                                        } else {
+                                            echo 'default';
+                                        }
+                                        ?> btn-xs">
+                                            <?php echo $invoice->getStatusAsString(); ?>
+                                        </button>
+                                    </td>
+                                    <td><?php echo nl2br($invoice->getNote()); ?></td>
                                 </tr>
                             <?php } } ?>
 

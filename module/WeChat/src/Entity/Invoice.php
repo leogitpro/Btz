@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Invoice
 {
-    const STATUS_INVOICE_REFUSED = 0;
+    const STATUS_INVOICE_REFUSED = 99;
     const STATUS_INVOICE_APPLY = 1;
     const STATUS_INVOICE_PRINT = 2;
     const STATUS_INVOICE_DELIVER = 3;

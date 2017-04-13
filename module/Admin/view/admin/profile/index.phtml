@@ -13,24 +13,24 @@ $this->pageBreadcrumbBar()->addItem('Summary');
                 <th>资料</th>
             </tr>
             <tr>
-                <th>登入账号(E-mail):</th>
-                <td><?php echo $member->getMemberEmail(); ?></th>
+                <td>登入账号(E-mail):</td>
+                <td><?php echo $member->getMemberEmail(); ?></td>
             </tr>
             <tr>
-                <th>我的名字:</th>
-                <td><?php echo $this->escapeHtml($member->getMemberName()); ?></th>
+                <td>我的名字:</td>
+                <td><?php echo $this->escapeHtml($member->getMemberName()); ?></td>
             </tr>
             <tr>
-                <th>我的状态:</th>
-                <td><?php echo $member->getMemberStatusAsString(); ?></th>
+                <td>我的状态:</td>
+                <td><?php echo $member->getMemberStatusAsString(); ?></td>
             </tr>
             <tr>
-                <th>账号过期时间:</th>
-                <td><?php echo $member->getMemberExpired()->format('Y-m-d'); ?></th>
+                <td>账号过期时间:</td>
+                <td><?php echo $member->getMemberExpired()->format('Y-m-d'); ?></td>
             </tr>
             <tr>
-                <th>账号创建时间:</th>
-                <td><?php echo $member->getMemberCreated()->format('Y-m-d'); ?></th>
+                <td>账号创建时间:</td>
+                <td><?php echo $member->getMemberCreated()->format('Y-m-d'); ?></td>
             </tr>
         </table>
     </div>

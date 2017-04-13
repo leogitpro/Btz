@@ -279,7 +279,7 @@ class WeChatQrCodeController extends AdminBaseController
      */
     public static function ComponentRegistry()
     {
-        $item = self::CreateControllerRegistry(__CLASS__, '公众号二维码管理', 'admin/weChatQrCode', 1, 'qrcode', 20);
+        $item = self::CreateControllerRegistry(__CLASS__, '公众号二维码', 'admin/weChatQrCode', 1, 'qrcode', 20);
 
         $item['actions']['index'] = self::CreateActionRegistry('index', '二维码列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '申请二维码', 1, 'plus', 8);
