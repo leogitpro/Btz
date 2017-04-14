@@ -152,8 +152,6 @@ class WeixinController extends ApiBaseController
             throw new InvalidArgumentException('Invalid request.');
         }
 
-        $oauthUrl = $this->getWeChatOauthService()->getOauthUrl($state);
-
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
         $appId = $weChat->getWxAppId();
         $appSecret = $weChat->getWxAppSecret();
@@ -162,11 +160,49 @@ class WeixinController extends ApiBaseController
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
 
+        $extra = [
+            'openid=' . $openid,
+        ];
+
         if('userinfo' == $type) {
             $res = NetworkService::SnsUserInfo($accessToken, $openid);
+            $extra[] = 'nickname=' . urlencode($res['nickname']);
+            $extra[] = 'sex=' . $res['sex'];
+            $extra[] = 'province=' . urlencode($res['province']);
+            $extra[] = 'city=' . urlencode($res['city']);
+            $extra[] = 'country=' . urlencode($res['country']);
+            $extra[] = 'headimgurl=' . urlencode($res['headimgurl']);
         }
 
+        $oauthUrl = $this->getWeChatOauthService()->getOauthUrl($state);
+        $goUrl = $oauthUrl->getUrl();
 
+        $goUrlFragment = '';
+        $pos = stripos($goUrl, '#');
+        if(false !== $pos) {
+            $goUrlFragment = substr($goUrl, $pos);
+            $goUrl = substr($goUrl, 0, $pos);
+        }
+
+        $goUrlQuery = '';
+        $pos = stripos($goUrl, '?');
+        if(false !== $pos) {
+            $goUrlQuery = substr($goUrl, ($pos + 1));
+            $goUrl = substr($goUrl, 0, $pos);
+        }
+
+        if(!empty($goUrlQuery)) {
+            $queries = explode('&', $goUrlQuery);
+            foreach($queries as $param) {
+                if(!empty($param)) {
+                    $extra[] = $param;
+                }
+            }
+        }
+
+        $goUrl .= '?' . implode('&', $extra) . $goUrlFragment;
+
+        $this->redirect()->toUrl($goUrl);
     }
 
 
