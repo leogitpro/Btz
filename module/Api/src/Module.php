@@ -26,13 +26,27 @@ class Module
         // Get shared event manager
         $sharedEventManager = $event->getApplication()->getEventManager()->getSharedManager();
 
-        // Register listener
+        // Register dispatch listener
+        $sharedEventManager->attach(__NAMESPACE__, MvcEvent::EVENT_DISPATCH, [$this, 'onDispatchListener'], 100);
+
+        // Register dispatch error listener
         $sharedEventManager->attach(\Zend\Mvc\Application::class, MvcEvent::EVENT_DISPATCH_ERROR, [$this, 'onDispatchErrorListener'], 100);
+    }
+
+
+    /**
+     * @param MvcEvent $event
+     */
+    public function onDispatchListener(MvcEvent $event)
+    {
+        //var_dump(__NAMESPACE__);
     }
 
 
 
     /**
+     * Module exception
+     *
      * @param MvcEvent $event
      */
     public function onDispatchErrorListener(MvcEvent $event)
@@ -48,37 +62,41 @@ class Module
             return ;
         }
 
-        
-        $request = $event->getRequest();
-        if ($request instanceof \Zend\Http\PhpEnvironment\Request) {
+        $serviceManager = $event->getApplication()->getServiceManager();
+        $logger = $serviceManager->get('Logger');
+        $logger->exception($exception);
 
-            $response = new \Zend\Http\PhpEnvironment\Response();
-            //$response->setStatusCode(500);
-            $content = $exception->getMessage();
 
-            $headerContentType = new \Zend\Http\Header\ContentType();
+        $response = $event->getResponse();
+        $resetContented = false;
 
-            if($request->isXmlHttpRequest()) {
-                $headerContentType->setMediaType('application/json');
-                $content = \Zend\Json\Encoder::encode(['errcode' => '9999', 'errmsg' => $content]);
-            } else {
-                $headerContentType = new \Zend\Http\Header\ContentType();
-                $headerContentType->setMediaType('text/html');
+        if($response instanceof \Zend\Http\PhpEnvironment\Response) {
+            if ($response->getHeaders()->has('Content-Type')) {
+                $contentType = $response->getHeaders()->get('Content-Type');
+                if ($contentType instanceof \Zend\Http\Header\ContentType) {
+                    if('application/json' == $contentType->getMediaType()) {
+                        $response->setContent(json_encode(
+                            ['success' => false, 'errcode' => 9999, 'errmsg' => $exception->getMessage()],
+                            JSON_UNESCAPED_UNICODE
+                        ));
+                        $resetContented = true;
+                    }
+                }
             }
-
+        } else {
+            $response = new \Zend\Http\PhpEnvironment\Response();
+            $headerContentType = new \Zend\Http\Header\ContentType();
+            $headerContentType->setMediaType('text/html');
             $headerContentType->setCharset('UTF-8');
-
-            $responseHeaders = new \Zend\Http\Headers();
-            $responseHeaders->addHeader($headerContentType);
-
-            $response->setHeaders($responseHeaders);
-
-            $response->setStatusCode(200);
-
-            $response->setContent($content);
-            $event->setResult($response);
+            $response->getHeaders()->addHeader($headerContentType);
+        }
+        if(!$resetContented) {
+            $response->setContent($exception->getMessage());
         }
 
+        $response->setStatusCode(200);
+
+        $event->setResult($response);
     }
 
 

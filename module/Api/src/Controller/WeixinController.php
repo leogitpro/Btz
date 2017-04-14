@@ -9,7 +9,8 @@
 namespace Api\Controller;
 
 
-use Api\Exception\InvalidArgumentException as ApiInvalidArgumentException;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 
 
 class WeixinController extends ApiBaseController
@@ -20,9 +21,25 @@ class WeixinController extends ApiBaseController
      */
     public function tokenAction()
     {
+        $this->declareResponseContentType(self::MEDIA_TYPE_JSON);
+
+        $data = ['success' => false, 'wxid' => 0];
+
         $weixinId = (int)$this->params()->fromRoute('key', 0);
         if (!$weixinId) {
-            throw new ApiInvalidArgumentException('无效的公众号ID');
+            //todo
         }
+
+        return new JsonModel($data);
+    }
+
+
+    public function authAction()
+    {
+        $this->declareResponseContentType(self::MEDIA_TYPE_HTML);
+
+        return new ViewModel([
+            'hello' => 'Wold',
+        ]);
     }
 }

@@ -12,6 +12,7 @@ namespace Admin\Controller;
 
 use Admin\Entity\MessageBox;
 use Admin\Entity\MessageContent;
+use Admin\Exception\InvalidArgumentException;
 use Admin\Form\MessageForm;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;

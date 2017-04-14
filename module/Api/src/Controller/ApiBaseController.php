@@ -10,36 +10,60 @@
 namespace Api\Controller;
 
 
-use Admin\Service\WechatManager;
 use Application\Controller\AppBaseController;
-use Zend\Json\Json;
+use Zend\Http\Header\ContentType;
+use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Helper\RenderToPlaceholder;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 
 class ApiBaseController extends AppBaseController
 {
+    const MEDIA_TYPE_JSON = 'application/json';
+    const MEDIA_TYPE_HTML = 'text/html';
+    const API_CHARSET = 'UTF-8';
 
-    /**
+
     public function onDispatch(MvcEvent $e)
     {
-        $response = parent::onDispatch($e);
+        $viewModel = parent::onDispatch($e);
 
-        $headers = $this->getResponse()->getHeaders();
+        if ($viewModel instanceof JsonModel) {
+            $params = $viewModel->getVariables();
 
-        if ($response instanceof JsonModel) {
-            $value = $response->getVariables();
-            $headers->addHeaderLine('content-type', 'application/json; charset=UTF-8');
-            $this->getResponse()->setContent(Json::encode($value, true));
-            return $this->getResponse();
+            $response = $this->getResponse();
+            $response->setContent(json_encode($params, JSON_UNESCAPED_UNICODE));
+            return $response;
         }
 
-        $headers->addHeaderLine('content-type', 'text/html; charset=UTF-8');
+        if ($viewModel instanceof ViewModel) {
+            $viewModel->setTerminal(true);
+
+            return $viewModel;
+        }
 
         return $this->getResponse();
     }
 
-    //*/
+
+    protected function declareResponseContentType($type = 'application/json')
+    {
+        $headerContentType = new ContentType();
+        if ($type == self::MEDIA_TYPE_JSON) {
+            $headerContentType->setMediaType(self::MEDIA_TYPE_JSON);
+        } else {
+            $headerContentType->setMediaType(self::MEDIA_TYPE_HTML);
+        }
+        $headerContentType->setCharset(self::API_CHARSET);
+
+        $response = $this->getResponse();
+        if($response instanceof Response) {
+            $response->getHeaders()->addHeader($headerContentType);
+        }
+
+    }
+
 
 }

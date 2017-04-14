@@ -28,9 +28,6 @@ class Module
     public function onBootstrap(MvcEvent $event)
     {
 
-        // Init Default Session
-        $event->getApplication()->getServiceManager()->get(SessionManager::class);
-
         // Get shared event manager
         $sharedEventManager = $event->getApplication()->getEventManager()->getSharedManager();
 
