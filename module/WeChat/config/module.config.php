@@ -37,6 +37,7 @@ return [
             Service\MenuService::class => Service\Factory\BaseEntityFactory::class,
             Service\OrderService::class => Service\Factory\BaseEntityFactory::class,
             Service\InvoiceService::class => Service\Factory\BaseEntityFactory::class,
+            Service\OauthService::class => Service\Factory\BaseEntityFactory::class,
             Service\WeChatService::class => Service\Factory\WeChatFactory::class,
         ],
     ],

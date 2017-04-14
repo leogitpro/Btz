@@ -11,10 +11,12 @@ namespace Api\Controller;
 
 
 use Application\Controller\AppBaseController;
+use WeChat\Service\AccountService;
+use WeChat\Service\OauthService;
+use WeChat\Service\WeChatService;
 use Zend\Http\Header\ContentType;
 use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
-use Zend\View\Helper\RenderToPlaceholder;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -62,7 +64,33 @@ class ApiBaseController extends AppBaseController
         if($response instanceof Response) {
             $response->getHeaders()->addHeader($headerContentType);
         }
+    }
 
+
+    /**
+     * @return WeChatService
+     */
+    protected function getWeChatService()
+    {
+        return $this->getSm(WeChatService::class);
+    }
+
+
+    /**
+     * @return AccountService
+     */
+    protected function getWeChatAccountService()
+    {
+        return $this->getSm(AccountService::class);
+    }
+
+
+    /**
+     * @return OauthService
+     */
+    protected function getWeChatOauthService()
+    {
+        return $this->getSm(OauthService::class);
     }
 
 

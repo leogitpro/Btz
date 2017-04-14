@@ -209,6 +209,26 @@ class NetworkService
     }
 
 
+    /**
+     * 读取粉丝资料
+     *
+     * @param string $access_token
+     * @param string $openid
+     * @return array
+     */
+    public static function userInfo($access_token, $openid)
+    {
+        $path = '/cgi-bin/user/info?access_token=' . (string)$access_token . '&openid=' . (string)$openid . '&lang=zh_CN';
+
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+
+        return $res;
+    }
+
+
     ///////////////////// 基础接口 /////////////////
     /**
      * 微信服务器 IP 地址
@@ -251,6 +271,43 @@ class NetworkService
         return $res;
     }
 
+    ////////////////////// 网页授权接口 ////////////
+    /**
+     * 获取网页授权 AccessToken
+     *
+     * @param string $appId
+     * @param string $secret
+     * @param string $code
+     * @return array
+     */
+    public static function SnsAccessToken($appId, $secret, $code)
+    {
+        $path = '/sns/oauth2/access_token?appid=' . $appId . '&secret=' . $secret . '&code=' . $code . '&grant_type=authorization_code';
+
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+        return $res;
+    }
+
+
+    /**
+     * 网页授权提取用户信息
+     *
+     * @param string $access_token
+     * @param string $openid
+     * @return array
+     */
+    public static function SnsUserInfo($access_token, $openid)
+    {
+        $path = '/sns/userinfo?access_token=' . $access_token . '&openid=' . $openid . '&lang=zh_CN';
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
+        if (isset($res['errcode'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], $res['errcode']);
+        }
+        return $res;
+    }
 
     ////////////////////// Network Request ////////////
 

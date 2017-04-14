@@ -111,6 +111,13 @@ class Version20170319043717 extends AbstractMigration
         $invoice->addColumn('created', 'datetime');
         $invoice->setPrimaryKey(['id']);
         $invoice->addIndex(['wx']);
+
+        $oauth = $schema->createTable('wechat_oauth');
+        $oauth->addColumn('id', 'string', ['fixed' => true, 'length' => 32]);
+        $oauth->addColumn('url', 'string', ['length' => 255]);
+        $oauth->addColumn('created', 'datetime');
+        $oauth->setPrimaryKey(['id']);
+
     }
 
     public function postUp(Schema $schema)

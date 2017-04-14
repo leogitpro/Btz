@@ -33,13 +33,18 @@ class WeChatService
     /**
      * 提取公众号 AccessToken
      *
-     * @param Account $account
+     * @param int|Account $account
      * @return string
      * @throws RuntimeException
      * @throws InvalidArgumentException
      */
-    public function getAccessToken(Account $account)
+    public function getAccessToken($account)
     {
+        if (!$account instanceof Account) {
+            $account = (int)$account;
+            $account = $this->accountService->getWeChat($account);
+        }
+
         if (time() > $account->getWxExpired()) {
             throw new RuntimeException('公众号服务已经过期, AppID:' . $account->getWxAppId());
         }
@@ -60,6 +65,23 @@ class WeChatService
             return $account->getWxAccessToken();
         }
     }
+
+
+    /**
+     * 读取用户个人资料
+     *
+     * @param integer $wxid
+     * @param string $openid
+     * @return array
+     */
+    public function getUserInfo($wxid, $openid)
+    {
+        $token = $this->getAccessToken($wxid);
+
+        return NetworkService::userInfo($token, $openid);
+    }
+
+
 
 
     /**

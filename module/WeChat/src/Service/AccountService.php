@@ -53,7 +53,7 @@ class AccountService extends BaseEntityService
 
 
     /**
-     * @param string $weChatId
+     * @param int $weChatId
      * @param bool $ignoreExpired
      * @return Account
      * @throws InvalidArgumentException
