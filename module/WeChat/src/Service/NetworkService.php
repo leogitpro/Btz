@@ -264,12 +264,55 @@ class NetworkService
         $path = '/cgi-bin/token?grant_type=client_credential&appid=' . (string)$appId . '&secret=' . (string)$appSecret;
 
         $res = self::sendGetRequest(self::WX_API_HOST . $path);
-        if (!isset($res['access_token']) || !isset($res['expires_in'])) {
+        if (empty($res['access_token']) || empty($res['expires_in'])) {
             throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
         }
 
         return $res;
     }
+
+
+    /**
+     * 提取公众号 Jsapi_ticket
+     *
+     * @param string $accessToken
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public static function getJsapiTicket($accessToken)
+    {
+        $path = '/cgi-bin/ticket/getticket?access_token='. (string)$accessToken .'&type=jsapi';
+
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
+        if (empty($res['ticket']) || empty($res['expires_in'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
+        }
+
+        return $res;
+    }
+
+
+    /**
+     * 提取公众号 Api_ticket
+     *
+     * @param string $accessToken
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public static function getCardTicket($accessToken)
+    {
+        $path = '/cgi-bin/ticket/getticket?access_token='. (string)$accessToken .'&type=wx_card';
+
+        $res = self::sendGetRequest(self::WX_API_HOST . $path);
+        if (empty($res['ticket']) || empty($res['expires_in'])) {
+            throw new InvalidArgumentException(@$res['errmsg'], @$res['errcode']);
+        }
+
+        return $res;
+    }
+
 
     ////////////////////// 网页授权接口 ////////////
     /**

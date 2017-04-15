@@ -26,7 +26,7 @@ return [
                         'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                         'wxid' => '[0-9]+',
                         'key' => '[a-zA-Z0-9_\-]+',
-                        'suffix' => '(/|.html)',
+                        'suffix' => '(.json|.html)',
                     ],
                     'defaults' => [
                         'controller' => Controller\WeixinController::class,

@@ -22,6 +22,10 @@ class Version20170319043717 extends AbstractMigration
         $account->addColumn('wx_appsecret', 'string', ['length' => 255]);
         $account->addColumn('wx_access_token', 'string', ['length' => 512]);
         $account->addColumn('wx_access_token_expired', 'integer', ['unsigned' => true]);
+        $account->addColumn('wx_jsapi_ticket', 'string', ['length' => 512]);
+        $account->addColumn('wx_jsapi_ticket_expired', 'integer', ['unsigned' => true]);
+        $account->addColumn('wx_card_ticket', 'string', ['length' => 512]);
+        $account->addColumn('wx_card_ticket_expired', 'integer', ['unsigned' => true]);
         $account->addColumn('wx_expired', 'integer', ['unsigned' => true]);
         $account->addColumn('wx_checked', 'smallint');
         $account->addColumn('wx_created', 'datetime');

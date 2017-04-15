@@ -68,15 +68,82 @@ class WeChatService
 
 
     /**
+     * 提取公众号 Jsapi Ticket
+     *
+     * @param int|Account $account
+     * @return string
+     */
+    public function getJsapiTicket($account)
+    {
+        if (!$account instanceof Account) {
+            $account = (int)$account;
+            $account = $this->accountService->getWeChat($account);
+        }
+
+        $accessToken = $this->getAccessToken($account);
+
+        if (time() > $account->getWxJsapiTicketExpired()) {
+            $res = NetworkService::getJsapiTicket($accessToken);
+
+            $ticket = $res['ticket'];
+            $expires = $res['expires_in'] + time() - 300;
+
+            $account->setWxJsapiTicket($ticket);
+            $account->setWxJsapiTicketExpired($expires);
+
+            $this->accountService->saveModifiedEntity($account);
+
+            return $ticket;
+        } else {
+            return $account->getWxJsapiTicket();
+        }
+    }
+
+
+    /**
+     * 提取公众号 Card Ticket
+     *
+     * @param int|Account $account
+     * @return string
+     */
+    public function getCardTicket($account)
+    {
+        if (!$account instanceof Account) {
+            $account = (int)$account;
+            $account = $this->accountService->getWeChat($account);
+        }
+
+        $accessToken = $this->getAccessToken($account);
+
+        if (time() > $account->getWxCardTicketExpired()) {
+            $res = NetworkService::getCardTicket($accessToken);
+
+            $ticket = $res['ticket'];
+            $expires = $res['expires_in'] + time() - 300;
+
+            $account->setWxCardTicket($ticket);
+            $account->setWxCardTicketExpired($expires);
+
+            $this->accountService->saveModifiedEntity($account);
+
+            return $ticket;
+        } else {
+            return $account->getWxCardTicket();
+        }
+    }
+
+
+
+    /**
      * 读取用户个人资料
      *
-     * @param integer $wxid
+     * @param Account $account
      * @param string $openid
      * @return array
      */
-    public function getUserInfo($wxid, $openid)
+    public function getUserInfo(Account $account, $openid)
     {
-        $token = $this->getAccessToken($wxid);
+        $token = $this->getAccessToken($account);
 
         return NetworkService::userInfo($token, $openid);
     }

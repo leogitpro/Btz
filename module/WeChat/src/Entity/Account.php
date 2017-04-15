@@ -66,6 +66,34 @@ class Account
     private $wxAccessTokenExpired = 0;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="wx_jsapi_ticket", type="string", length=512)
+     */
+    private $wxJsapiTicket = '';
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="wx_jsapi_ticket_expired", type="integer")
+     */
+    private $wxJsapiTicketExpired = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="wx_card_ticket", type="string", length=512)
+     */
+    private $wxCardTicket = '';
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="wx_card_ticket_expired", type="integer")
+     */
+    private $wxCardTicketExpired = 0;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="wx_expired", type="integer")
@@ -234,6 +262,70 @@ class Account
     public function setWxAccessTokenExpired($wxAccessTokenExpired)
     {
         $this->wxAccessTokenExpired = $wxAccessTokenExpired;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxJsapiTicket()
+    {
+        return $this->wxJsapiTicket;
+    }
+
+    /**
+     * @param string $wxJsapiTicket
+     */
+    public function setWxJsapiTicket($wxJsapiTicket)
+    {
+        $this->wxJsapiTicket = $wxJsapiTicket;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWxJsapiTicketExpired()
+    {
+        return $this->wxJsapiTicketExpired;
+    }
+
+    /**
+     * @param int $wxJsapiTicketExpired
+     */
+    public function setWxJsapiTicketExpired($wxJsapiTicketExpired)
+    {
+        $this->wxJsapiTicketExpired = $wxJsapiTicketExpired;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWxCardTicket()
+    {
+        return $this->wxCardTicket;
+    }
+
+    /**
+     * @param string $wxCardTicket
+     */
+    public function setWxCardTicket($wxCardTicket)
+    {
+        $this->wxCardTicket = $wxCardTicket;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWxCardTicketExpired()
+    {
+        return $this->wxCardTicketExpired;
+    }
+
+    /**
+     * @param int $wxCardTicketExpired
+     */
+    public function setWxCardTicketExpired($wxCardTicketExpired)
+    {
+        $this->wxCardTicketExpired = $wxCardTicketExpired;
     }
 
     /**
