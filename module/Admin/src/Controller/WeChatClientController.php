@@ -67,6 +67,14 @@ class WeChatClientController extends AdminBaseController
         $myself = $this->getMemberManager()->getCurrentMember();
         $weChat = $this->getWeChatAccountService()->getWeChatByMember($myself);
 
+        if ($weChat->getClients()->count() > 9) {
+            return $this->go(
+                '客户端已经超额',
+                '您的微信公众号访问客户端数量已经超额! 最多可以设置9个.',
+                $this->url()->fromRoute('admin/weChatClient')
+            );
+        }
+
         $form = new WeChatClientForm();
 
         if($this->getRequest()->isPost()) {

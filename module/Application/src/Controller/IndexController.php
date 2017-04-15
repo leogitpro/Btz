@@ -55,12 +55,6 @@ class IndexController extends AppBaseController
     {
         $items = [
             [
-                'title' => '公众号接入',
-                'desc' => '微信公众账号接入平台',
-                'share' => 1,
-                'pro' => 1,
-            ],
-            [
                 'title' => '免费试用',
                 'desc' => '每个微信认证公众号可以申请7天免费体验服务',
                 'share' => 1,
@@ -74,13 +68,13 @@ class IndexController extends AppBaseController
             ],
             [
                 'title' => '接口管理',
-                'desc' => 'AccessToken, 授权接口, JSSDK 分享接口服务',
+                'desc' => 'AccessToken, 网页授权接口, JSSDK分享等接口服务',
                 'share' => 1,
                 'pro' => 1,
             ],
             [
                 'title' => '接口安全管理',
-                'desc' => '提供基于域名与 IP 及时效性接口访问控制服务',
+                'desc' => '提供基于域名与 IP 及时效性的接口安全访问控制服务',
                 'share' => 1,
                 'pro' => 1,
             ],
@@ -93,13 +87,13 @@ class IndexController extends AppBaseController
             [
                 'title' => '二维码追踪服务',
                 'desc' => '追踪由本平台发行的公众号二维码被扫描数据统计服务',
-                'share' => 1,
+                'share' => 0,
                 'pro' => 1,
             ],
             [
-                'title' => '数据同步',
-                'desc' => '公众号用户标签等数据同步服务',
-                'share' => 1,
+                'title' => '数据同步服务',
+                'desc' => '公众号用户信息等数据同步服务',
+                'share' => 0,
                 'pro' => 1,
             ],
             [
@@ -123,7 +117,7 @@ class IndexController extends AppBaseController
         ];
 
         return new ViewModel([
-            'items' => [], //$items,
+            'items' => $items,
         ]);
     }
 
@@ -248,7 +242,7 @@ class IndexController extends AppBaseController
                     $mailTpl = str_replace('%contact_url%', $contact_url, $mailTpl);
 
                     $postData = [
-                        'mail_subject' => 'Btz微信接口平台试用通知',
+                        'mail_subject' => '宽绩科技微信接口平台试用通知',
                         'mail_content' => $mailTpl,
                         'mail_recipient' => $email,
                     ];

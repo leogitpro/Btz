@@ -30,9 +30,11 @@ $this->inlineScript()->captureEnd();
         <?php } else { ?>
             <div class="row">
                 <div class="col-lg-12">
+                    <?php if(count($clients) < 9) { ?>
                     <p>
                         <a class="btn btn-default btn-sm" href="<?php echo $this->url('admin/weChatClient', ['action'=>'add']); ?>"><i class="fa fa-plus fa-fw"></i> 添加客户端</a>
                     </p>
+                    <?php } ?>
                     <table class="table table-striped">
                         <tr>
                             <th>客户端</th>

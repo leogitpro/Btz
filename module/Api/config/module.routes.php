@@ -34,7 +34,7 @@ return [
     'weixin' => [
         'type' => Segment::class,
         'options' => [
-            'route' => '/weixin[/:action[/:wxid[/:key]]][:suffix]',
+            'route' => 'weixin[/:action[/:wxid[/:key]]][:suffix]',
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                 'wxid' => '[0-9]+',
