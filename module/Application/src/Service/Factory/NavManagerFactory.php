@@ -25,7 +25,10 @@ class NavManagerFactory implements FactoryInterface
         $viewHelperManager = $container->get('ViewHelperManager');
         $urlHelper = $viewHelperManager->get('url');
 
-        return new NavManager($urlHelper);
+        $config = $container->get('Config');
+
+
+        return new NavManager($urlHelper, @$config['api_list']['weixin']);
     }
 
 

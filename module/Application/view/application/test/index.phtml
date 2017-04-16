@@ -1,0 +1,104 @@
+<?php
+$this->headTitle('接口测试');
+
+$this->barMenu()->setActiveItemId($activeId);
+
+$apiKeys = array_keys($apiList);
+
+
+$this->barBreadcrumbs()->setItems([
+    'Bentuzi' => $this->url('home'),
+    '接口验证' => $this->url('app/test', ['action' => 'index', 'key' => $apiKey, 'suffix' => '.html']),
+    $apiList[$apiKey] => '#',
+]);
+
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function () {
+    $("form").submit(function() {
+        if($("#submit").hasClass("disabled")) {
+            return false;
+        }
+      
+        var wxid = $("#wxid").val();
+        var client = $("#client").val();
+        if(parseInt(wxid) < 1 || client.length != 6) {
+            alert("请填写好正确的公众号编号和客户端编号再进行测试.");
+            return false;
+        }
+        
+        var openid = $("#openid").val();
+        var url = $("#url").val();
+        
+        var data = {
+            'wxid': wxid,
+            'identifier': client,
+            'openid': openid,
+            'url': url
+        };
+        
+        $("#submit").addClass("disabled");
+        $("#processBox").show();
+        $.post($(this).attr("action"), data, function(dt) {
+            $("#result").text(dt);
+            $("#processBox").hide();
+            $("#submit").removeClass("disabled");
+            console.log(dt);
+        });
+        
+        return false;
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <form class="form-inline" method="post" action="<?php echo $this->url('app/test', ['action' => 'simulator', 'key' => $apiKey, 'suffix' => '.html']); ?>">
+            <div class="form-group">
+                <label for="wxid">公众号编号</label>
+                <input type="text" class="form-control" id="wxid">
+            </div>
+            <div class="form-group">
+                <label for="client">客户端编号</label>
+                <input type="text" class="form-control" id="client">
+            </div>
+            <?php if('userinfo' == $apiKey) { ?>
+                <div class="form-group">
+                    <label for="openid">OpenID</label>
+                    <input type="text" class="form-control" id="openid">
+                </div>
+            <?php } ?>
+            <?php if('jssign' == $apiKey) { ?>
+                <div class="form-group">
+                    <label for="url">需签名URL</label>
+                    <input type="text" class="form-control" id="url">
+                </div>
+            <?php } ?>
+            <div class="form-group">
+                <button type="submit" id="submit" class="btn btn-primary">测试验证</button>
+            </div>
+            <div id="processBox" class="form-group" style="display: none;">
+                <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-lg-12">
+
+      <div id="result">
+
+      </div>
+
+    </div>
+</div>

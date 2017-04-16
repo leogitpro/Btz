@@ -22,6 +22,7 @@ return [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\DisplayController::class => InvokableFactory::class,
+            Controller\TestController::class => InvokableFactory::class,
         ],
     ],
     'controller_plugins' => [
