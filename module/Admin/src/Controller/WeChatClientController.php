@@ -52,6 +52,7 @@ class WeChatClientController extends AdminBaseController
 
         return new ViewModel([
             'weChat' => $weChat,
+            'apis' => (array)$this->getConfigPlugin()->get('api_list.weixin'),
             'clients' => $rows,
             'activeId' => __METHOD__,
         ]);
@@ -75,6 +76,8 @@ class WeChatClientController extends AdminBaseController
             );
         }
 
+        $apis = (array)$this->getConfigPlugin()->get('api_list.weixin');
+
         $form = new WeChatClientForm();
 
         if($this->getRequest()->isPost()) {
@@ -91,11 +94,24 @@ class WeChatClientController extends AdminBaseController
                 $end->modify("+1 day");
                 $expireTime = $end->format('U') - 1;
 
+                $selectedApis = (array)$data['apis'];
+                $apiList = [];
+                if(!empty($selectedApis)) {
+                    foreach ($selectedApis as $_api) {
+                        if (array_key_exists($_api, $apis)) {
+                            $apiList[] = $_api;
+                        }
+                    }
+                }
+
+                //echo '<pre>'; print_r($apis); print_r($selectedApis); print_r($apiList); echo '</pre>';
+                //**
                 $this->getWeChatClientService()->createWeChatClient(
                     $weChat,
                     $data['name'],
                     $data['domain'],
                     $data['ip'],
+                    implode(',', $apiList),
                     $activeTime,
                     $expireTime
                 );
@@ -105,11 +121,13 @@ class WeChatClientController extends AdminBaseController
                     '您的微信公众号访问客户端已经创建成功!',
                     $this->url()->fromRoute('admin/weChatClient')
                 );
+                //*/
             }
         }
 
         return new ViewModel([
             'form' => $form,
+            'apis' => $apis,
             'activeId' => __METHOD__,
         ]);
     }

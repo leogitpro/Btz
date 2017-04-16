@@ -14,8 +14,6 @@ use Api\Exception\RuntimeException;
 use WeChat\Entity\Account;
 use WeChat\Entity\Client;
 use WeChat\Service\NetworkService;
-use Zend\Http\Header\Referer;
-use Zend\Http\Request;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -24,132 +22,100 @@ class WeixinController extends ApiBaseController
 {
 
     /**
+     * @var Client
+     */
+    private $currentClient = null;
+
+
+    /**
+     * @param Account $weChat
+     * @param string $identifier
+     * @return Client
+     */
+    private function getCurrentClient(Account $weChat, $identifier)
+    {
+        if (null == $this->currentClient) {
+            $this->currentClient = $this->getWeChatClientService()->getWeChatClientByWeChatAndIdentifier($weChat, $identifier);
+        }
+
+        return $this->currentClient;
+    }
+
+
+    /**
      * IP address verify
      *
-     * @param Account $account
+     * @param Account $weChat
+     * @param string $identifier
      * @return bool
      */
-    private function ipVerify(Account $account)
+    private function ipVerify(Account $weChat, $identifier)
     {
         $ip = $this->getServerPlugin()->ipAddress();
         if (empty($ip)) {
             return false;
         }
 
-        $clients = $account->getClients();
-        $allowedIps = [];
-        $currentTime  = time();
-        $unlimited = false;
-        foreach ($clients as $client) {
-            if ($client instanceof Client) {
-                if ($currentTime > $client->getActiveTime() && $currentTime < $client->getExpireTime()) {
-                    $allowedIp = $client->getIp();
-                    if ('0.0.0.0' == $allowedIp) {
-                        $unlimited = true;
-                        break;
-                    }
-                    $allowedIps[$allowedIp] = $allowedIp;
-                }
-            }
+        $client = $this->getCurrentClient($weChat, $identifier);
+        if (null == $client) {
+            return false;
         }
-        if ($unlimited) {
+
+        if ('0.0.0.0' == $client->getIp() || $ip == $client->getIp()) {
             return true;
         }
 
-        return in_array($ip, $allowedIps);
+        return false;
     }
 
 
     /**
      * Domain verify
      *
-     * @param Account $account
+     * @param Account $weChat
+     * @param string $identifier
      * @param string $domain
      * @return bool
      */
-    private function domainVerify(Account $account, $domain = '')
+    private function domainVerify(Account $weChat, $identifier, $domain = '')
     {
         if (empty($domain)) {
             return false;
         }
 
-        $clients = $account->getClients();
-        $allowedDomains = [];
-        $currentTime  = time();
-        $unlimited = false;
-        foreach ($clients as $client) {
-            if ($client instanceof Client) {
-                if ($currentTime > $client->getActiveTime() && $currentTime < $client->getExpireTime()) {
-                    $allowedDomain = $client->getDomain();
-                    if (preg_match("/anonymous\\.com/", $allowedDomain)) {
-                        $unlimited = true;
-                        break;
-                    }
-                    $allowedDomains[$allowedDomain] = $allowedDomain;
-                }
-            }
+        $client = $this->getCurrentClient($weChat, $identifier);
+        if (null == $client) {
+            return false;
         }
-        if ($unlimited) {
+        if($domain == $client->getDomain() || 'anonymous.com' == $client->getDomain()) {
             return true;
         }
-
-        return in_array($domain, $allowedDomains);
+        return false;
     }
 
 
     /**
-     * Verify ip and domain
-     *
      * @param Account $weChat
-     * @param string $domain
+     * @param string $identifier
+     * @param string $api
      * @return bool
      */
-    private function ipAndDomainVerify(Account $weChat, $domain = '')
+    private function apiVerify(Account $weChat, $identifier, $api)
     {
-        if (empty($domain)) {
+        if (empty($api)) {
             return false;
         }
 
-        $ip = $this->getServerPlugin()->ipAddress();
-        if (empty($ip)) {
+        $client = $this->getCurrentClient($weChat, $identifier);
+        if (null == $client) {
             return false;
         }
 
-        $clients = $weChat->getClients();
+        $apis = explode(',', $client->getApiList());
 
-        $allowedDomains = [];
-        $allowedIps = [];
-
-        $currentTime  = time();
-
-        $ipUnlimited = false;
-        $domainUnlimited = false;
-
-        foreach ($clients as $client) {
-            if ($client instanceof Client) {
-                if ($currentTime > $client->getActiveTime() && $currentTime < $client->getExpireTime()) {
-
-                    $allowedDomain = $client->getDomain();
-                    $allowedIp = $client->getIp();
-
-                    if (preg_match("/anonymous\\.com/", $allowedDomain)) {
-                        $domainUnlimited = true;
-                    }
-                    if ('0.0.0.0' == $allowedIp) {
-                        $ipUnlimited = true;
-                    }
-
-                    $allowedDomains[$allowedDomain] = $allowedDomain;
-                    $allowedIps[$allowedIp] = $allowedIp;
-                }
-            }
-        }
-        if ($ipUnlimited && $domainUnlimited) {
-            return true;
-        }
-
-        return in_array($ip, $allowedIps) && in_array($domain, $allowedDomains);
+        return in_array($api, $apis);
     }
+
 
 
     /**
@@ -173,7 +139,7 @@ class WeixinController extends ApiBaseController
      * 获取公众号 AccessToken
      * 接口访问限制 IP 地址. 需要在后台进行配置.
      *
-     * Path: /weixin/accesstoken/wxid.json
+     * Path: /weixin/accesstoken/wxid/identifier.json
      *
      */
     public function accesstokenAction()
@@ -184,10 +150,17 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
+        }
 
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->ipVerify($weChat)) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->ipVerify($weChat, $identifier)) {
+            throw new RuntimeException('Ip address access disabled!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         $data = [
@@ -203,7 +176,7 @@ class WeixinController extends ApiBaseController
      * 获取公众号 JsapiTicket
      * 接口访问限制 IP 地址. 需要在后台进行配置.
      *
-     * Path: /weixin/jsapiticket/wxid.json
+     * Path: /weixin/jsapiticket/wxid/identifier.json
      */
     public function jsapiticketAction()
     {
@@ -213,10 +186,17 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
+        }
 
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->ipVerify($weChat)) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->ipVerify($weChat, $identifier)) {
+            throw new RuntimeException('Ip address access disabled!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         $data = [
@@ -232,7 +212,7 @@ class WeixinController extends ApiBaseController
      * 获取公众号 ApiTicket
      * 接口访问限制 IP 地址. 需要在后台进行配置.
      *
-     * Path: /weixin/apiticket/wxid.json
+     * Path: /weixin/apiticket/wxid/identifier.json
      */
     public function apiticketAction()
     {
@@ -242,10 +222,17 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
+        }
 
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->ipVerify($weChat)) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->ipVerify($weChat, $identifier)) {
+            throw new RuntimeException('Ip address access disabled!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         $data = [
@@ -262,7 +249,7 @@ class WeixinController extends ApiBaseController
      * 接口访问限制 IP 地址. 需要在后台进行配置.
      *
      *
-     * Path: /weixin/userinfo/wxid/openid.json
+     * Path: /weixin/userinfo/wxid/identifier.json?openid=OPENID
      */
     public function userinfoAction()
     {
@@ -272,15 +259,22 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
+        }
 
-        $openid = (string)$this->params()->fromRoute('key');
+        $openid = (string)$this->params()->fromQuery('openid');
         if(empty($openid)) {
             throw new InvalidArgumentException('Invalid user openid.');
         }
 
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->ipVerify($weChat)) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->ipVerify($weChat, $identifier)) {
+            throw new RuntimeException('Ip address access disabled!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         $data = [
@@ -295,8 +289,7 @@ class WeixinController extends ApiBaseController
     /**
      * Jsapi 签名服务
      *
-     * //Path: /weixin/jssign/wxid.json => For client ajax call. to be removed
-     * Path: /weixin/jssign/wxid.json?url=urlencode('http://www.example.com/demo.html') => For server api call.
+     * Path: /weixin/jssign/wxid/identifier.json?url=urlencode('http://www.example.com/demo.html') => For server api call.
      */
     public function jssignAction()
     {
@@ -306,36 +299,10 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
-
-        // Ajax call use referer sign
-        /**
-        $request = $this->getRequest();
-        if(!$request instanceof Request) {
-            throw new InvalidArgumentException('Invalid access request');
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
         }
-
-        $referer = $request->getHeaders()->get('Referer');
-        if (!$referer instanceof Referer) {
-            throw new InvalidArgumentException('Invalid request Referer');
-        }
-
-        $url = $referer->getFieldValue();
-        $pos = stripos($url, '#');
-        if(false !== $pos) {
-            $url = substr($url, 0, $pos);
-        }
-
-        $urlParams = parse_url($url);
-        if (empty($urlParams['host'])) {
-            throw new InvalidArgumentException('Invalid Referer Domain');
-        }
-
-        // Domain validate
-        $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->domainVerify($weChat, $urlParams['host'])) {
-            throw new RuntimeException('Access disabled!');
-        }
-        //*/
 
         // Server call use query url
         $url = $this->params()->fromQuery('url', '');
@@ -349,8 +316,14 @@ class WeixinController extends ApiBaseController
         }
 
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if (!$this->ipAndDomainVerify($weChat, $urls['host'])) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->ipVerify($weChat, $identifier)) {
+            throw new RuntimeException('Ip address access disabled!');
+        }
+        if (!$this->domainVerify($weChat, $identifier, $urls['host'])) {
+            throw new RuntimeException('Domain not allowed!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         // signature params
@@ -378,7 +351,7 @@ class WeixinController extends ApiBaseController
     /**
      * 网页授权接口
      *
-     * Path: /weixin/oauth/wxid/base|userinfo.html?url=urlencode('http://www.example.com/demo.html')
+     * Path: /weixin/oauth/wxid/identifier.html?type=base|userinfo&url=urlencode('http://www.example.com/demo.html')
      */
     public function oauthAction()
     {
@@ -388,8 +361,12 @@ class WeixinController extends ApiBaseController
         if (!$wxid) {
             throw new InvalidArgumentException('Invalid weChat service number.');
         }
+        $identifier = (string)$this->params()->fromRoute('key', '');
+        if (empty($identifier)) {
+            throw new InvalidArgumentException('Invalid client identifier.');
+        }
 
-        $type = (string)$this->params()->fromRoute('key', '');
+        $type = (string)$this->params()->fromQuery('type', '');
         if(!in_array($type, ['base', 'userinfo'])) {
             throw new InvalidArgumentException('Invalid request.');
         }
@@ -403,8 +380,11 @@ class WeixinController extends ApiBaseController
 
         // Domain validate
         $weChat = $this->getWeChatAccountService()->getWeChat($wxid);
-        if ($this->domainVerify($weChat)) {
-            throw new RuntimeException('Access disabled!');
+        if (!$this->domainVerify($weChat, $identifier, $urls['host'])) {
+            throw new RuntimeException('Domain not allowed!');
+        }
+        if (!$this->apiVerify($weChat, $identifier, str_replace('Action', '', __FUNCTION__))) {
+            throw new RuntimeException('Api access disabled!');
         }
 
         //save url
@@ -510,8 +490,6 @@ class WeixinController extends ApiBaseController
 
     public function testAction()
     {
-        echo sys_get_temp_dir();
-        $this->getLoggerPlugin()->info(sys_get_temp_dir());
         return new ViewModel();
     }
 

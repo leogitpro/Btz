@@ -39,6 +39,12 @@ class Client
      */
     private $name = '';
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="identifier", type="string", length=6)
+     */
+    private $identifier = '';
 
     /**
      * @var integer
@@ -67,6 +73,13 @@ class Client
      * @ORM\Column(name="ip", type="string", length=255)
      */
     private $ip = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="api_list", type="string", length=255)
+     */
+    private $apiList = '';
 
     /**
      * @var \DateTime
@@ -114,6 +127,22 @@ class Client
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param string $identifier
+     */
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
     }
 
     /**
@@ -178,6 +207,22 @@ class Client
     public function setIp($ip)
     {
         $this->ip = $ip;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiList()
+    {
+        return $this->apiList;
+    }
+
+    /**
+     * @param string $apiList
+     */
+    public function setApiList($apiList)
+    {
+        $this->apiList = $apiList;
     }
 
     /**

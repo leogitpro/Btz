@@ -59,6 +59,15 @@ class WeChatClientForm extends BaseForm
     }
 
 
+    /**
+     * 表单: APIs
+     */
+    private function addWeChatClientApis()
+    {
+        $this->addMultiCheckboxElement('apis');
+    }
+
+
     public function addElements()
     {
         $this->addWeChatClientName();
@@ -66,6 +75,7 @@ class WeChatClientForm extends BaseForm
         $this->addWeChatClientIp();
         $this->addWeChatClientActive();
         $this->addWeChatClientExpire();
+        $this->addWeChatClientApis();
     }
 
 }

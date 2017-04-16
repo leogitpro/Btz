@@ -12,6 +12,7 @@ namespace Api\Controller;
 
 use Application\Controller\AppBaseController;
 use WeChat\Service\AccountService;
+use WeChat\Service\ClientService;
 use WeChat\Service\OauthService;
 use WeChat\Service\WeChatService;
 use Zend\Http\Header\ContentType;
@@ -82,6 +83,14 @@ class ApiBaseController extends AppBaseController
     protected function getWeChatAccountService()
     {
         return $this->getSm(AccountService::class);
+    }
+
+    /**
+     * @return ClientService
+     */
+    protected function getWeChatClientService()
+    {
+        return $this->getSm(ClientService::class);
     }
 
 

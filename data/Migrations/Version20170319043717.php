@@ -40,14 +40,17 @@ class Version20170319043717 extends AbstractMigration
         $client->addColumn('id', 'string', ['fixed' => true, 'length' => 36]);
         $client->addColumn('wx', 'integer', ['unsigned' => true]);
         $client->addColumn('name', 'string', ['length' => 45]);
+        $client->addColumn('identifier', 'string', ['fixed' => true, 'length' => 6]);
         $client->addColumn('active_time', 'integer', ['unsigned' => true]);
         $client->addColumn('expire_time', 'integer', ['unsigned' => true]);
         $client->addColumn('domain', 'string', ['length' => 255]);
         $client->addColumn('ip', 'string', ['length' => 255]);
+        $client->addColumn('api_list', 'string', ['length' => 255]);
         $client->addColumn('created', 'datetime');
         $client->setPrimaryKey(['id']);
         $client->addIndex(['wx']);
-        $client->addIndex(['expire_time']);
+        $client->addIndex(['identifier']);
+        $client->addIndex(['active_time', 'expire_time']);
 
 
         $qrcode = $schema->createTable('wechat_qrcode');

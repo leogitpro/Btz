@@ -65,5 +65,15 @@ return [
         ],
     ],
 
+    'api_list' => [
+        'weixin' => [
+            'accesstoken' => '获取公众号 access_token 接口',
+            'jsapiticket' => '获取公众号 jsapi_ticket 接口',
+            'apiticket' => '获取公众号卡券 api_ticket 接口',
+            'userinfo' => '通过提供的 OpenID 查询用户信息接口',
+            'jssign' => '公众号JS-SDK使用权限签名接口',
+            'oauth' => '公众号网页授权接口',
+        ],
+    ],
 
 ];

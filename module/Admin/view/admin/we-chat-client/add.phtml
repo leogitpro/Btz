@@ -50,12 +50,26 @@ $this->formLocalMessage($input, [
     '__undefined__' => '请输入有效的客户端失效日期.',
 ]);
 
+
+$input = $form->get('apis');
+$input->setAttributes([
+    //'class' => 'form-control',
+]);
+$input->setValueOptions($apis);
+
+
 $form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
 
 $form->prepare();
 
 ?>
 
+<style type="text/css">
+    .panel-body > .checkbox > label {
+        display: block;
+        padding-bottom: 10px;
+    }
+</style>
 
 <div class="row">
     <div class="col-lg-6">
@@ -114,6 +128,16 @@ $form->prepare();
                 <small>日期格式示例: <strong><?php echo date('Y-m-d', strtotime("+7 day")); ?></strong></small>
             </p>
             <?php echo $this->formElementErrors($form->get('expire')); ?>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">允许该客户端访问的接口列表</div>
+            <div class="panel-body">
+                <div class="checkbox">
+                <?php echo $this->formElement($form->get('apis')); ?>
+                </div>
+                <?php echo $this->formElementErrors($form->get('apis')); ?>
+            </div>
         </div>
 
         <div class="form-group">

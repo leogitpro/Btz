@@ -37,10 +37,9 @@ $this->inlineScript()->captureEnd();
                     <?php } ?>
                     <table class="table table-striped">
                         <tr>
-                            <th>客户端</th>
-                            <th>生效时间</th>
-                            <th>失效时间</th>
+                            <th>客户端有效期</th>
                             <th>访问控制(允许的域名及 IP)</th>
+                            <th>授权的接口列表</th>
                             <th>操作</th>
                         </tr>
                         <?php
@@ -48,12 +47,26 @@ $this->inlineScript()->captureEnd();
                             if ($client instanceof \WeChat\Entity\Client) {
                                 ?>
                                 <tr>
-                                    <td><?php echo $client->getName(); ?></td>
-                                    <td><?php echo date('Y-m-d H:i:s', $client->getActiveTime()); ?></td>
-                                    <td><?php echo date('Y-m-d H:i:s', $client->getExpireTime()); ?></td>
                                     <td>
-                                        域名: <?php echo $client->getDomain();  ?><br>
-                                        IP: <?php echo $client->getIp(); ?>
+                                        名称: <strong><?php echo $client->getName(); ?></strong><br>
+                                        生效: <span class="btn btn-success btn-xs"><?php echo date('Y-m-d H:i:s', $client->getActiveTime()); ?></span><br>
+                                        失效: <span class="btn btn-warning btn-xs"><?php echo date('Y-m-d H:i:s', $client->getExpireTime()); ?></span>
+                                    </td>
+                                    <td>
+                                        标识: <strong><?php echo $client->getIdentifier(); ?></strong><br>
+                                        域名: <?php echo 'anonymous.com' == $client->getDomain() ? '不限制' : $client->getDomain();  ?><br>
+                                        IP: <?php echo '0.0.0.0' == $client->getIp() ? '不限制' : $client->getIp(); ?>
+                                    </td>
+                                    <td>
+                                        <?php if(empty($client->getApiList())) { ?>
+                                            <span class="btn btn-danger btn-xs">无授权任何接口</span>
+                                        <?php } else {
+                                            $api_list = explode(',', $client->getApiList());
+                                            foreach ($api_list as $item) {
+                                                if(isset($apis[$item])) {
+                                        ?>
+                                            <span class="btn btn-success btn-xs"><?php echo $apis[$item]; ?></span><br>
+                                        <?php } } } ?>
                                     </td>
                                     <td>
                                         <a class="delete" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a>

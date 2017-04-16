@@ -109,6 +109,34 @@ class BaseForm extends Form
 
     /**
      * @param string $name
+     * @param array $value_options
+     */
+    protected function addMultiCheckboxElement($name = 'checkbox', $value_options = [])
+    {
+        $this->addElement([
+            'type' => 'multiCheckbox',
+            'name' => $name,
+            'options' => [
+                'disable_inarray_validator' => true,
+                'value_options' => $value_options,
+            ],
+        ]);
+
+
+        $filter = [
+            'name' => $name,
+            'required' => false,
+            'break_on_failure' => true,
+            'filters' => [
+                FilterFactory::StripTags(),
+            ],
+        ];
+        $this->addFilter($filter);
+    }
+
+
+    /**
+     * @param string $name
      */
     protected function addHiddenElement($name = 'hide', $validators = [])
     {
