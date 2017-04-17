@@ -8,8 +8,8 @@
 
 namespace Application;
 
+
 use Zend\Mvc\MvcEvent;
-use Zend\Session\SessionManager;
 
 
 class Module
@@ -41,25 +41,13 @@ class Module
      */
     public function onDispatchListener(MvcEvent $event)
     {
+        $serviceManager = $event->getApplication()->getServiceManager();
 
-        /**
-        //var_dump(__METHOD__);
-        $controllerClass = $event->getControllerClass();
-        $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
-        if ($moduleNamespace != __NAMESPACE__) {
-            return ;
-        }
-        //*/
+        $viewModel = $event->getViewModel();
 
-        $request = $event->getRequest();
-        if (!$request instanceof \Zend\Http\PhpEnvironment\Request) {
-            return ;
-        }
-
-        $result = $event->getResult();
-        if ($result instanceof \Zend\View\Model\ViewModel) {
-            $result->setTerminal($request->isXmlHttpRequest()); // Disable layout
-        }
+        $appConfig = $serviceManager->get('ApplicationConfig');
+        $appEnv = isset($appConfig['application']['env']) ? $appConfig['application']['env'] : 'development';
+        $viewModel->setVariable('appEnv', $appEnv);
 
     }
 

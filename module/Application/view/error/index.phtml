@@ -3,6 +3,12 @@
 <?php if(isset($this->exception) && ($this->exception instanceof \Exception || $this->exception instanceof \Error)) { ?>
 <hr/>
 <div class="alert alert-danger" role="alert">
-    <?php echo nl2br($this->escapeHtml($this->exception->getMessage())); ?>
+    <?php
+    //if('production' == @$appEnv) {
+        echo nl2br($this->escapeHtml($this->exception->getMessage()));
+    //} else {
+        //echo '这里出现了一个错误!';
+    //}
+    ?>
 </div>
 <?php } ?>

@@ -13,6 +13,7 @@ use Admin\Exception\InvalidArgumentException as AdminInvalidArgumentException;
 use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
 use Application\Exception\InvalidArgumentException;
+use Application\Exception\RuntimeException;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
 use Application\Form\TestForm;

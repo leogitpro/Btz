@@ -43,15 +43,13 @@ class Module
     public function onDispatchListener(MvcEvent $event)
     {
 
-        // Init Default Session
-        $event->getApplication()->getServiceManager()->get(SessionManager::class);
-
         $serviceManager = $event->getApplication()->getServiceManager();
+        $serviceManager->get(SessionManager::class); //Init session manager
+
+        $viewModel = $event->getViewModel();
 
         $appConfig = $serviceManager->get('ApplicationConfig');
         $appEnv = isset($appConfig['application']['env']) ? $appConfig['application']['env'] : 'development';
-
-        $viewModel = $event->getViewModel();
         $viewModel->setVariable('appEnv', $appEnv);
 
         $controller = $event->getRouteMatch()->getParam('controller', null);
