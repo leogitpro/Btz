@@ -49,6 +49,24 @@ class IndexController extends AppBaseController
         return new ViewModel();
     }
 
+
+    /**
+     * wx domain verify
+     */
+    public function wxMpVerifyAction()
+    {
+        $key = (string)$this->params()->fromRoute('key', '');
+        $response = $this->getResponse();
+        $response->setContent($key);
+        return $response;
+    }
+
+    public function apidocAction()
+    {
+        //return new ViewModel([]);
+    }
+
+
     /**
      * 产品&服务
      */

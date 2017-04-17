@@ -29,6 +29,8 @@ temp/
 #Doctrine 2
 data/DoctrineORMModule/Proxy/
 data/DoctrineORMModule/cache/
+data/Proxy/
+data/cache/
 
 
 # Legacy ZF1

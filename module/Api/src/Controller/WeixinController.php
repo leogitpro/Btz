@@ -35,7 +35,13 @@ class WeixinController extends ApiBaseController
     private function getCurrentClient(Account $weChat, $identifier)
     {
         if (null == $this->currentClient) {
-            $this->currentClient = $this->getWeChatClientService()->getWeChatClientByWeChatAndIdentifier($weChat, $identifier);
+            $client = $this->getWeChatClientService()->getWeChatClientByWeChatAndIdentifier($weChat, $identifier);
+            $nowTime = time();
+            if($nowTime > $client->getActiveTime() && $nowTime < $client->getExpireTime()) {
+                $this->currentClient = $client;
+            } else {
+                throw new RuntimeException('客户端: ' . $identifier . ' 已过期!');
+            }
         }
 
         return $this->currentClient;
@@ -335,6 +341,7 @@ class WeixinController extends ApiBaseController
         $signature = sha1($sha1Source);
 
         $data = [
+            'success' => true,
             'appId' => $weChat->getWxAppId(),
             'timestamp' => $timestamp,
             'nonceStr' => $noncestr,

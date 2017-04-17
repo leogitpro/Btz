@@ -15,6 +15,21 @@ use Zend\Router\Http\Segment;
 
 
 return [
+
+    'wx_mp_verify' => [
+        'type' => Segment::class,
+        'options' => [
+            'route'    => '/MP_verify_[:key].txt',
+            'constraints' => [
+                'key' => '[a-zA-Z0-9]+',
+            ],
+            'defaults' => [
+                'controller' => Controller\IndexController::class,
+                'action'     => 'wx-mp-verify',
+            ],
+        ],
+    ],
+
     'home' => [
         'type' => Literal::class,
         'options' => [
