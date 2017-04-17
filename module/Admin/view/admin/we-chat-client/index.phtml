@@ -13,6 +13,25 @@ $(function () {
             return false;
         }
     });
+    
+    $(".show-api").click(function() {
+        var target = $(this).parent().parent().next();
+        var targetId = $(this).attr("target");
+        $(".api-container").each(function() {
+            if(targetId != $(this).attr("id")) {
+                $(this).hide();
+            }
+        });
+        $(this).blur();
+        
+        if (target.is(':visible')) {
+        //if("none" == target.css("display")) {
+            target.css("display", "none");
+        } else {
+            target.css("display", "block");
+        }
+        return false;
+    });
 });
 JS;
 $this->inlineScript()->captureEnd();
@@ -45,7 +64,7 @@ $this->inlineScript()->captureEnd();
                         <?php
                         foreach ($clients as $client) {
                             if ($client instanceof \WeChat\Entity\Client) {
-                                ?>
+                        ?>
                                 <tr>
                                     <td>
                                         名称: <strong><?php echo $client->getName(); ?></strong><br>
@@ -64,15 +83,18 @@ $this->inlineScript()->captureEnd();
                                             $api_list = explode(',', $client->getApiList());
                                             foreach ($api_list as $item) {
                                                 if(isset($apis[$item])) {
-                                        ?>
-                                            <span class="btn btn-success btn-xs"><?php echo $apis[$item]; ?></span><br>
-                                        <?php } } } ?>
+                                                    ?>
+                                                    <span class="btn btn-success btn-xs"><?php echo $apis[$item]; ?></span><br>
+                                                <?php } } } ?>
                                     </td>
                                     <td>
-                                        <a class="delete" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a>
+                                        <a class="delete" href="<?php echo $this->url('admin/weChatClient', ['action' => 'delete', 'key' => $client->getId()]); ?>">删除</a><br>
+                                        <a>&nbsp;</a><br>
+                                        <a href="<?php echo $this->url('admin/weChatClient', ['action' => 'apilist', 'key' => $client->getId()]); ?>">查看 API</a>
                                     </td>
                                 </tr>
-                            <?php } } ?>
+
+                        <?php } } ?>
 
                     </table>
 

@@ -187,6 +187,8 @@ class WeChatAccountController extends AdminBaseController
         $weChat->setWxAccessToken($accessToken);
         $weChat->setWxAccessTokenExpired($expiredIn);
         $weChat->setWxChecked(Account::STATUS_CHECKED);
+        $weChat->setWxJsapiTicketExpired(0);
+        $weChat->setWxCardTicketExpired(0);
 
         $this->getWeChatAccountService()->saveModifiedEntity($weChat);
 

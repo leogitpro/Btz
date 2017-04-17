@@ -1,5 +1,11 @@
 <?php
-$this->pageTitleBar('我的公众号');
+
+$wxId = null;
+if($weChat instanceof \WeChat\Entity\Account) {
+    $wxId = '编号:[' . $weChat->getWxId() . ']';
+}
+
+$this->pageTitleBar('我的公众号', $wxId);
 $this->sideTreeMenu()->setActiveId($activeId);
 
 
@@ -59,6 +65,10 @@ echo <<<JS
            return false;
        });
        
+       $(".list-group > a").click(function() {
+           $(this).blur();
+           return false;
+       });
        
     });
 JS;
@@ -107,4 +117,38 @@ $this->inlineScript()->captureEnd();
         <?php } ?>
     </div>
 </div>
+
+<?php if ($weChat instanceof \WeChat\Entity\Account) { ?>
+<div class="row">
+    <div class="col-lg-12">
+        <h4 class="page-header">Api 接口列表</h4>
+        <div class="list-group">
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 网页授权接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/oauth/<?php echo $weChat->getWxId(); ?>/[客户端编号].html?type=(base 或 userinfo)&url=urlencode('授权回调URL')</span></p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: JSSDK签名授权接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/jssign/<?php echo $weChat->getWxId(); ?>/[客户端编号].json?url=urlencode('需签名的URL')</span></p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 AccessToken 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/accesstoken/<?php echo $weChat->getWxId(); ?>/[客户端编号].json</span></p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 JsApiTicket 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/jsapiticket/<?php echo $weChat->getWxId(); ?>/[客户端编号].json</span></p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 ApiTicket 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/apiticket/<?php echo $weChat->getWxId(); ?>/[客户端编号].json</span></p>
+            </a>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取用户信息接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger">http://www.bentuzi.com/weixin/userinfo/<?php echo $weChat->getWxId(); ?>/[客户端编号].json?openid=OPENID</span></p>
+            </a>
+        </div>
+    </div>
+</div>
+<?php } ?>
 

@@ -159,6 +159,95 @@ class WeChatClientController extends AdminBaseController
     }
 
 
+    /**
+     * Api清单
+     */
+    public function apilistAction()
+    {
+        $clientId = (string)$this->params()->fromRoute('key');
+
+        $client = $this->getWeChatClientService()->getWeChatClient($clientId);
+
+        $weChat = $client->getWeChat();
+
+        return new ViewModel([
+            'client' => $client,
+            'weChat' => $weChat,
+            'activeId' => __CLASS__,
+        ]);
+    }
+
+
+    /**
+     * 导出 Excel
+     */
+    public function exportAction()
+    {
+        $clientId = (string)$this->params()->fromRoute('key');
+
+        $client = $this->getWeChatClientService()->getWeChatClient($clientId);
+
+        $weChat = $client->getWeChat();
+
+
+        $apis = $client->getApiList();
+        $apiList = explode(',', $apis);
+
+        $apiTpl = 'http://www.bentuzi.com/weixin/%s/' . $weChat->getWxId() . '/' . $client->getIdentifier();
+
+        $apiUrls = [];
+
+        if(in_array('oauth', $apiList)) {
+            $apiUrls[] = [
+                'title' => '网页授权接口',
+                'url' => sprintf($apiTpl, 'oauth') . ".html?type=(base 或 userinfo)&url=urlencode('授权回调URL')",
+            ];
+        }
+
+        if(in_array('jssign', $apiList)) {
+            $apiUrls[] = [
+                'title' => 'JSSDK签名授权接口',
+                'url' => sprintf($apiTpl, 'jssign') . ".json?url=urlencode('需签名的URL')",
+            ];
+        }
+
+        if(in_array('accesstoken', $apiList)) {
+            $apiUrls[] = [
+                'title' => '获取 AccessToken 接口',
+                'url' => sprintf($apiTpl, 'accesstoken') . '.json',
+            ];
+        }
+
+        if(in_array('jsapiticket', $apiList)) {
+            $apiUrls[] = [
+                'title' => '获取 JsApiTicket 接口',
+                'url' => sprintf($apiTpl, 'jsapiticket') . '.json',
+            ];
+        }
+
+        if(in_array('apiticket', $apiList)) {
+            $apiUrls[] = [
+                'title' => '获取 ApiTicket 接口',
+                'url' => sprintf($apiTpl, 'apiticket') . '.json',
+            ];
+        }
+
+        if(in_array('userinfo', $apiList)) {
+            $apiUrls[] = [
+                'title' => '获取用户信息接口',
+                'url' => sprintf($apiTpl, 'userinfo') . '.json?openid=OPENID',
+            ];
+        }
+
+
+        $text = json_encode($apiUrls, JSON_UNESCAPED_UNICODE);
+
+        $response = $this->getResponse();
+        $response->setContent($text);
+        return $response;
+    }
+
+
 
     /**
      *  ACL 登记
@@ -172,6 +261,8 @@ class WeChatClientController extends AdminBaseController
         $item['actions']['index'] = self::CreateActionRegistry('index', '客户端列表', 1, 'bars', 9);
         $item['actions']['add'] = self::CreateActionRegistry('add', '添加客户端', 1, 'plus', 8);
         $item['actions']['delete'] = self::CreateActionRegistry('delete', '删除客户端');
+        $item['actions']['apilist'] = self::CreateActionRegistry('apilist', '客户端API列表');
+        $item['actions']['export'] = self::CreateActionRegistry('export', ' 导出客户端API列表');
 
         return $item;
     }

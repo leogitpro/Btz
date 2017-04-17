@@ -1,0 +1,73 @@
+<?php
+
+
+if (!$client instanceof \WeChat\Entity\Client) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的客户端信息');
+}
+
+if (!$weChat instanceof \WeChat\Entity\Account) {
+    throw new \Admin\Exception\InvalidArgumentException('无效的公众号信息');
+}
+
+$this->pageTitleBar('客户端 API 接口列表', $client->getName());
+
+$this->sideTreeMenu()->setActiveId($activeId);
+
+$apis = $client->getApiList();
+$apiList = explode(',', $apis);
+
+$wxId = $weChat->getWxId();
+$clientId = $client->getIdentifier();
+
+$domain = 'http://www.bentuzi.com/weixin/%s/' . $wxId . '/' . $clientId;
+
+?>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="list-group">
+            <?php if(in_array('oauth', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 网页授权接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'oauth'); ?>.html?type=(base 或 userinfo)&url=urlencode('授权回调URL')</span></p>
+            </a>
+            <?php } ?>
+            <?php if(in_array('jssign', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: JSSDK签名授权接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'jssign'); ?>.json?url=urlencode('需签名的URL')</span></p>
+            </a>
+            <?php } ?>
+            <?php if(in_array('accesstoken', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 AccessToken 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'accesstoken'); ?>.json</span></p>
+            </a>
+            <?php } ?>
+            <?php if(in_array('jsapiticket', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 JsApiTicket 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'jsapiticket'); ?>.json</span></p>
+            </a>
+            <?php } ?>
+            <?php if(in_array('apiticket', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取 ApiTicket 接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'apiticket'); ?>.json</span></p>
+            </a>
+            <?php } ?>
+            <?php if(in_array('userinfo', $apiList)) { ?>
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">名称: 获取用户信息接口</h5>
+                <p class="list-group-item-text">地址: <span class="text-danger"><?php echo sprintf($domain, 'userinfo'); ?>.json?openid=OPENID</span></p>
+            </a>
+            <?php } ?>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <a class="btn btn-primary" href="<?php echo $this->url('admin/weChatClient', ['action' => 'export', 'key' => $client->getId(), 'suffix' => '.html']); ?>" target="_blank">导出 API 接口清单到 Excel</a>
+    </div>
+</div>
