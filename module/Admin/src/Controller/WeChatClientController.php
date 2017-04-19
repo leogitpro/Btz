@@ -189,7 +189,6 @@ class WeChatClientController extends AdminBaseController
 
         $weChat = $client->getWeChat();
 
-
         $apis = $client->getApiList();
         $apiList = explode(',', $apis);
 
@@ -240,11 +239,37 @@ class WeChatClientController extends AdminBaseController
         }
 
 
-        $text = json_encode($apiUrls, JSON_UNESCAPED_UNICODE);
+        $excel = new \PHPExcel();
+        $excel->getProperties()->setCreator($_SERVER['HTTP_HOST']);
+        $excel->setActiveSheetIndex(0)
+            ->setCellValue('A1', '接口名')
+            ->setCellValue('B1', '接口地址');
+        $start = 2;
+        foreach($apiUrls as $api) {
+            $titleCell = 'A' . $start;
+            $valueCell = 'B' . $start;
+            $start++;
+            $excel->setActiveSheetIndex(0)
+                ->setCellValue($titleCell, $api['title'])
+                ->setCellValue($valueCell, $api['url']);
+        }
 
-        $response = $this->getResponse();
-        $response->setContent($text);
-        return $response;
+        $excel->setActiveSheetIndex(0)
+            ->setCellValue('A' . $start, '接口文档')
+            ->setCellValue('B' . $start, $this->url('app/index', ['action' => 'apidoc', 'suffix' => '.html']));
+
+        $excel->getActiveSheet()->setTitle('微信接口列表');
+        $excel->setActiveSheetIndex(0);
+
+        $excelWriter = \PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+
+        $filename = 'Api_list_' . $weChat->getWxId() . '_' . $client->getIdentifier() . '_' . date('Ymd') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        $excelWriter->save('php://output');
+
+        return $this->getResponse();
     }
 
 

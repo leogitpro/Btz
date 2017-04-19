@@ -12,11 +12,8 @@ use Admin\Entity\Member;
 use Admin\Exception\InvalidArgumentException as AdminInvalidArgumentException;
 use Admin\Service\DepartmentManager;
 use Admin\Service\MemberManager;
-use Application\Exception\InvalidArgumentException;
-use Application\Exception\RuntimeException;
 use Application\Form\ApplyForm;
 use Application\Form\ContactUsForm;
-use Application\Form\TestForm;
 use Mail\Exception\InvalidArgumentException as MailInvalidArgumentException;
 use Mail\Exception\RuntimeException as MailRuntimeException;
 use Ramsey\Uuid\Uuid;
@@ -36,7 +33,7 @@ class IndexController extends AppBaseController
      */
     public function testAction()
     {
-        throw new InvalidArgumentException('test exception on application');
+
     }
 
 
