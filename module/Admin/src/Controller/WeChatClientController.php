@@ -254,9 +254,11 @@ class WeChatClientController extends AdminBaseController
                 ->setCellValue($valueCell, $api['url']);
         }
 
+        $docUrl = $this->getServerPlugin()->domain();
+        $docUrl .= $this->url()->fromRoute('app/index', ['action' => 'apidoc', 'suffix' => '.html']);
         $excel->setActiveSheetIndex(0)
             ->setCellValue('A' . $start, '接口文档')
-            ->setCellValue('B' . $start, $this->url()->fromRoute('app/index', ['action' => 'apidoc', 'suffix' => '.html']));
+            ->setCellValue('B' . $start, $docUrl);
 
         $excel->getActiveSheet()->setTitle('微信接口列表');
         $excel->setActiveSheetIndex(0);
