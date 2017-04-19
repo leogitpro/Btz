@@ -256,7 +256,7 @@ class WeChatClientController extends AdminBaseController
 
         $excel->setActiveSheetIndex(0)
             ->setCellValue('A' . $start, '接口文档')
-            ->setCellValue('B' . $start, $this->url('app/index', ['action' => 'apidoc', 'suffix' => '.html']));
+            ->setCellValue('B' . $start, $this->url()->fromRoute('app/index', ['action' => 'apidoc', 'suffix' => '.html']));
 
         $excel->getActiveSheet()->setTitle('微信接口列表');
         $excel->setActiveSheetIndex(0);

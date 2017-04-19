@@ -68,6 +68,6 @@ $domain = 'http://www.bentuzi.com/weixin/%s/' . $wxId . '/' . $clientId;
 
 <div class="row">
     <div class="col-lg-12">
-        <a class="btn btn-primary" href="<?php echo $this->url('admin/weChatClient', ['action' => 'export', 'key' => $client->getId(), 'suffix' => '.html']); ?>" target="_blank">导出 API 接口清单到 Excel</a>
+        <a class="btn btn-primary" href="<?php echo $this->url('admin/weChatClient', ['action' => 'export', 'key' => $client->getId(), 'suffix' => '.xlsx']); ?>" target="_blank">导出 API 接口清单到 Excel</a>
     </div>
 </div>

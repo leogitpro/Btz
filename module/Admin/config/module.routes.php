@@ -213,7 +213,7 @@ return [
             'constraints' => [
                 'action' => '[a-zA-Z][a-zA-Z0-9_\-]+',
                 'key' => '[a-zA-Z0-9_\-]+',
-                'suffix' => '(/|.html)',
+                'suffix' => '(/|.html|.xlsx)',
             ],
             'defaults' => [
                 'controller' => Controller\WeChatClientController::class,
