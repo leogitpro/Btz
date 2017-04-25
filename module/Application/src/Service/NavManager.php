@@ -56,7 +56,7 @@ class NavManager
         }
 
 
-        //$this->addItem(['id' => 'home', 'label' => '首页', 'link' => $urlHelper('home')]);
+        $this->addItem(['id' => 'home', 'label' => '微信接口服务', 'link' => $urlHelper('home')]);
         $this->addItem(['id' => 'service', 'label' => '服务&产品', 'link' => $urlHelper('service')]);
         $this->addItem(['id' => 'contact', 'label' => '联络我们', 'link' => $urlHelper('contact')]);
         $this->addItem(['id' => 'apidoc', 'label' => '接口文档', 'link' => $urlHelper('app/index', ['action' => 'apidoc', 'suffix' => '.html'])]);

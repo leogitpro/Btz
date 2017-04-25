@@ -60,7 +60,7 @@ class Menu extends AbstractHelper
         $result .= '<span class="icon-bar"></span>';
         $result .= '<span class="icon-bar"></span>';
         $result .= '</button>';
-        $result .= '<a class="navbar-brand" href="/">Bentuzi</a>';
+        //$result .= '<a class="navbar-brand" href="/">KjApi</a>';
         $result .= '</div>';
 
         $result .= '<div class="collapse navbar-collapse navbar-ex1-collapse">';
